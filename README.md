@@ -61,7 +61,7 @@ In order to support these, we have a couple of compile-time definitions:
 TODO
 ----
 
- - Message packetisation and reassembly
+ - Partial packet queue transmit
  - Control messages
  - Message- and packet-buffer pools and preallocation
  - C++ API
