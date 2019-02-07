@@ -38,6 +38,9 @@ struct mctp_binding_serial {
 		STATE_WAIT_FCS2,
 		STATE_WAIT_SYNC_END,
 	} rx_state;
+
+	/* temporary transmit buffer */
+	uint8_t			txbuf[256];
 };
 
 #ifndef container_of
@@ -64,28 +67,29 @@ struct mctp_serial_trailer {
 	uint8_t	flag;
 };
 
-static void mctp_serial_pkt_escape(struct mctp_pktbuf *pkt)
+static size_t mctp_serial_pkt_escape(struct mctp_pktbuf *pkt, uint8_t *buf)
 {
-	uint8_t buf[MCTP_MTU + sizeof(struct mctp_hdr)], *p;
 	uint8_t total_len;
+	uint8_t *p;
 	int i, j;
 
 	total_len = pkt->end - pkt->mctp_hdr_off;
 
 	p = (void *)mctp_pktbuf_hdr(pkt);
 
-	memcpy(buf, p, total_len);
-
 	for (i = 0, j = 0; i < total_len; i++, j++) {
-		uint8_t c = buf[i];
+		uint8_t c = p[i];
 		if (c == 0x7e || c == 0x7d) {
-			p[j] = 0x7d;
-			mctp_pktbuf_alloc_end(pkt, 1);
+			if (buf)
+				buf[j] = 0x7d;
 			j++;
 			c ^= 0x20;
 		}
-		p[j] = c;
+		if (buf)
+			buf[j] = c;
 	}
+
+	return j;
 }
 
 static int mctp_binding_serial_tx(struct mctp_binding *b,
@@ -94,24 +98,35 @@ static int mctp_binding_serial_tx(struct mctp_binding *b,
 	struct mctp_binding_serial *serial = binding_to_serial(b);
 	struct mctp_serial_header *hdr;
 	struct mctp_serial_trailer *tlr;
-	uint8_t len;
+	uint8_t *buf;
+	size_t len;
 
 	/* the length field in the header excludes serial framing
 	 * and escape sequences */
 	len = mctp_pktbuf_size(pkt);
 
-	hdr = mctp_pktbuf_alloc_start(pkt, 3);
+	hdr = (void *)serial->txbuf;
 	hdr->flag = MCTP_SERIAL_FRAMING_FLAG;
 	hdr->revision = MCTP_SERIAL_REVISION;
 	hdr->len = len;
 
-	mctp_serial_pkt_escape(pkt);
+	buf = (void *)(hdr + 1);
 
-	tlr = mctp_pktbuf_alloc_end(pkt, 3);
-	/* todo: trailer FCS */
+	len = mctp_serial_pkt_escape(pkt, NULL);
+	if (len + sizeof(*hdr) + sizeof(*tlr) > sizeof(serial->txbuf))
+		return -1;
+
+	mctp_serial_pkt_escape(pkt, buf);
+
+	buf += len;
+
+	tlr = (void *)buf;
 	tlr->flag = MCTP_SERIAL_FRAMING_FLAG;
+	/* todo: trailer FCS */
+	tlr->fcs_msb = 0;
+	tlr->fcs_lsb = 0;
 
-	write(serial->fd, pkt->data + pkt->start, pkt->end - pkt->start);
+	write(serial->fd, serial->txbuf, sizeof(*hdr) + len + sizeof(*tlr));
 
 	return 0;
 }
@@ -166,7 +181,8 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial,
 		}
 		break;
 	case STATE_WAIT_LEN:
-		if (c > MCTP_MTU || c < sizeof(struct mctp_hdr)) {
+		if (c > (MCTP_MTU + sizeof(struct mctp_hdr))
+				|| c < sizeof(struct mctp_hdr)) {
 			mctp_prdebug("invalid size %d", c);
 			serial->rx_state = STATE_WAIT_SYNC_START;
 		} else {
