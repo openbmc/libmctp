@@ -43,6 +43,7 @@ struct mctp_pktbuf {
 	unsigned char	data[MCTP_PKTBUF_SIZE];
 	uint8_t		start, end;
 	uint8_t		mctp_hdr_off;
+	struct mctp_pktbuf *next;
 };
 
 struct mctp_pktbuf *mctp_pktbuf_alloc(uint8_t len);
