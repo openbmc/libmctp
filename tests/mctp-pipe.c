@@ -22,8 +22,8 @@ int main(void)
 	struct mctp_binding_serial *serial[2];
 	mctp_eid_t eids[] = {8, 9};
 	struct pollfd pollfds[3];
+	int rc, n, mctp_fds[2];
 	struct mctp *mctp[2];
-	int rc, mctp_fds[2];
 
 	mctp[0] = mctp_init();
 	mctp[1] = mctp_init();
@@ -35,7 +35,7 @@ int main(void)
 
 	assert(serial[0] && serial[1]);
 
-	rc = socketpair(AF_UNIX, SOCK_DGRAM, 0, mctp_fds);
+	rc = socketpair(AF_UNIX, SOCK_STREAM, 0, mctp_fds);
 	if (rc)
 		err(EXIT_FAILURE, "Can't create sockets");
 
@@ -53,26 +53,42 @@ int main(void)
 	pollfds[1].events = POLLIN;
 	pollfds[2].fd = STDIN_FILENO;
 	pollfds[2].events = POLLIN;
+	n = 3;
 
 	for (;;) {
 		uint8_t buf[1024];
 
-		rc = poll(pollfds, 3, 0);
+		rc = poll(pollfds, n, -1);
 		if (rc < 0)
 			return EXIT_FAILURE;
 
-		if (pollfds[0].revents)
-			mctp_serial_read(serial[0]);
-		if (pollfds[1].revents)
-			mctp_serial_read(serial[1]);
-		if (pollfds[2].revents) {
-			rc = read(STDIN_FILENO, buf, sizeof(buf));
-			if (rc == 0)
-				break;
-			else if (rc < 0)
-				err(EXIT_FAILURE, "read");
-			mctp_message_tx(mctp[0], eids[1], buf, rc);
+		if (pollfds[0].revents) {
+			rc = mctp_serial_read(serial[0]);
+			if (rc)
+				pollfds[0].fd = -1;
 		}
+
+		if (pollfds[1].revents) {
+			rc = mctp_serial_read(serial[1]);
+			if (rc)
+				pollfds[1].fd = -1;
+		}
+
+		if (n > 2 && pollfds[2].revents) {
+			rc = read(STDIN_FILENO, buf, sizeof(buf));
+			if (rc == 0) {
+				n = 2;
+				close(mctp_fds[0]);
+				pollfds[0].fd = -1;
+			} else if (rc < 0) {
+				err(EXIT_FAILURE, "read");
+			} else {
+				mctp_message_tx(mctp[0], eids[1], buf, rc);
+			}
+		}
+
+		if (n == 2 && pollfds[0].fd < 0 && pollfds[1].fd < 0)
+			break;
 	}
 
 	return EXIT_SUCCESS;
