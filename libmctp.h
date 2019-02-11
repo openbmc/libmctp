@@ -37,7 +37,7 @@ struct mctp_hdr {
 #define MCTP_PKTBUF_BINDING_PAD	2
 
 #define MCTP_PKTBUF_SIZE	(MCTP_PKTBUF_BINDING_PAD + \
-		(sizeof(struct mctp_hdr) + MCTP_MTU)
+		(sizeof(struct mctp_hdr) + MCTP_MTU))
 
 struct mctp_pktbuf {
 	unsigned char	data[MCTP_PKTBUF_SIZE];
