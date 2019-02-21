@@ -247,9 +247,9 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 {
 	struct mctp_bus *bus = binding->bus;
 	struct mctp *mctp = binding->mctp;
+	uint8_t flags, exp_seq, seq, tag;
 	struct mctp_msg_ctx *ctx;
 	struct mctp_hdr *hdr;
-	uint8_t flags, seq, tag;
 	size_t len;
 	void *p;
 	int rc;
@@ -284,10 +284,6 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 			mctp_msg_ctx_reset(ctx);
 		} else {
 			ctx = mctp_msg_ctx_create(mctp, hdr->src, tag);
-			if (((ctx->last_seq + 1) % 4) != seq) {
-				mctp_msg_ctx_drop(ctx);
-				return;
-			}
 		}
 
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
@@ -304,7 +300,12 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		if (!ctx)
 			return;
 
-		if (((ctx->last_seq + 1) % 4) != seq) {
+		exp_seq = (ctx->last_seq + 1) % 4;
+
+		if (exp_seq != seq) {
+			mctp_prdebug(
+				"Sequence number %d does not match expected %d",
+				seq, exp_seq);
 			mctp_msg_ctx_drop(ctx);
 			return;
 		}
@@ -316,6 +317,30 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		}
 
 		mctp_msg_ctx_drop(ctx);
+		break;
+
+	case 0:
+		/* Neither SOM nor EOM */
+		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, tag);
+		if (!ctx)
+			return;
+
+		exp_seq = (ctx->last_seq + 1) % 4;
+		if (exp_seq != seq) {
+			mctp_prdebug(
+				"Sequence number %d does not match expected %d",
+				seq, exp_seq);
+			mctp_msg_ctx_drop(ctx);
+			return;
+		}
+
+		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
+		if (rc) {
+			mctp_msg_ctx_drop(ctx);
+			return;
+		}
+		ctx->last_seq = seq;
+
 		break;
 	}
 }
