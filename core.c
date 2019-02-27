@@ -149,7 +149,7 @@ static struct mctp_msg_ctx *mctp_msg_ctx_lookup(struct mctp *mctp,
 static struct mctp_msg_ctx *mctp_msg_ctx_create(struct mctp *mctp,
 		uint8_t src, uint8_t tag)
 {
-	struct mctp_msg_ctx *ctx;
+	struct mctp_msg_ctx *ctx = NULL;
 	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(mctp->msg_ctxs); i++) {
