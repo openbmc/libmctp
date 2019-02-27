@@ -3,6 +3,7 @@
 #ifndef _LIBMCTP_H
 #define _LIBMCTP_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 typedef uint8_t mctp_eid_t;
@@ -86,6 +87,8 @@ struct mctp_binding {
 	int		(*tx)(struct mctp_binding *binding,
 				struct mctp_pktbuf *pkt);
 };
+
+void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable);
 
 void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
 

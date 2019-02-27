@@ -20,6 +20,7 @@
 struct mctp_bus {
 	mctp_eid_t		eid;
 	struct mctp_binding	*binding;
+	bool			tx_enabled;
 
 	/* todo: routing */
 };
@@ -322,13 +323,48 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 static int mctp_packet_tx(struct mctp_bus *bus,
 		struct mctp_pktbuf *pkt)
 {
+	if (!bus->tx_enabled)
+		return -1;
+
+	mctp_prdebug("sending pkt, len %d",
+			mctp_pktbuf_size(pkt));
+
 	return bus->binding->tx(bus->binding, pkt);
+}
+
+static void mctp_send_tx_queue(struct mctp *mctp,
+		struct mctp_bus *bus)
+{
+	struct mctp_pktbuf *pkt;
+
+	while ((pkt = mctp->tx_queue_head)) {
+		int rc;
+
+		rc = mctp_packet_tx(bus, pkt);
+		if (rc)
+			break;
+
+		mctp->tx_queue_head = pkt->next;
+		mctp_pktbuf_free(pkt);
+	}
+
+	if (!mctp->tx_queue_head)
+		mctp->tx_queue_tail = NULL;
+
+}
+
+void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
+{
+	struct mctp_bus *bus = binding->bus;
+	bus->tx_enabled = enable;
+	if (enable)
+		mctp_send_tx_queue(binding->mctp, bus);
 }
 
 int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 		void *msg, size_t msg_len)
 {
-	struct mctp_pktbuf *pkt, *tmp;
+	struct mctp_pktbuf *pkt;
 	struct mctp_hdr *hdr;
 	struct mctp_bus *bus;
 	size_t pkt_len, p;
@@ -366,18 +402,7 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 		p += pkt_len;
 	}
 
-	/* send queued packets */
-	for (pkt = mctp->tx_queue_head; pkt;) {
-		mctp_prdebug("sending pkt, len %d",
-				mctp_pktbuf_size(pkt));
-		mctp_packet_tx(bus, pkt);
-		tmp = pkt->next;
-		mctp_pktbuf_free(pkt);
-		pkt = tmp;
-	}
-
-	mctp->tx_queue_tail = NULL;
-	mctp->tx_queue_head = NULL;
+	mctp_send_tx_queue(mctp, bus);
 
 	return 0;
 }

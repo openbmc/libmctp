@@ -288,6 +288,7 @@ void mctp_serial_register_bus(struct mctp_binding_serial *serial,
 {
 	assert(serial->fd >= 0);
 	mctp_register_bus(mctp, &serial->binding, eid);
+	mctp_binding_set_tx_enabled(&serial->binding, true);
 }
 
 struct mctp_binding_serial *mctp_serial_init(void)
