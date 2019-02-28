@@ -185,14 +185,8 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial,
 			mctp_prdebug("invalid size %d", c);
 			serial->rx_state = STATE_WAIT_SYNC_START;
 		} else {
-			uint8_t *p;
-
 			mctp_serial_start_packet(serial, 0);
 			pkt = serial->rx_pkt;
-			p = mctp_pktbuf_alloc_start(pkt, 3);
-			p[0] = MCTP_SERIAL_FRAMING_FLAG;
-			p[1] = MCTP_SERIAL_REVISION;
-			p[2] = c;
 			serial->rx_exp_len = c;
 			serial->rx_state = STATE_DATA;
 		}
