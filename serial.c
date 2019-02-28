@@ -138,7 +138,7 @@ static void mctp_serial_finish_packet(struct mctp_binding_serial *serial,
 	assert(pkt);
 
 	if (valid)
-		mctp_bus_rx(serial->mctp, serial->bus_id, pkt);
+		mctp_bus_rx(serial->mctp, &serial->binding, pkt);
 
 	mctp_pktbuf_free(pkt);
 	serial->rx_pkt = NULL;
@@ -295,7 +295,7 @@ void mctp_serial_register_bus(struct mctp_binding_serial *serial,
 {
 	assert(serial->fd >= 0);
 	serial->mctp = mctp;
-	serial->bus_id = mctp_register_bus(mctp, &serial->binding, eid);
+	mctp_register_bus(mctp, &serial->binding, eid);
 }
 
 struct mctp_binding_serial *mctp_serial_init(void)

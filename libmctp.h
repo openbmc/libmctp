@@ -57,11 +57,15 @@ int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, uint8_t len);
 
 /* MCTP core */
 struct mctp;
+struct mctp_bus;
 struct mctp_binding;
 
 struct mctp *mctp_init(void);
 
-unsigned long mctp_register_bus(struct mctp *mctp,
+/* Register a binding to the MCTP core, and creates a bus (populating
+ * binding->bus).
+ */
+int mctp_register_bus(struct mctp *mctp,
 		struct mctp_binding *binding,
 		mctp_eid_t eid);
 
@@ -77,11 +81,12 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 struct mctp_binding {
 	const char	*name;
 	uint8_t		version;
+	struct mctp_bus	*bus;
 	int		(*tx)(struct mctp_binding *binding,
 				struct mctp_pktbuf *pkt);
 };
 
-void mctp_bus_rx(struct mctp *mctp, unsigned long bus_id,
+void mctp_bus_rx(struct mctp *mctp, struct mctp_binding *binding,
 		struct mctp_pktbuf *pkt);
 
 /* environment-specific allocation */

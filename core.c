@@ -229,26 +229,30 @@ static struct mctp_bus *find_bus_for_eid(struct mctp *mctp,
 	return &mctp->busses[0];
 }
 
-unsigned long mctp_register_bus(struct mctp *mctp,
+int mctp_register_bus(struct mctp *mctp,
 		struct mctp_binding *binding,
 		mctp_eid_t eid)
 {
+	/* todo: multiple busses */
 	assert(!mctp->busses[0].binding);
 	mctp->busses[0].binding = binding;
 	mctp->busses[0].eid = eid;
+	binding->bus = &mctp->busses[0];
 	return 0;
 }
 
-void mctp_bus_rx(struct mctp *mctp, unsigned long bus_id,
+void mctp_bus_rx(struct mctp *mctp, struct mctp_binding *binding,
 		struct mctp_pktbuf *pkt)
 {
-	struct mctp_bus *bus = &mctp->busses[bus_id];
+	struct mctp_bus *bus = binding->bus;
 	struct mctp_msg_ctx *ctx;
 	struct mctp_hdr *hdr;
 	uint8_t flags, seq, tag;
 	size_t len;
 	void *p;
 	int rc;
+
+	assert(bus);
 
 	hdr = mctp_pktbuf_hdr(pkt);
 
