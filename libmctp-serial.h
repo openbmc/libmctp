@@ -3,6 +3,10 @@
 #ifndef _LIBMCTP_SERIAL_H
 #define _LIBMCTP_SERIAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "libmctp.h"
 
 struct mctp_binding_serial;
@@ -15,5 +19,9 @@ int mctp_serial_read(struct mctp_binding_serial *serial);
 int mctp_serial_open_path(struct mctp_binding_serial *serial,
 		const char *path);
 void mctp_serial_open_fd(struct mctp_binding_serial *serial, int fd);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _LIBMCTP_SERIAL_H */
