@@ -82,12 +82,12 @@ struct mctp_binding {
 	const char	*name;
 	uint8_t		version;
 	struct mctp_bus	*bus;
+	struct mctp	*mctp;
 	int		(*tx)(struct mctp_binding *binding,
 				struct mctp_pktbuf *pkt);
 };
 
-void mctp_bus_rx(struct mctp *mctp, struct mctp_binding *binding,
-		struct mctp_pktbuf *pkt);
+void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
 
 /* environment-specific allocation */
 void mctp_set_alloc_ops(void *(*alloc)(size_t),

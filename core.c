@@ -238,13 +238,14 @@ int mctp_register_bus(struct mctp *mctp,
 	mctp->busses[0].binding = binding;
 	mctp->busses[0].eid = eid;
 	binding->bus = &mctp->busses[0];
+	binding->mctp = mctp;
 	return 0;
 }
 
-void mctp_bus_rx(struct mctp *mctp, struct mctp_binding *binding,
-		struct mctp_pktbuf *pkt)
+void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 {
 	struct mctp_bus *bus = binding->bus;
+	struct mctp *mctp = binding->mctp;
 	struct mctp_msg_ctx *ctx;
 	struct mctp_hdr *hdr;
 	uint8_t flags, seq, tag;
@@ -318,8 +319,7 @@ void mctp_bus_rx(struct mctp *mctp, struct mctp_binding *binding,
 	}
 }
 
-static int mctp_packet_tx(struct mctp *mctp __attribute__((unused)),
-		struct mctp_bus *bus,
+static int mctp_packet_tx(struct mctp_bus *bus,
 		struct mctp_pktbuf *pkt)
 {
 	return bus->binding->tx(bus->binding, pkt);
@@ -370,7 +370,7 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 	for (pkt = mctp->tx_queue_head; pkt;) {
 		mctp_prdebug("sending pkt, len %d",
 				mctp_pktbuf_size(pkt));
-		mctp_packet_tx(mctp, bus, pkt);
+		mctp_packet_tx(bus, pkt);
 		tmp = pkt->next;
 		mctp_pktbuf_free(pkt);
 		pkt = tmp;
