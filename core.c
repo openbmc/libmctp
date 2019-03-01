@@ -22,6 +22,9 @@ struct mctp_bus {
 	struct mctp_binding	*binding;
 	bool			tx_enabled;
 
+	struct mctp_pktbuf	*tx_queue_head;
+	struct mctp_pktbuf	*tx_queue_tail;
+
 	/* todo: routing */
 };
 
@@ -37,9 +40,6 @@ struct mctp_msg_ctx {
 struct mctp {
 	/* todo: multiple busses */
 	struct mctp_bus	busses[1];
-
-	struct mctp_pktbuf	*tx_queue_head;
-	struct mctp_pktbuf	*tx_queue_tail;
 
 	/* Message RX callback */
 	mctp_rx_fn		message_rx;
@@ -332,24 +332,23 @@ static int mctp_packet_tx(struct mctp_bus *bus,
 	return bus->binding->tx(bus->binding, pkt);
 }
 
-static void mctp_send_tx_queue(struct mctp *mctp,
-		struct mctp_bus *bus)
+static void mctp_send_tx_queue(struct mctp_bus *bus)
 {
 	struct mctp_pktbuf *pkt;
 
-	while ((pkt = mctp->tx_queue_head)) {
+	while ((pkt = bus->tx_queue_head)) {
 		int rc;
 
 		rc = mctp_packet_tx(bus, pkt);
 		if (rc)
 			break;
 
-		mctp->tx_queue_head = pkt->next;
+		bus->tx_queue_head = pkt->next;
 		mctp_pktbuf_free(pkt);
 	}
 
-	if (!mctp->tx_queue_head)
-		mctp->tx_queue_tail = NULL;
+	if (!bus->tx_queue_head)
+		bus->tx_queue_tail = NULL;
 
 }
 
@@ -358,7 +357,7 @@ void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
 	struct mctp_bus *bus = binding->bus;
 	bus->tx_enabled = enable;
 	if (enable)
-		mctp_send_tx_queue(binding->mctp, bus);
+		mctp_send_tx_queue(bus);
 }
 
 int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
@@ -393,16 +392,16 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 		memcpy(mctp_pktbuf_data(pkt), msg + p, pkt_len);
 
 		/* add to tx queue */
-		if (mctp->tx_queue_tail)
-			mctp->tx_queue_tail->next = pkt;
+		if (bus->tx_queue_tail)
+			bus->tx_queue_tail->next = pkt;
 		else
-			mctp->tx_queue_head = pkt;
-		mctp->tx_queue_tail = pkt;
+			bus->tx_queue_head = pkt;
+		bus->tx_queue_tail = pkt;
 
 		p += pkt_len;
 	}
 
-	mctp_send_tx_queue(mctp, bus);
+	mctp_send_tx_queue(bus);
 
 	return 0;
 }
