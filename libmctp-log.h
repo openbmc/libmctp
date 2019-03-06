@@ -34,11 +34,8 @@
 
 #elif defined(MCTP_LOG_CUSTOM)
 
-#include <config.h>
-
-#if !defined(mctp_prlog)
-#error Custom logging implementation enabled, but no definition for mctp_prlog
-#endif
+extern void mctp_prlog(int level, const char *fmt, ...)
+	__attribute__((format(printf, 2, 3)));
 
 
 #else
