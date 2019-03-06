@@ -266,7 +266,7 @@ void mctp_bus_rx(struct mctp *mctp, unsigned long bus_id,
 		 * no need to create a message context */
 		len = pkt->end - pkt->mctp_hdr_off - sizeof(struct mctp_hdr);
 		p = pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr),
-		mctp->message_rx(bus->eid, mctp->message_rx_data, p, len);
+		mctp->message_rx(hdr->src, mctp->message_rx_data, p, len);
 		break;
 
 	case MCTP_HDR_FLAG_SOM:
