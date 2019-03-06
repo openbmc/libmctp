@@ -9,9 +9,11 @@ struct {
 	void	(*free)(void *);
 	void	*(*realloc)(void *, size_t);
 } alloc_ops = {
+#ifndef MCTP_NO_DEFAULT_ALLOC
 	malloc,
 	free,
 	realloc,
+#endif
 };
 
 /* internal-only allocation functions */

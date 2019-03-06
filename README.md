@@ -79,6 +79,9 @@ In order to support these, we have a couple of compile-time definitions:
     - `MCTP_LOG_CUSTOM`: provide your own macro for logging, of
       the format: ```#define mctp_prlog(level, fmt, ...) (....)```
 
+ - `MCTP_NO_DEFAULT_ALLOC`: do not set default allocator functions (malloc,
+   free, realloc), and require the use of `mctp_set_alloc_ops`.
+
 TODO
 ----
 
