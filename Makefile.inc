@@ -1,5 +1,8 @@
 LIBMCTP_DIR ?= libmctp/
-LIBMCTP_OBJS = core.o alloc.o serial.o
+LIBMCTP_OBJS = core.o alloc.o
+LIBMCTP_BINDINGS ?= serial
+
+LIBMCTP_OBJS += $(LIBMCTP_BINDINGS:%=%.o)
 
 LIBMCTP = $(LIBMCTP_DIR)libmctp.a
 
