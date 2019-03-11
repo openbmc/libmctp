@@ -3,6 +3,10 @@
 #ifndef _LIBMCTP_H
 #define _LIBMCTP_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -98,5 +102,9 @@ void mctp_set_alloc_ops(void *(*alloc)(size_t),
 		void (*free)(void *),
 		void *(realloc)(void *, size_t));
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _LIBMCTP_H */
