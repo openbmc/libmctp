@@ -13,7 +13,7 @@ all: $(LIBMCTP)
 libmctp.a:
 	$(AR) rcsTPD $@ $^
 
-tests/%: tests/%.o libmctp.a
+utils/%: utils/%.o libmctp.a
 	$(LINK.o) -o $@ $^
 
 clean:
