@@ -18,7 +18,7 @@ utils/%: utils/%.o libmctp.a
 
 test_util_objs = tests/test-utils.o
 
-tests = test_eid
+tests = test_eid test_seq
 
 test_targets = $(tests:%=tests/%)
 
