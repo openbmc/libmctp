@@ -16,6 +16,22 @@ libmctp.a:
 utils/%: utils/%.o libmctp.a
 	$(LINK.o) -o $@ $^
 
+test_util_objs = tests/test-utils.o
+
+tests =
+
+test_targets = $(tests:%=tests/%)
+
+$(test_targets): $(test_util_objs) libmctp.a
+
+$(test_targets): %: %.o
+	$(LINK.o) -o $@ $^
+
+check: $(test_targets)
+	for t in $(test_targets); do echo $$t; $$t || exit 1; done
+
+.PHONY: check
+
 clean:
 	rm -f $(LIBMCTP)
 	rm -f $(LIBMCTP_OBJS)
