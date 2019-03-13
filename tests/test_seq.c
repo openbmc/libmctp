@@ -72,6 +72,26 @@ struct test {
 		.exp_rx_count = 1,
 		.exp_rx_len = 3,
 	},
+	{
+		/* two packets, wrapping sequence numbers */
+		.n_packets = 2,
+		.flags_seq_tags = {
+			SEQ(3) | MCTP_HDR_FLAG_SOM,
+			SEQ(0) | MCTP_HDR_FLAG_EOM,
+		},
+		.exp_rx_count = 1,
+		.exp_rx_len = 2,
+	},
+	{
+		/* two packets, invalid sequence number */
+		.n_packets = 2,
+		.flags_seq_tags = {
+			SEQ(1) | MCTP_HDR_FLAG_SOM,
+			SEQ(3) | MCTP_HDR_FLAG_EOM,
+		},
+		.exp_rx_count = 0,
+		.exp_rx_len = 0,
+	},
 };
 
 static void run_one_test(struct test_ctx *ctx, struct test *test)
