@@ -312,7 +312,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
 		if (!rc) {
-			mctp->message_rx(bus->eid, mctp->message_rx_data,
+			mctp->message_rx(ctx->src, mctp->message_rx_data,
 					ctx->buf, ctx->buf_size);
 		}
 
