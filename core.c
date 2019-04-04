@@ -72,6 +72,7 @@ struct mctp_pktbuf *mctp_pktbuf_alloc(uint8_t len)
 	buf->start = MCTP_PKTBUF_BINDING_PAD;
 	buf->end = buf->start + len;
 	buf->mctp_hdr_off = buf->start;
+	buf->next = NULL;
 
 	return buf;
 }
