@@ -5,12 +5,16 @@
 #include "libmctp.h"
 #include "libmctp-alloc.h"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 struct {
 	void	*(*m_alloc)(size_t);
 	void	(*m_free)(void *);
 	void	*(*m_realloc)(void *, size_t);
 } alloc_ops = {
-#ifndef MCTP_NO_DEFAULT_ALLOC
+#ifdef MCTP_DEFAULT_ALLOC
 	malloc,
 	free,
 	realloc,

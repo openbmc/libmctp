@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -101,6 +102,11 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
 void mctp_set_alloc_ops(void *(*alloc)(size_t),
 		void (*free)(void *),
 		void *(realloc)(void *, size_t));
+
+/* environment-specific logging */
+void mctp_set_log_stdio(int level);
+void mctp_set_log_syslog(void);
+void mctp_set_log_custom(void (*fn)(int, const char *, va_list));
 
 
 #ifdef __cplusplus

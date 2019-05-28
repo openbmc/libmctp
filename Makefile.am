@@ -1,11 +1,8 @@
 ACLOCAL_AMFLAGS = -I m4
 
-# standalone compilation uses stdio
-libmctp_la_CPPFLAGS = -DMCTP_LOG_STDERR -DMCTP_FILEIO
-
 lib_LTLIBRARIES = libmctp.la
-libmctp_la_SOURCES = core.c alloc.c \
-		     libmctp.h libmctp-alloc.h
+libmctp_la_SOURCES = core.c alloc.c log.c \
+		     libmctp.h libmctp-alloc.h libmctp-log.h
 
 if LIBMCTP_BINDING_serial
 libmctp_la_SOURCES += serial.c libmctp-serial.h

@@ -6,7 +6,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef MCTP_FILEIO
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef MCTP_HAVE_FILEIO
 #include <fcntl.h>
 #endif
 
@@ -243,7 +247,7 @@ static void __attribute__((used)) mctp_rx_consume(struct mctp_binding_serial *se
 		mctp_rx_consume_one(serial, *(uint8_t *)(buf + i));
 }
 
-#ifdef MCTP_FILEIO
+#ifdef MCTP_HAVE_FILEIO
 int mctp_serial_read(struct mctp_binding_serial *serial)
 {
 	ssize_t len;

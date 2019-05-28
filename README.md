@@ -37,7 +37,7 @@ Integration
 The libmctp code is intended to be integrated into other codebases by two
 methods:
 
- 1. as a simple library (`libmctp.a`), which can be compiled separately
+ 1. as a simple library (`libmctp.{a,so}`) which can be compiled separately
     and linked into the containing project
 
  2. as a set of sources to be included into the containing project (either
@@ -64,23 +64,16 @@ but the main targets are:
 For the latter, we need to support customisation of the functions that libmctp
 uses (for example, POSIX file IO is not available).
 
-In order to support these, we have a couple of compile-time definitions:
+In order to support these, we have a few compile-time definitions:
 
- - `MCTP_FILEIO`: define if POSIX file io is available, allowing the
+ - `MCTP_HAVE_FILEIO`: define if POSIX file io is available, allowing the
    serial hardware binding to access char devices for IO.
 
- - `MCTP_LOG_`: allows selection of a logging backend. Currently available
-   are:
+ - `MCTP_HAVE_SYSLOG`: allow logging to syslog, through the `vsyslog`
+   call.
 
-    - `MCTP_LOG_STDERR`: use `fprintf(stderr, ...)` for log output
-
-    - `MCTP_LOG_SYSLOG`: use `syslog()` for log output
-
-    - `MCTP_LOG_CUSTOM`: provide your own macro for logging, of
-      the format: ```#define mctp_prlog(level, fmt, ...) (....)```
-
- - `MCTP_NO_DEFAULT_ALLOC`: do not set default allocator functions (malloc,
-   free, realloc), and require the use of `mctp_set_alloc_ops`.
+ - `MCTP_DEFAULT_ALLOC`: set default allocator functions (malloc, free,
+   realloc), so that applications do not have to provide their own.
 
 TODO
 ----
