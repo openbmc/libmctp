@@ -476,6 +476,8 @@ int main(int argc, char * const *argv)
 		return EXIT_FAILURE;
 	}
 
+	mctp_set_log_stdio(ctx->verbose ? MCTP_LOG_DEBUG : MCTP_LOG_WARNING);
+
 	ctx->mctp = mctp_init();
 	assert(ctx->mctp);
 
