@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
+
 #ifndef _MCTP_TESTS_TEST_UTILS_H
 #define _MCTP_TESTS_TEST_UTILS_H
 

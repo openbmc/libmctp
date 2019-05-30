@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
+
 #define _GNU_SOURCE
 
 #include <assert.h>
