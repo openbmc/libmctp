@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-#include "libmctp.h"
+#include <libmctp.h>
 
 struct mctp_binding_serial;
 

@@ -2,14 +2,17 @@ ACLOCAL_AMFLAGS = -I m4
 
 lib_LTLIBRARIES = libmctp.la
 libmctp_la_SOURCES = core.c alloc.c log.c \
-		     libmctp.h libmctp-alloc.h libmctp-log.h
+		     libmctp-alloc.h libmctp-log.h
+include_HEADERS = libmctp.h
 
 if LIBMCTP_BINDING_serial
-libmctp_la_SOURCES += serial.c libmctp-serial.h
+libmctp_la_SOURCES += serial.c
+include_HEADERS += libmctp-serial.h
 endif
 
 if LIBMCTP_BINDING_astlpc
-libmctp_la_SOURCES += astlpc.c libmctp-astlpc.h
+libmctp_la_SOURCES += astlpc.c
+include_HEADERS += libmctp-astlpc.h
 endif
 
 bin_PROGRAMS = utils/mctp-demux-daemon
