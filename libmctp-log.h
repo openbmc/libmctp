@@ -5,14 +5,6 @@
 
 /* libmctp-internal logging */
 
-/* these should match the syslog-standard LOG_* definitions, for
- * easier use with syslog */
-#define MCTP_LOG_ERR		3
-#define MCTP_LOG_WARNING	4
-#define MCTP_LOG_NOTICE		5
-#define MCTP_LOG_INFO		6
-#define MCTP_LOG_DEBUG		7
-
 void mctp_prlog(int level, const char *fmt, ...)
 	__attribute__((format(printf, 2, 3)));
 

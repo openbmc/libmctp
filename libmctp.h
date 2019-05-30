@@ -104,9 +104,18 @@ void mctp_set_alloc_ops(void *(*alloc)(size_t),
 		void *(realloc)(void *, size_t));
 
 /* environment-specific logging */
+
 void mctp_set_log_stdio(int level);
 void mctp_set_log_syslog(void);
 void mctp_set_log_custom(void (*fn)(int, const char *, va_list));
+
+/* these should match the syslog-standard LOG_* definitions, for
+ * easier use with syslog */
+#define MCTP_LOG_ERR		3
+#define MCTP_LOG_WARNING	4
+#define MCTP_LOG_NOTICE		5
+#define MCTP_LOG_INFO		6
+#define MCTP_LOG_DEBUG		7
 
 
 #ifdef __cplusplus
