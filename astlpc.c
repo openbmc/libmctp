@@ -88,9 +88,19 @@ enum {
 static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 		uint8_t status)
 {
+	uint8_t buf[2];
 	int rc;
 
-	rc = pwrite(astlpc->kcs_fd, &status, 1, KCS_REG_STATUS);
+	/* Since we're setting the status register, we want the other endpoint
+	 * to be interrupted. However, some hardware may only raise a host-side
+	 * interrupt on an ODR event.
+	 * So, write a dummy value of 0xff to ODR, which will ensure that an
+	 * interrupt is triggered, and can be ignored by the host.
+	 */
+	buf[KCS_REG_DATA] = 0xff;
+	buf[KCS_REG_STATUS] = status;
+
+	rc = pwrite(astlpc->kcs_fd, buf, 2, 0);
 	if (rc != 1) {
 		mctp_prwarn("KCS status write failed");
 		return -1;
@@ -217,6 +227,9 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 		break;
 	case 0x2:
 		mctp_astlpc_tx_complete(astlpc);
+		break;
+	case 0xff:
+		/* reserved value for dummy data writes; do nothing */
 		break;
 	default:
 		mctp_prwarn("unknown message 0x%x", data);
