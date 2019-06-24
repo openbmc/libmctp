@@ -281,7 +281,7 @@ static int socket_process(struct ctx *ctx)
 static int client_process_recv(struct ctx *ctx, int idx)
 {
 	struct client *client = &ctx->clients[idx];
-	uint8_t buf[4096];
+	uint8_t eid, buf[4096];
 	int rc;
 
 	/* are we waiting for a type message? */
@@ -309,20 +309,22 @@ static int client_process_recv(struct ctx *ctx, int idx)
 		goto out_close;
 	}
 
-	if (rc == 0) {
+	if (rc <= 0) {
 		rc = -1;
 		goto out_close;
 	}
 
-	if (rc > 0) {
-		uint8_t eid = buf[0];
-		if (ctx->verbose)
-			fprintf(stderr,
-				"client[%d] sent message: dest 0x%02x len %d\n",
-				idx, eid, rc - 1);
+	if (ctx->verbose)
+		fprintf(stderr,
+			"client[%d] sent message: dest 0x%02x len %d\n",
+			idx, eid, rc - 1);
 
+	eid = buf[0];
+
+	if (eid == ctx->local_eid)
+		rx_message(eid, ctx, buf + 1, rc - 1);
+	else
 		tx_message(ctx, eid, buf + 1, rc - 1);
-	}
 
 	return 0;
 
