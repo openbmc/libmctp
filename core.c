@@ -393,11 +393,12 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 	struct mctp_hdr *hdr;
 	struct mctp_bus *bus;
 	size_t pkt_len, p;
+	int i;
 
 	bus = find_bus_for_eid(mctp, eid);
 
 	/* queue up packets, each of max MCTP_MTU size */
-	for (p = 0; p < msg_len; ) {
+	for (p = 0, i = 0; p < msg_len; i++) {
 		pkt_len = msg_len - p;
 		if (pkt_len > MCTP_MTU)
 			pkt_len = MCTP_MTU;
@@ -409,11 +410,15 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 		hdr->ver = bus->binding->version & 0xf;
 		hdr->dest = eid;
 		hdr->src = bus->eid;
-		hdr->flags_seq_tag = MCTP_HDR_FLAG_SOM |
-			MCTP_HDR_FLAG_EOM |
-			(0 << MCTP_HDR_SEQ_SHIFT) |
-			MCTP_HDR_FLAG_TO |
+		hdr->flags_seq_tag = MCTP_HDR_FLAG_TO |
 			(0 << MCTP_HDR_TAG_SHIFT);
+
+		if (i == 0)
+			hdr->flags_seq_tag |= MCTP_HDR_FLAG_SOM;
+		if (p + pkt_len >= msg_len)
+			hdr->flags_seq_tag |= MCTP_HDR_FLAG_EOM;
+		hdr->flags_seq_tag |=
+			(i & MCTP_HDR_SEQ_MASK) << MCTP_HDR_SEQ_SHIFT;
 
 		memcpy(mctp_pktbuf_data(pkt), msg + p, pkt_len);
 
