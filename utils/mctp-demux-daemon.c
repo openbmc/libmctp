@@ -314,12 +314,13 @@ static int client_process_recv(struct ctx *ctx, int idx)
 		goto out_close;
 	}
 
+	eid = buf[0];
+
 	if (ctx->verbose)
 		fprintf(stderr,
 			"client[%d] sent message: dest 0x%02x len %d\n",
 			idx, eid, rc - 1);
 
-	eid = buf[0];
 
 	if (eid == ctx->local_eid)
 		rx_message(eid, ctx, buf + 1, rc - 1);
