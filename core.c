@@ -167,6 +167,7 @@ static struct mctp_msg_ctx *mctp_msg_ctx_create(struct mctp *mctp,
 
 	ctx->src = src;
 	ctx->tag = tag;
+	ctx->buf_size = 0;
 
 	return ctx;
 }
