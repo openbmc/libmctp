@@ -44,6 +44,8 @@ struct ctx {
 	struct binding	*binding;
 	bool		verbose;
 	int		local_eid;
+	void		*buf;
+	size_t		buf_size;
 
 	int		sock;
 	struct pollfd	*pollfds;
@@ -281,7 +283,8 @@ static int socket_process(struct ctx *ctx)
 static int client_process_recv(struct ctx *ctx, int idx)
 {
 	struct client *client = &ctx->clients[idx];
-	uint8_t eid, buf[4096];
+	uint8_t eid;
+	ssize_t len;
 	int rc;
 
 	/* are we waiting for a type message? */
@@ -302,8 +305,25 @@ static int client_process_recv(struct ctx *ctx, int idx)
 		return 0;
 	}
 
-	/* todo: size detection through MSG_TRUNC or MSG_PEEK */
-	rc = recv(client->sock, buf, sizeof(buf), 0);
+	len = recv(client->sock, NULL, 0, MSG_PEEK | MSG_TRUNC);
+	if (len < 0) {
+		warn("can't receive(peek) from client");
+		goto out_close;
+	}
+
+	if (len > ctx->buf_size) {
+		void *tmp;
+
+		tmp = realloc(ctx->buf, len);
+		if (!tmp) {
+			warn("can't allocate for incoming message");
+			goto out_close;
+		}
+		ctx->buf = tmp;
+		ctx->buf_size = len;
+	}
+
+	rc = recv(client->sock, ctx->buf, ctx->buf_size, 0);
 	if (rc < 0) {
 		warn("can't receive from client");
 		goto out_close;
@@ -314,7 +334,7 @@ static int client_process_recv(struct ctx *ctx, int idx)
 		goto out_close;
 	}
 
-	eid = buf[0];
+	eid = *(uint8_t *)ctx->buf;
 
 	if (ctx->verbose)
 		fprintf(stderr,
@@ -323,9 +343,9 @@ static int client_process_recv(struct ctx *ctx, int idx)
 
 
 	if (eid == ctx->local_eid)
-		rx_message(eid, ctx, buf + 1, rc - 1);
+		rx_message(eid, ctx, ctx->buf + 1, rc - 1);
 	else
-		tx_message(ctx, eid, buf + 1, rc - 1);
+		tx_message(ctx, eid, ctx->buf + 1, rc - 1);
 
 	return 0;
 
@@ -478,6 +498,10 @@ int main(int argc, char * const *argv)
 		usage(argv[0]);
 		return EXIT_FAILURE;
 	}
+
+	/* setup initial buffer */
+	ctx->buf_size = 4096;
+	ctx->buf = malloc(ctx->buf_size);
 
 	mctp_set_log_stdio(ctx->verbose ? MCTP_LOG_DEBUG : MCTP_LOG_WARNING);
 
