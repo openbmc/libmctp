@@ -31,41 +31,33 @@ struct mctp_hdr {
 #define MCTP_HDR_TAG_SHIFT	(0)
 #define MCTP_HDR_TAG_MASK	(0x7)
 
-/* Maximum size of *payload* data in a MCTP packet
- * @todo: dynamic sixing based on channel implementation.
- */
-#define MCTP_MTU	64
+/* Baseline maximum size of a MCTP packet */
+#define MCTP_BMTU_PAYLOAD	64
+#define MCTP_BMTU		(MCTP_BMTU_PAYLOAD + sizeof(struct mctp_hdr))
 
 /* packet buffers */
 
-/* Allow a little space before the MCTP header in the packet, for bindings that
- * may add their own header
- */
-#define MCTP_PKTBUF_BINDING_PAD	2
-
-#define MCTP_PKTBUF_SIZE	(MCTP_PKTBUF_BINDING_PAD + \
-		(sizeof(struct mctp_hdr) + MCTP_MTU))
-
 struct mctp_pktbuf {
-	unsigned char	data[MCTP_PKTBUF_SIZE];
-	uint8_t		start, end;
-	uint8_t		mctp_hdr_off;
+	size_t		start, end, size;
+	size_t		mctp_hdr_off;
 	struct mctp_pktbuf *next;
+	unsigned char	data[];
 };
 
-struct mctp_pktbuf *mctp_pktbuf_alloc(uint8_t len);
+struct mctp_binding;
+
+struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *hw, size_t len);
 void mctp_pktbuf_free(struct mctp_pktbuf *pkt);
 struct mctp_hdr *mctp_pktbuf_hdr(struct mctp_pktbuf *pkt);
 void *mctp_pktbuf_data(struct mctp_pktbuf *pkt);
 uint8_t mctp_pktbuf_size(struct mctp_pktbuf *pkt);
-void *mctp_pktbuf_alloc_start(struct mctp_pktbuf *pkt, uint8_t size);
-void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, uint8_t size);
-int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, uint8_t len);
+void *mctp_pktbuf_alloc_start(struct mctp_pktbuf *pkt, size_t size);
+void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, size_t size);
+int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, size_t len);
 
 /* MCTP core */
 struct mctp;
 struct mctp_bus;
-struct mctp_binding;
 
 struct mctp *mctp_init(void);
 
@@ -90,6 +82,8 @@ struct mctp_binding {
 	uint8_t		version;
 	struct mctp_bus	*bus;
 	struct mctp	*mctp;
+	int		pkt_size;
+	int		pkt_pad;
 	int		(*tx)(struct mctp_binding *binding,
 				struct mctp_pktbuf *pkt);
 };

@@ -178,12 +178,12 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 		return;
 	}
 
-	if (len > MCTP_MTU + sizeof(struct mctp_hdr)) {
+	if (len > astlpc->binding.pkt_size) {
 		mctp_prwarn("invalid RX len 0x%x", len);
 		return;
 	}
 
-	pkt = mctp_pktbuf_alloc(len);
+	pkt = mctp_pktbuf_alloc(&astlpc->binding, len);
 	if (!pkt)
 		goto out_complete;
 
@@ -335,6 +335,8 @@ struct mctp_binding_astlpc *mctp_astlpc_init(void)
 	astlpc->binding.name = "astlpc";
 	astlpc->binding.version = 1;
 	astlpc->binding.tx = mctp_binding_astlpc_tx;
+	astlpc->binding.pkt_size = MCTP_BMTU;
+	astlpc->binding.pkt_pad = 0;
 
 	rc = mctp_astlpc_init_lpc(astlpc);
 	if (rc) {

@@ -149,7 +149,7 @@ static void mctp_serial_finish_packet(struct mctp_binding_serial *serial,
 static void mctp_serial_start_packet(struct mctp_binding_serial *serial,
 		uint8_t len)
 {
-	serial->rx_pkt = mctp_pktbuf_alloc(len);
+	serial->rx_pkt = mctp_pktbuf_alloc(&serial->binding, len);
 }
 
 static void mctp_rx_consume_one(struct mctp_binding_serial *serial,
@@ -183,8 +183,8 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial,
 		}
 		break;
 	case STATE_WAIT_LEN:
-		if (c > (MCTP_MTU + sizeof(struct mctp_hdr))
-				|| c < sizeof(struct mctp_hdr)) {
+		if (c > serial->binding.pkt_size ||
+				c < sizeof(struct mctp_hdr)) {
 			mctp_prdebug("invalid size %d", c);
 			serial->rx_state = STATE_WAIT_SYNC_START;
 		} else {
@@ -305,6 +305,8 @@ struct mctp_binding_serial *mctp_serial_init(void)
 	serial->rx_pkt = NULL;
 	serial->binding.name = "serial";
 	serial->binding.version = 1;
+	serial->binding.pkt_size = MCTP_BMTU;
+	serial->binding.pkt_pad = 0;
 
 	serial->binding.tx = mctp_binding_serial_tx;
 
