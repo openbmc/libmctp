@@ -60,16 +60,18 @@ struct mctp {
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif
 
-struct mctp_pktbuf *mctp_pktbuf_alloc(uint8_t len)
+struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *binding, size_t len)
 {
 	struct mctp_pktbuf *buf;
+	size_t size;
 
-	BUILD_ASSERT(MCTP_PKTBUF_SIZE <= 0xff);
+	size = binding->pkt_size + binding->pkt_pad;
 
 	/* todo: pools */
-	buf = __mctp_alloc(sizeof(*buf));
+	buf = __mctp_alloc(sizeof(*buf) + size);
 
-	buf->start = MCTP_PKTBUF_BINDING_PAD;
+	buf->size = size;
+	buf->start = binding->pkt_pad;
 	buf->end = buf->start + len;
 	buf->mctp_hdr_off = buf->start;
 	buf->next = NULL;
@@ -97,30 +99,28 @@ uint8_t mctp_pktbuf_size(struct mctp_pktbuf *pkt)
 	return pkt->end - pkt->start;
 }
 
-void *mctp_pktbuf_alloc_start(struct mctp_pktbuf *pkt, uint8_t size)
+void *mctp_pktbuf_alloc_start(struct mctp_pktbuf *pkt, size_t size)
 {
 	assert(size <= pkt->start);
 	pkt->start -= size;
 	return pkt->data + pkt->start;
 }
 
-void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, uint8_t size)
+void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, size_t size)
 {
 	void *buf;
 
-	assert(size < (MCTP_PKTBUF_SIZE - pkt->end));
+	assert(size < (pkt->size - pkt->end));
 	buf = pkt->data + pkt->end;
 	pkt->end += size;
 	return buf;
 }
 
-int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, uint8_t len)
+int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, size_t len)
 {
 	void *p;
 
-	assert(pkt->end + len <= MCTP_PKTBUF_SIZE);
-
-	if (pkt->end + len > MCTP_PKTBUF_SIZE)
+	if (pkt->end + len > pkt->size)
 		return -1;
 
 	p = pkt->data + pkt->end;
@@ -355,9 +355,6 @@ static int mctp_packet_tx(struct mctp_bus *bus,
 	if (!bus->tx_enabled)
 		return -1;
 
-	mctp_prdebug("sending pkt, len %d",
-			mctp_pktbuf_size(pkt));
-
 	return bus->binding->tx(bus->binding, pkt);
 }
 
@@ -392,21 +389,22 @@ void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
 int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 		void *msg, size_t msg_len)
 {
+	size_t max_payload_len, payload_len, p;
 	struct mctp_pktbuf *pkt;
 	struct mctp_hdr *hdr;
 	struct mctp_bus *bus;
-	size_t pkt_len, p;
 	int i;
 
 	bus = find_bus_for_eid(mctp, eid);
+	max_payload_len = bus->binding->pkt_size - sizeof(*hdr);
 
 	/* queue up packets, each of max MCTP_MTU size */
 	for (p = 0, i = 0; p < msg_len; i++) {
-		pkt_len = msg_len - p;
-		if (pkt_len > MCTP_MTU)
-			pkt_len = MCTP_MTU;
+		payload_len = msg_len - p;
+		if (payload_len > max_payload_len)
+			payload_len = max_payload_len;
 
-		pkt = mctp_pktbuf_alloc(pkt_len + sizeof(*hdr));
+		pkt = mctp_pktbuf_alloc(bus->binding, payload_len + sizeof(*hdr));
 		hdr = mctp_pktbuf_hdr(pkt);
 
 		/* todo: tags */
@@ -418,12 +416,12 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 
 		if (i == 0)
 			hdr->flags_seq_tag |= MCTP_HDR_FLAG_SOM;
-		if (p + pkt_len >= msg_len)
+		if (p + payload_len >= msg_len)
 			hdr->flags_seq_tag |= MCTP_HDR_FLAG_EOM;
 		hdr->flags_seq_tag |=
 			(i & MCTP_HDR_SEQ_MASK) << MCTP_HDR_SEQ_SHIFT;
 
-		memcpy(mctp_pktbuf_data(pkt), msg + p, pkt_len);
+		memcpy(mctp_pktbuf_data(pkt), msg + p, payload_len);
 
 		/* add to tx queue */
 		if (bus->tx_queue_tail)
@@ -432,7 +430,7 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 			bus->tx_queue_head = pkt;
 		bus->tx_queue_tail = pkt;
 
-		p += pkt_len;
+		p += payload_len;
 	}
 
 	mctp_send_tx_queue(bus);
