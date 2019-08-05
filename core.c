@@ -262,7 +262,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 	if (hdr->dest != bus->eid)
 		/* @todo: non-local packet routing */
-		return;
+		goto out;
 
 	flags = hdr->flags_seq_tag & (MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM);
 	tag = (hdr->flags_seq_tag >> MCTP_HDR_TAG_SHIFT) & MCTP_HDR_TAG_MASK;
@@ -300,7 +300,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 	case MCTP_HDR_FLAG_EOM:
 		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, tag);
 		if (!ctx)
-			return;
+			goto out;
 
 		exp_seq = (ctx->last_seq + 1) % 4;
 
@@ -309,7 +309,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 				"Sequence number %d does not match expected %d",
 				seq, exp_seq);
 			mctp_msg_ctx_drop(ctx);
-			return;
+			goto out;
 		}
 
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
@@ -325,7 +325,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		/* Neither SOM nor EOM */
 		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, tag);
 		if (!ctx)
-			return;
+			goto out;
 
 		exp_seq = (ctx->last_seq + 1) % 4;
 		if (exp_seq != seq) {
@@ -333,18 +333,20 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 				"Sequence number %d does not match expected %d",
 				seq, exp_seq);
 			mctp_msg_ctx_drop(ctx);
-			return;
+			goto out;
 		}
 
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
 		if (rc) {
 			mctp_msg_ctx_drop(ctx);
-			return;
+			goto out;
 		}
 		ctx->last_seq = seq;
 
 		break;
 	}
+out:
+	mctp_pktbuf_free(pkt);
 }
 
 static int mctp_packet_tx(struct mctp_bus *bus,

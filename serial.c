@@ -143,7 +143,6 @@ static void mctp_serial_finish_packet(struct mctp_binding_serial *serial,
 	if (valid)
 		mctp_bus_rx(&serial->binding, pkt);
 
-	mctp_pktbuf_free(pkt);
 	serial->rx_pkt = NULL;
 }
 
