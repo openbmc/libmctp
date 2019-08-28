@@ -173,7 +173,7 @@ static int binding_astlpc_init(struct mctp *mctp, struct binding *binding,
 		return -1;
 	}
 
-	astlpc = mctp_astlpc_init();
+	astlpc = mctp_astlpc_init_fileio();
 	if (!astlpc) {
 		warnx("could not initialise astlpc binding");
 		return -1;
