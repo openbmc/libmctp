@@ -21,11 +21,19 @@
 
 struct mctp_binding_astlpc {
 	struct mctp_binding	binding;
-	void			*lpc_map_base;
+
 	union {
 		void			*lpc_map;
 		struct mctp_lpcmap_hdr	*lpc_hdr;
 	};
+
+	/* direct ops data */
+	struct mctp_binding_astlpc_ops	ops;
+	void			*ops_data;
+	struct mctp_lpcmap_hdr	*priv_hdr;
+
+	/* fileio ops data */
+	void			*lpc_map_base;
 	int			kcs_fd;
 	uint8_t			kcs_status;
 
@@ -85,10 +93,15 @@ enum {
 #define KCS_STATUS_IBF			0x02
 #define KCS_STATUS_OBF			0x01
 
+static bool lpc_direct(struct mctp_binding_astlpc *astlpc)
+{
+	return astlpc->lpc_map != NULL;
+}
+
 static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 		uint8_t status)
 {
-	uint8_t buf[2];
+	uint8_t data;
 	int rc;
 
 	/* Since we're setting the status register, we want the other endpoint
@@ -97,11 +110,20 @@ static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 	 * So, write a dummy value of 0xff to ODR, which will ensure that an
 	 * interrupt is triggered, and can be ignored by the host.
 	 */
-	buf[KCS_REG_DATA] = 0xff;
-	buf[KCS_REG_STATUS] = status;
+	data = 0xff;
+	status |= KCS_STATUS_OBF;
 
-	rc = pwrite(astlpc->kcs_fd, buf, 2, 0);
-	if (rc != 1) {
+	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
+			data);
+	if (rc) {
+		mctp_prwarn("KCS dummy data write failed");
+		return -1;
+	}
+
+
+	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
+			status);
+	if (rc) {
 		mctp_prwarn("KCS status write failed");
 		return -1;
 	}
@@ -115,7 +137,8 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 	int rc;
 
 	for (;;) {
-		rc = pread(astlpc->kcs_fd, &status, 1, KCS_REG_STATUS);
+		rc = astlpc->ops.kcs_read(astlpc->ops_data,
+				MCTP_ASTLPC_KCS_REG_STATUS, &status);
 		if (rc != 1) {
 			mctp_prwarn("KCE status read failed");
 			return -1;
@@ -125,8 +148,9 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 		/* todo: timeout */
 	}
 
-	rc = pwrite(astlpc->kcs_fd, &data, 1, KCS_REG_DATA);
-	if (rc != 1) {
+	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
+			data);
+	if (rc) {
 		mctp_prwarn("KCS data write failed");
 		return -1;
 	}
@@ -146,9 +170,17 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 		return -1;
 	}
 
-	*(uint32_t *)(astlpc->lpc_map + rx_offset) = htobe32(len);
-
-	memcpy(astlpc->lpc_map + rx_offset + 4, mctp_pktbuf_hdr(pkt), len);
+	if (lpc_direct(astlpc)) {
+		*(uint32_t *)(astlpc->lpc_map + rx_offset) = htobe32(len);
+		memcpy(astlpc->lpc_map + rx_offset + 4, mctp_pktbuf_hdr(pkt),
+				len);
+	} else {
+		uint32_t tmp = htobe32(len);
+		astlpc->ops.lpc_write(astlpc->ops_data, &tmp, rx_offset,
+				sizeof(tmp));
+		astlpc->ops.lpc_write(astlpc->ops_data, mctp_pktbuf_hdr(pkt),
+				rx_offset + 4, len);
+	}
 
 	mctp_binding_set_tx_enabled(b, false);
 
@@ -159,7 +191,15 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 {
 	/* todo: actual version negotiation */
-	astlpc->lpc_hdr->negotiated_ver = htobe16(1);
+	if (lpc_direct(astlpc)) {
+		astlpc->lpc_hdr->negotiated_ver = htobe16(1);
+	} else {
+		uint16_t ver = htobe16(1);
+		astlpc->ops.lpc_write(astlpc->ops_data, &ver,
+				offsetof(struct mctp_lpcmap_hdr,
+					negotiated_ver),
+				sizeof(ver));
+	}
 	mctp_astlpc_kcs_set_status(astlpc,
 			KCS_STATUS_BMC_READY | KCS_STATUS_CHANNEL_ACTIVE |
 			KCS_STATUS_OBF);
@@ -172,7 +212,14 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	struct mctp_pktbuf *pkt;
 	uint32_t len;
 
-	len = htobe32(*(uint32_t *)(astlpc->lpc_map + tx_offset));
+	if (lpc_direct(astlpc)) {
+		len = *(uint32_t *)(astlpc->lpc_map + tx_offset);
+	} else {
+		astlpc->ops.lpc_read(astlpc->ops_data, &len,
+				tx_offset, sizeof(len));
+	}
+	len = be32toh(len);
+
 	if (len > tx_size - 4) {
 		mctp_prwarn("invalid RX len 0x%x", len);
 		return;
@@ -187,7 +234,13 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	if (!pkt)
 		goto out_complete;
 
-	memcpy(mctp_pktbuf_hdr(pkt), astlpc->lpc_map + tx_offset + 4, len);
+	if (lpc_direct(astlpc)) {
+		memcpy(mctp_pktbuf_hdr(pkt),
+				astlpc->lpc_map + tx_offset + 4, len);
+	} else {
+		astlpc->ops.lpc_read(astlpc->ops_data, mctp_pktbuf_hdr(pkt),
+				tx_offset + 4, len);
+	}
 
 	mctp_bus_rx(&astlpc->binding, pkt);
 
@@ -202,22 +255,26 @@ static void mctp_astlpc_tx_complete(struct mctp_binding_astlpc *astlpc)
 
 int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 {
-	uint8_t kcs_regs[2], data;
+	uint8_t status, data;
 	int rc;
 
-	rc = pread(astlpc->kcs_fd, kcs_regs, 2, 0);
-	if (rc < 0) {
+	rc = astlpc->ops.kcs_read(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
+			&status);
+	if (rc) {
 		mctp_prwarn("KCS read error");
-		return -1;
-	} else if (rc != 2) {
-		mctp_prwarn("KCS short read (%d)", rc);
 		return -1;
 	}
 
-	if (!(kcs_regs[KCS_REG_STATUS] & KCS_STATUS_IBF))
+	if (!(status & KCS_STATUS_IBF))
 		return 0;
 
-	data = kcs_regs[KCS_REG_DATA];
+	rc = astlpc->ops.kcs_read(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
+			&data);
+	if (rc) {
+		mctp_prwarn("KCS data read error");
+		return -1;
+	}
+
 	switch (data) {
 	case 0x0:
 		mctp_astlpc_init_channel(astlpc);
@@ -237,12 +294,6 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 	return 0;
 }
 
-int mctp_astlpc_get_fd(struct mctp_binding_astlpc *astlpc)
-{
-	return astlpc->kcs_fd;
-}
-
-
 void mctp_astlpc_register_bus(struct mctp_binding_astlpc *astlpc,
 		struct mctp *mctp, mctp_eid_t eid)
 {
@@ -251,32 +302,86 @@ void mctp_astlpc_register_bus(struct mctp_binding_astlpc *astlpc,
 
 static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 {
+	struct mctp_lpcmap_hdr *hdr;
 	uint8_t status;
 	int rc;
 
-	astlpc->lpc_hdr->magic = htobe32(MCTP_MAGIC);
-	astlpc->lpc_hdr->bmc_ver_min = htobe16(BMC_VER_MIN);
-	astlpc->lpc_hdr->bmc_ver_cur = htobe16(BMC_VER_CUR);
+	if (lpc_direct(astlpc))
+		hdr = astlpc->lpc_hdr;
+	else
+		hdr = astlpc->priv_hdr;
 
-	astlpc->lpc_hdr->rx_offset = htobe32(rx_offset);
-	astlpc->lpc_hdr->rx_size = htobe32(rx_size);
-	astlpc->lpc_hdr->tx_offset = htobe32(tx_offset);
-	astlpc->lpc_hdr->tx_size = htobe32(tx_size);
+	hdr->magic = htobe32(MCTP_MAGIC);
+	hdr->bmc_ver_min = htobe16(BMC_VER_MIN);
+	hdr->bmc_ver_cur = htobe16(BMC_VER_CUR);
+
+	hdr->rx_offset = htobe32(rx_offset);
+	hdr->rx_size = htobe32(rx_size);
+	hdr->tx_offset = htobe32(tx_offset);
+	hdr->tx_size = htobe32(tx_size);
+
+	if (!lpc_direct(astlpc))
+		astlpc->ops.lpc_write(astlpc->ops_data, hdr, 0, sizeof(*hdr));
 
 	/* set status indicating that the BMC is now active */
 	status = KCS_STATUS_BMC_READY | KCS_STATUS_OBF;
-	rc = pwrite(astlpc->kcs_fd, &status, 1, KCS_REG_STATUS);
-	if (rc != 1) {
+	rc = astlpc->ops.kcs_write(astlpc->ops_data,
+			MCTP_ASTLPC_KCS_REG_STATUS, status);
+	if (rc) {
 		mctp_prwarn("KCS write failed");
-		rc = -1;
-	} else {
-		rc = 0;
 	}
 
 	return rc;
 }
 
-static int mctp_astlpc_init_lpc(struct mctp_binding_astlpc *astlpc)
+/* allocate and basic initialisation */
+static struct mctp_binding_astlpc *__mctp_astlpc_init(void)
+{
+	struct mctp_binding_astlpc *astlpc;
+
+	astlpc = __mctp_alloc(sizeof(*astlpc));
+	memset(astlpc, 0, sizeof(*astlpc));
+	astlpc->binding.name = "astlpc";
+	astlpc->binding.version = 1;
+	astlpc->binding.tx = mctp_binding_astlpc_tx;
+	astlpc->binding.pkt_size = MCTP_BMTU;
+	astlpc->binding.pkt_pad = 0;
+	astlpc->lpc_map = NULL;
+
+	return astlpc;
+}
+
+struct mctp_binding_astlpc *mctp_astlpc_init_ops(
+		struct mctp_binding_astlpc_ops *ops,
+		void *ops_data, void *lpc_map)
+{
+	struct mctp_binding_astlpc *astlpc;
+	int rc;
+
+	astlpc = __mctp_astlpc_init();
+	if (!astlpc)
+		return NULL;
+
+	memcpy(&astlpc->ops, ops, sizeof(astlpc->ops));
+	astlpc->ops_data = ops_data;
+	astlpc->lpc_map = lpc_map;
+
+	/* In indirect mode, we keep a separate buffer of header data.
+	 * We need to sync this through the lpc_read/lpc_write ops.
+	 */
+	if (!astlpc->lpc_map)
+		astlpc->priv_hdr = __mctp_alloc(sizeof(*astlpc->priv_hdr));
+
+	rc = mctp_astlpc_init_bmc(astlpc);
+	if (rc) {
+		free(astlpc);
+		return NULL;
+	}
+
+	return astlpc;
+}
+
+static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 {
 	struct aspeed_lpc_ctrl_mapping map = {
 		.window_type = ASPEED_LPC_CTRL_WINDOW_MEMORY,
@@ -316,7 +421,7 @@ static int mctp_astlpc_init_lpc(struct mctp_binding_astlpc *astlpc)
 	return rc;
 }
 
-static int mctp_astlpc_init_kcs(struct mctp_binding_astlpc *astlpc)
+static int mctp_astlpc_init_fileio_kcs(struct mctp_binding_astlpc *astlpc)
 {
 	astlpc->kcs_fd = open(kcs_path, O_RDWR);
 	if (astlpc->kcs_fd < 0)
@@ -325,26 +430,57 @@ static int mctp_astlpc_init_kcs(struct mctp_binding_astlpc *astlpc)
 	return 0;
 }
 
-struct mctp_binding_astlpc *mctp_astlpc_init(void)
+static int __mctp_astlpc_fileio_kcs_read(void *arg,
+		enum mctp_binding_astlpc_kcs_reg reg, uint8_t *val)
+{
+	struct mctp_binding_astlpc *astlpc = arg;
+	off_t offset = reg;
+	int rc;
+
+	rc = pread(astlpc->kcs_fd, val, 1, offset);
+
+	return rc == 1 ? 0 : -1;
+}
+
+static int __mctp_astlpc_fileio_kcs_write(void *arg,
+		enum mctp_binding_astlpc_kcs_reg reg, uint8_t val)
+{
+	struct mctp_binding_astlpc *astlpc = arg;
+	off_t offset = reg;
+	int rc;
+
+	rc = pwrite(astlpc->kcs_fd, &val, 1, offset);
+
+	return rc == 1 ? 0 : -1;
+}
+
+int mctp_astlpc_get_fd(struct mctp_binding_astlpc *astlpc)
+{
+	return astlpc->kcs_fd;
+}
+
+struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 {
 	struct mctp_binding_astlpc *astlpc;
 	int rc;
 
-	astlpc = __mctp_alloc(sizeof(*astlpc));
-	memset(astlpc, 0, sizeof(*astlpc));
-	astlpc->binding.name = "astlpc";
-	astlpc->binding.version = 1;
-	astlpc->binding.tx = mctp_binding_astlpc_tx;
-	astlpc->binding.pkt_size = MCTP_BMTU;
-	astlpc->binding.pkt_pad = 0;
+	astlpc = __mctp_astlpc_init();
+	if (!astlpc)
+		return NULL;
 
-	rc = mctp_astlpc_init_lpc(astlpc);
+	/* Set internal operations for kcs. We use direct accesses to the lpc
+	 * map area */
+	astlpc->ops.kcs_read = __mctp_astlpc_fileio_kcs_read;
+	astlpc->ops.kcs_write = __mctp_astlpc_fileio_kcs_write;
+	astlpc->ops_data = astlpc;
+
+	rc = mctp_astlpc_init_fileio_lpc(astlpc);
 	if (rc) {
 		free(astlpc);
 		return NULL;
 	}
 
-	rc = mctp_astlpc_init_kcs(astlpc);
+	rc = mctp_astlpc_init_fileio_kcs(astlpc);
 	if (rc) {
 		free(astlpc);
 		return NULL;
