@@ -1,16 +1,11 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
 #include <assert.h>
-#include <fcntl.h>
+#include <endian.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-
-#include <linux/aspeed-lpc-ctrl.h>
 
 #define pr_fmt(x) "astlpc: " x
 
@@ -18,6 +13,19 @@
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
 #include "libmctp-astlpc.h"
+
+#ifndef MCTP_WITHOUT_FILEIO
+
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <linux/aspeed-lpc-ctrl.h>
+
+/* kernel interface */
+static const char *kcs_path = "/dev/mctp0";
+static const char *lpc_path = "/dev/aspeed-lpc-ctrl";
+
+#endif
 
 struct mctp_binding_astlpc {
 	struct mctp_binding	binding;
@@ -76,10 +84,6 @@ static const uint32_t	rx_offset = 0x100;
 static const uint32_t	rx_size   = 0x100;
 static const uint32_t	tx_offset = 0x200;
 static const uint32_t	tx_size   = 0x100;
-
-/* kernel interface */
-static const char *kcs_path = "/dev/mctp0";
-static const char *lpc_path = "/dev/aspeed-lpc-ctrl";
 
 #define LPC_WIN_SIZE                (1 * 1024 * 1024)
 
@@ -381,6 +385,7 @@ struct mctp_binding_astlpc *mctp_astlpc_init_ops(
 	return astlpc;
 }
 
+#ifndef MCTP_WITHOUT_FILEIO
 static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 {
 	struct aspeed_lpc_ctrl_mapping map = {
@@ -494,4 +499,16 @@ struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 
 	return astlpc;
 }
+#else
+struct mctp_binding_astlpc * __attribute__((const))
+	mctp_astlpc_init_fileio(void)
+{
+	return NULL;
+}
 
+int __attribute__((const)) mctp_astlpc_get_fd(
+		struct mctp_binding_astlpc *astlpc __attribute__((unused)))
+{
+	return -1;
+}
+#endif
