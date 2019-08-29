@@ -15,6 +15,10 @@ AC_PROG_MAKE_SET
 # libtool init
 LT_INIT
 
+# pkg-config
+PKG_PROG_PKG_CONFIG
+PKG_INSTALLDIR
+
 # Set defaults for standard library compiles. We may want to
 # AC_ARG_WITH these in the future.
 AC_DEFINE([MCTP_HAVE_SYSLOG], [1], [Define to enable syslog])
@@ -26,5 +30,5 @@ AC_DEFINE([MCTP_DEFAULT_ALLOC], [1],
 AM_CONDITIONAL([LIBMCTP_BINDING_serial], [true])
 AM_CONDITIONAL([LIBMCTP_BINDING_astlpc], [true])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile libmctp.pc])
 AC_OUTPUT
