@@ -18,6 +18,8 @@ endif
 bin_PROGRAMS = utils/mctp-demux-daemon
 utils_mctp_demux_daemon_LDADD = libmctp.la
 
+pkgconfig_DATA = libmctp.pc
+
 TESTS = $(check_PROGRAMS)
 
 check_PROGRAMS = tests/test_eid tests/test_seq
