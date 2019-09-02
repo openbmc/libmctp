@@ -299,6 +299,7 @@ struct mctp_binding_serial *mctp_serial_init(void)
 	struct mctp_binding_serial *serial;
 
 	serial = __mctp_alloc(sizeof(*serial));
+	memset(serial, 0, sizeof(*serial));
 	serial->fd = -1;
 	serial->rx_state = STATE_WAIT_SYNC_START;
 	serial->rx_pkt = NULL;
