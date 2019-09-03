@@ -12,6 +12,11 @@
 
 #ifdef MCTP_HAVE_FILEIO
 #include <fcntl.h>
+#else
+static const size_t write(int fd, void *buf, size_t len)
+{
+	return -1;
+}
 #endif
 
 #define pr_fmt(x) "serial: " x
@@ -25,6 +30,9 @@ struct mctp_binding_serial {
 	struct mctp_binding	binding;
 	int			fd;
 	unsigned long		bus_id;
+
+	mctp_serial_tx_fn	tx_fn;
+	void			*tx_fn_data;
 
 	/* receive buffer and state */
 	uint8_t			rxbuf[1024];
@@ -129,7 +137,12 @@ static int mctp_binding_serial_tx(struct mctp_binding *b,
 	tlr->fcs_msb = 0;
 	tlr->fcs_lsb = 0;
 
-	write(serial->fd, serial->txbuf, sizeof(*hdr) + len + sizeof(*tlr));
+	len += sizeof(*hdr) + sizeof(*tlr);
+
+	if (serial->tx_fn)
+		serial->tx_fn(serial->tx_fn_data, serial->txbuf, len);
+	else
+		write(serial->fd, serial->txbuf, len);
 
 	return 0;
 }
@@ -237,8 +250,8 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial,
 
 	mctp_prdebug(" -> state: %d", serial->rx_state);
 }
-static void __attribute__((used)) mctp_rx_consume(struct mctp_binding_serial *serial,
-		void *buf, size_t len)
+static void mctp_rx_consume(struct mctp_binding_serial *serial,
+		const void *buf, size_t len)
 {
 	size_t i;
 
@@ -285,6 +298,19 @@ void mctp_serial_open_fd(struct mctp_binding_serial *serial, int fd)
 	serial->fd = fd;
 }
 #endif
+
+void mctp_serial_set_tx_fn(struct mctp_binding_serial *serial,
+		mctp_serial_tx_fn fn, void *data)
+{
+	serial->tx_fn = fn;
+	serial->tx_fn_data = data;
+}
+
+int mctp_serial_rx(struct mctp_binding_serial *serial,
+		const void *buf, size_t len)
+{
+	mctp_rx_consume(serial, buf, len);
+}
 
 void mctp_serial_register_bus(struct mctp_binding_serial *serial,
 		struct mctp *mctp, mctp_eid_t eid)
