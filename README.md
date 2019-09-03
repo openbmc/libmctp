@@ -31,6 +31,22 @@ The binding may require you to notify it to receive packets. For example,
 for the serial binding, the `mctp_serial_read()` function should be invoked
 when the file-descriptor for the serial device has data available.
 
+### Bridging
+
+libmctp implements basic support for bridging between two hardware bindings.
+In this mode, bindings may have different MTUs, so packets are reassembled into
+their messages, then the messages are re-packetised for the outgoing binding.
+
+For bridging between two endpoints, use the `mctp_bridge_busses()` function:
+
+ * `mctp = mctp_init()`: Initialise the MCTP core
+ * `b1 = mctp_<binding>_init(); b2 = mctp_<binding>_init()`: Initialise two hardware bindings
+ * `mctp_bridge_busses(mctp, b1, b2)`: Setup bridge
+
+Note that no EIDs are defined here; the bridge does not deliver any messages
+to a local rx callback, and messages are bridged as-is.
+
+
 Integration
 -----------
 
