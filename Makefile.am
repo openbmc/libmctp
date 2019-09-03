@@ -22,7 +22,7 @@ pkgconfig_DATA = libmctp.pc
 
 TESTS = $(check_PROGRAMS)
 
-check_PROGRAMS = tests/test_eid tests/test_seq
+check_PROGRAMS = tests/test_eid tests/test_seq tests/test_bridge
 # We set a global LDADD here, as there's no way to specify it for all
 # tests. This means other targets' LDADDs need to be overridden.
 LDADD = tests/libtest-utils.a libmctp.la

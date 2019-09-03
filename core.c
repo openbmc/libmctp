@@ -30,6 +30,7 @@ struct mctp_bus {
 
 struct mctp_msg_ctx {
 	uint8_t		src;
+	uint8_t		dest;
 	uint8_t		tag;
 	uint8_t		last_seq;
 	void		*buf;
@@ -38,8 +39,8 @@ struct mctp_msg_ctx {
 };
 
 struct mctp {
-	/* todo: multiple busses */
-	struct mctp_bus	busses[1];
+	int			n_busses;
+	struct mctp_bus		*busses;
 
 	/* Message RX callback */
 	mctp_rx_fn		message_rx;
@@ -49,6 +50,11 @@ struct mctp {
 	 * @todo: flexible context count
 	 */
 	struct mctp_msg_ctx	msg_ctxs[16];
+
+	enum {
+		ROUTE_ENDPOINT,
+		ROUTE_BRIDGE,
+	}			route_policy;
 };
 
 #ifndef BUILD_ASSERT
@@ -59,6 +65,9 @@ struct mctp {
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif
+
+static int mctp_message_tx_on_bus(struct mctp *mctp, struct mctp_bus *bus,
+		mctp_eid_t src, mctp_eid_t dest, void *msg, size_t msg_len);
 
 struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *binding, size_t len)
 {
@@ -133,7 +142,7 @@ int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, size_t len)
 
 /* Message reassembly */
 static struct mctp_msg_ctx *mctp_msg_ctx_lookup(struct mctp *mctp,
-		uint8_t src, uint8_t tag)
+		uint8_t src, uint8_t dest, uint8_t tag)
 {
 	unsigned int i;
 
@@ -141,7 +150,7 @@ static struct mctp_msg_ctx *mctp_msg_ctx_lookup(struct mctp *mctp,
 	 * message contexts */
 	for (i = 0; i < ARRAY_SIZE(mctp->msg_ctxs); i++) {
 		struct mctp_msg_ctx *ctx = &mctp->msg_ctxs[i];
-		if (ctx->src == src && ctx->tag == tag)
+		if (ctx->src == src && ctx->dest == dest && ctx->tag == tag)
 			return ctx;
 	}
 
@@ -149,7 +158,7 @@ static struct mctp_msg_ctx *mctp_msg_ctx_lookup(struct mctp *mctp,
 }
 
 static struct mctp_msg_ctx *mctp_msg_ctx_create(struct mctp *mctp,
-		uint8_t src, uint8_t tag)
+		uint8_t src, uint8_t dest, uint8_t tag)
 {
 	struct mctp_msg_ctx *ctx = NULL;
 	unsigned int i;
@@ -166,6 +175,7 @@ static struct mctp_msg_ctx *mctp_msg_ctx_create(struct mctp *mctp,
 		return NULL;
 
 	ctx->src = src;
+	ctx->dest = dest;
 	ctx->tag = tag;
 	ctx->buf_size = 0;
 
@@ -229,6 +239,8 @@ int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data)
 static struct mctp_bus *find_bus_for_eid(struct mctp *mctp,
 		mctp_eid_t dest __attribute__((unused)))
 {
+	/* for now, just use the first bus. For full routing support,
+	 * we will need a table of neighbours */
 	return &mctp->busses[0];
 }
 
@@ -237,12 +249,54 @@ int mctp_register_bus(struct mctp *mctp,
 		mctp_eid_t eid)
 {
 	/* todo: multiple busses */
-	assert(!mctp->busses[0].binding);
+	assert(mctp->n_busses == 0);
+	mctp->n_busses = 1;
+	mctp->busses = __mctp_alloc(sizeof(struct mctp_bus));
 	mctp->busses[0].binding = binding;
 	mctp->busses[0].eid = eid;
 	binding->bus = &mctp->busses[0];
 	binding->mctp = mctp;
+	mctp->route_policy = ROUTE_ENDPOINT;
 	return 0;
+}
+
+int mctp_bridge_busses(struct mctp *mctp,
+		struct mctp_binding *b1, struct mctp_binding *b2)
+{
+	assert(mctp->n_busses == 0);
+	mctp->busses = __mctp_alloc(2 * sizeof(struct mctp_bus));
+	mctp->n_busses = 2;
+	mctp->busses[0].binding = b1;
+	b1->bus = &mctp->busses[0];
+	b1->mctp = mctp;
+	mctp->busses[1].binding = b2;
+	b2->bus = &mctp->busses[1];
+	b2->mctp = mctp;
+
+	mctp->route_policy = ROUTE_BRIDGE;
+	return 0;
+}
+
+static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus,
+		mctp_eid_t src, mctp_eid_t dest, void *buf, size_t len)
+{
+	if (mctp->route_policy == ROUTE_ENDPOINT &&
+			dest == bus->eid && mctp->message_rx)
+		mctp->message_rx(src, mctp->message_rx_data, buf, len);
+
+	if (mctp->route_policy == ROUTE_BRIDGE) {
+		int i;
+
+		for (i = 0; i < mctp->n_busses; i++) {
+			struct mctp_bus *dest_bus = &mctp->busses[i];
+			if (dest_bus == bus)
+				continue;
+
+			mctp_message_tx_on_bus(mctp, dest_bus,
+					src, dest, buf, len);
+		}
+
+	}
 }
 
 void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
@@ -260,8 +314,9 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 	hdr = mctp_pktbuf_hdr(pkt);
 
-	if (hdr->dest != bus->eid)
-		/* @todo: non-local packet routing */
+	/* small optimisation: don't bother reassembly if we're going to
+	 * drop the packet in mctp_rx anyway */
+	if (mctp->route_policy == ROUTE_ENDPOINT && hdr->dest != bus->eid)
 		goto out;
 
 	flags = hdr->flags_seq_tag & (MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM);
@@ -274,18 +329,19 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		 * no need to create a message context */
 		len = pkt->end - pkt->mctp_hdr_off - sizeof(struct mctp_hdr);
 		p = pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr),
-		mctp->message_rx(hdr->src, mctp->message_rx_data, p, len);
+		mctp_rx(mctp, bus, hdr->src, hdr->dest, p, len);
 		break;
 
 	case MCTP_HDR_FLAG_SOM:
 		/* start of a new message - start the new context for
 		 * future message reception. If an existing context is
 		 * already present, drop it. */
-		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, tag);
+		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, hdr->dest, tag);
 		if (ctx) {
 			mctp_msg_ctx_reset(ctx);
 		} else {
-			ctx = mctp_msg_ctx_create(mctp, hdr->src, tag);
+			ctx = mctp_msg_ctx_create(mctp,
+					hdr->src, hdr->dest, tag);
 		}
 
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
@@ -298,7 +354,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		break;
 
 	case MCTP_HDR_FLAG_EOM:
-		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, tag);
+		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, hdr->dest, tag);
 		if (!ctx)
 			goto out;
 
@@ -313,17 +369,16 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		}
 
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
-		if (!rc) {
-			mctp->message_rx(ctx->src, mctp->message_rx_data,
+		if (!rc)
+			mctp_rx(mctp, bus, ctx->src, ctx->dest,
 					ctx->buf, ctx->buf_size);
-		}
 
 		mctp_msg_ctx_drop(ctx);
 		break;
 
 	case 0:
 		/* Neither SOM nor EOM */
-		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, tag);
+		ctx = mctp_msg_ctx_lookup(mctp, hdr->src,hdr->dest, tag);
 		if (!ctx)
 			goto out;
 
@@ -386,16 +441,14 @@ void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
 		mctp_send_tx_queue(bus);
 }
 
-int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
-		void *msg, size_t msg_len)
+static int mctp_message_tx_on_bus(struct mctp *mctp, struct mctp_bus *bus,
+		mctp_eid_t src, mctp_eid_t dest, void *msg, size_t msg_len)
 {
 	size_t max_payload_len, payload_len, p;
 	struct mctp_pktbuf *pkt;
 	struct mctp_hdr *hdr;
-	struct mctp_bus *bus;
 	int i;
 
-	bus = find_bus_for_eid(mctp, eid);
 	max_payload_len = bus->binding->pkt_size - sizeof(*hdr);
 
 	/* queue up packets, each of max MCTP_MTU size */
@@ -404,13 +457,14 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 		if (payload_len > max_payload_len)
 			payload_len = max_payload_len;
 
-		pkt = mctp_pktbuf_alloc(bus->binding, payload_len + sizeof(*hdr));
+		pkt = mctp_pktbuf_alloc(bus->binding,
+				payload_len + sizeof(*hdr));
 		hdr = mctp_pktbuf_hdr(pkt);
 
 		/* todo: tags */
 		hdr->ver = bus->binding->version & 0xf;
-		hdr->dest = eid;
-		hdr->src = bus->eid;
+		hdr->dest = dest;
+		hdr->src = src;
 		hdr->flags_seq_tag = MCTP_HDR_FLAG_TO |
 			(0 << MCTP_HDR_TAG_SHIFT);
 
@@ -436,4 +490,13 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 	mctp_send_tx_queue(bus);
 
 	return 0;
+}
+
+int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
+		void *msg, size_t msg_len)
+{
+	struct mctp_bus *bus;
+
+	bus = find_bus_for_eid(mctp, eid);
+	return mctp_message_tx_on_bus(mctp, bus, bus->eid, eid, msg, msg_len);
 }

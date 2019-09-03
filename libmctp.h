@@ -63,10 +63,23 @@ struct mctp *mctp_init(void);
 
 /* Register a binding to the MCTP core, and creates a bus (populating
  * binding->bus).
+ *
+ * If this function is called, the MCTP stack is initialised as an 'endpoint',
+ * and will deliver local packets to a RX callback - see `mctp_set_rx_all()`
+ * below.
  */
 int mctp_register_bus(struct mctp *mctp,
 		struct mctp_binding *binding,
 		mctp_eid_t eid);
+
+/* Create a simple bidirectional bridge between busses.
+ *
+ * In this mode, the MCTP stack is initialised as a bridge. There is no EID
+ * defined, so no packets are considered local. Instead, all messages from one
+ * binding are forwarded to the other.
+ */
+int mctp_bridge_busses(struct mctp *mctp,
+		struct mctp_binding *b1, struct mctp_binding *b2);
 
 typedef void (*mctp_rx_fn)(uint8_t src_eid, void *data,
 		void *msg, size_t len);
