@@ -332,6 +332,14 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 	return rc;
 }
 
+static int mctp_binding_astlpc_start(struct mctp_binding *b)
+{
+	struct mctp_binding_astlpc *astlpc = container_of(b,
+			struct mctp_binding_astlpc, binding);
+
+	return mctp_astlpc_init_bmc(astlpc);
+}
+
 /* allocate and basic initialisation */
 static struct mctp_binding_astlpc *__mctp_astlpc_init(void)
 {
@@ -342,6 +350,7 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(void)
 	astlpc->binding.name = "astlpc";
 	astlpc->binding.version = 1;
 	astlpc->binding.tx = mctp_binding_astlpc_tx;
+	astlpc->binding.start = mctp_binding_astlpc_start;
 	astlpc->binding.pkt_size = MCTP_BMTU;
 	astlpc->binding.pkt_pad = 0;
 	astlpc->lpc_map = NULL;
@@ -374,12 +383,6 @@ struct mctp_binding_astlpc *mctp_astlpc_init_ops(
 	 */
 	if (!astlpc->lpc_map)
 		astlpc->priv_hdr = __mctp_alloc(sizeof(*astlpc->priv_hdr));
-
-	rc = mctp_astlpc_init_bmc(astlpc);
-	if (rc) {
-		free(astlpc);
-		return NULL;
-	}
 
 	return astlpc;
 }
@@ -485,12 +488,6 @@ struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 	}
 
 	rc = mctp_astlpc_init_fileio_kcs(astlpc);
-	if (rc) {
-		free(astlpc);
-		return NULL;
-	}
-
-	rc = mctp_astlpc_init_bmc(astlpc);
 	if (rc) {
 		free(astlpc);
 		return NULL;
