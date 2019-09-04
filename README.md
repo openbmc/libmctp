@@ -46,6 +46,40 @@ For bridging between two endpoints, use the `mctp_bridge_busses()` function:
 Note that no EIDs are defined here; the bridge does not deliver any messages
 to a local rx callback, and messages are bridged as-is.
 
+Binding API
+-----------
+
+Hardware bindings provide a method for libmctp to send and receive packets
+to/from hardware. A binding defines a hardware specific structure (`struct
+mctp_binding_<name>`), which wraps the generic binding (`struct mctp_binding`):
+
+    struct mctp_binding_foo {
+	    struct mctp_binding binding;
+	    /* hardware-specific members here... */
+    };
+
+The binding code then provides a method (`_init`) to allocate and initialise
+the binding; this may be of any prototype (calling code will know what
+arguments to pass):
+
+    struct mctp_binding_foo *mctp_binding_foo_init(void);
+
+or maybe the `foo` binding needs a path argument:
+
+    struct mctp_binding_foo *mctp_binding_foo_init(const char *path);
+
+The binding then needs to provide a function (`_core`) to convert the
+hardware-specific struct to the libmctp generic core struct
+
+    struct mctp_binding *mctp_binding_foo_core(struct mctp_binding_foo *b);
+
+(Implementations of this will usually be fairly consistent, just returning
+`b->binding`). Callers can then use that generic pointer to register the
+binding with the core:
+
+    struct mctp_binding *binding = mctp_binding_foo_core(foo);
+    mctp_register_bus(mctp, binding, 8);
+
 
 Integration
 -----------

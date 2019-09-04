@@ -257,6 +257,10 @@ int mctp_register_bus(struct mctp *mctp,
 	binding->bus = &mctp->busses[0];
 	binding->mctp = mctp;
 	mctp->route_policy = ROUTE_ENDPOINT;
+
+	if (binding->start)
+		binding->start(binding);
+
 	return 0;
 }
 
@@ -274,6 +278,13 @@ int mctp_bridge_busses(struct mctp *mctp,
 	b2->mctp = mctp;
 
 	mctp->route_policy = ROUTE_BRIDGE;
+
+	if (b1->start)
+		b1->start(b1);
+
+	if (b2->start)
+		b2->start(b2);
+
 	return 0;
 }
 
