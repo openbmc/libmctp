@@ -13,8 +13,7 @@ struct mctp_binding_serial;
 
 struct mctp_binding_serial *mctp_serial_init(void);
 
-void mctp_serial_register_bus(struct mctp_binding_serial *serial,
-		struct mctp *mctp, mctp_eid_t eid);
+struct mctp_binding *mctp_binding_serial_core(struct mctp_binding_serial *b);
 
 /* file-based IO */
 int mctp_serial_get_fd(struct mctp_binding_serial *serial);

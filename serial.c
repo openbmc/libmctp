@@ -312,12 +312,15 @@ int mctp_serial_rx(struct mctp_binding_serial *serial,
 	mctp_rx_consume(serial, buf, len);
 }
 
-void mctp_serial_register_bus(struct mctp_binding_serial *serial,
-		struct mctp *mctp, mctp_eid_t eid)
+static int mctp_serial_core_start(struct mctp_binding *binding)
 {
-	assert(serial->fd >= 0);
-	mctp_register_bus(mctp, &serial->binding, eid);
-	mctp_binding_set_tx_enabled(&serial->binding, true);
+	mctp_binding_set_tx_enabled(binding, true);
+	return 0;
+}
+
+struct mctp_binding *mctp_binding_serial_core(struct mctp_binding_serial *b)
+{
+	return &b->binding;
 }
 
 struct mctp_binding_serial *mctp_serial_init(void)
@@ -334,6 +337,7 @@ struct mctp_binding_serial *mctp_serial_init(void)
 	serial->binding.pkt_size = MCTP_BMTU;
 	serial->binding.pkt_pad = 0;
 
+	serial->binding.start = mctp_serial_core_start;
 	serial->binding.tx = mctp_binding_serial_tx;
 
 	return serial;
