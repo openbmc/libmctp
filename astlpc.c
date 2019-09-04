@@ -298,12 +298,6 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 	return 0;
 }
 
-void mctp_astlpc_register_bus(struct mctp_binding_astlpc *astlpc,
-		struct mctp *mctp, mctp_eid_t eid)
-{
-	mctp_register_bus(mctp, &astlpc->binding, eid);
-}
-
 static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 {
 	struct mctp_lpcmap_hdr *hdr;
@@ -353,6 +347,11 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(void)
 	astlpc->lpc_map = NULL;
 
 	return astlpc;
+}
+
+struct mctp_binding *mctp_binding_astlpc_core(struct mctp_binding_astlpc *b)
+{
+	return &b->binding;
 }
 
 struct mctp_binding_astlpc *mctp_astlpc_init_ops(

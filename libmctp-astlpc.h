@@ -29,8 +29,9 @@ struct mctp_binding_astlpc_ops {
 struct mctp_binding_astlpc *mctp_astlpc_init_ops(
 		struct mctp_binding_astlpc_ops *ops,
 		void *ops_data, void *lpc_map);
-void mctp_astlpc_register_bus(struct mctp_binding_astlpc *astlpc,
-		struct mctp *mctp, mctp_eid_t eid);
+
+struct mctp_binding *mctp_binding_astlpc_core(struct mctp_binding_astlpc *b);
+
 int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc);
 
 /* fileio-based interface */
