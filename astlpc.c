@@ -14,7 +14,7 @@
 #include "libmctp-log.h"
 #include "libmctp-astlpc.h"
 
-#ifndef MCTP_WITHOUT_FILEIO
+#ifdef MCTP_HAVE_FILEIO
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -385,7 +385,7 @@ struct mctp_binding_astlpc *mctp_astlpc_init_ops(
 	return astlpc;
 }
 
-#ifndef MCTP_WITHOUT_FILEIO
+#ifdef MCTP_HAVE_FILEIO
 static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 {
 	struct aspeed_lpc_ctrl_mapping map = {
