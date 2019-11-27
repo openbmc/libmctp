@@ -19,6 +19,7 @@
 #include "libmctp-astlpc.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+#define __unused __attribute__((unused))
 
 static const mctp_eid_t local_eid_default = 8;
 static char sockname[] = "\0mctp-mux";
@@ -124,6 +125,18 @@ static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
 
 }
 
+static int binding_null_init(struct mctp *mctp __unused,
+		struct binding *binding __unused,
+		mctp_eid_t eid __unused,
+		int n_params, char * const *params __unused)
+{
+	if (n_params != 0) {
+		warnx("null binding doesn't accept parameters");
+		return -1;
+	}
+	return 0;
+}
+
 static int binding_serial_init(struct mctp *mctp, struct binding *binding,
 		mctp_eid_t eid, int n_params, char * const *params)
 {
@@ -196,6 +209,10 @@ static int binding_astlpc_process(struct binding *binding)
 }
 
 struct binding bindings[] = {
+	{
+		.name = "null",
+		.init = binding_null_init,
+	},
 	{
 		.name = "serial",
 		.init = binding_serial_init,
@@ -384,9 +401,14 @@ static int run_daemon(struct ctx *ctx)
 
 	ctx->pollfds = malloc(FD_NR * sizeof(struct pollfd));
 
-	ctx->pollfds[FD_BINDING].fd =
-		ctx->binding->get_fd(ctx->binding);
-	ctx->pollfds[FD_BINDING].events = POLLIN;
+	if (ctx->binding->get_fd) {
+		ctx->pollfds[FD_BINDING].fd =
+			ctx->binding->get_fd(ctx->binding);
+		ctx->pollfds[FD_BINDING].events = POLLIN;
+	} else {
+		ctx->pollfds[FD_BINDING].fd = -1;
+		ctx->pollfds[FD_BINDING].events = 0;
+	}
 
 	ctx->pollfds[FD_SOCKET].fd = ctx->sock;
 	ctx->pollfds[FD_SOCKET].events = POLLIN;
@@ -419,7 +441,9 @@ static int run_daemon(struct ctx *ctx)
 			continue;
 
 		if (ctx->pollfds[FD_BINDING].revents) {
-			rc = ctx->binding->process(ctx->binding);
+			rc = 0;
+			if (ctx->binding->process)
+				rc = ctx->binding->process(ctx->binding);
 			if (rc)
 				break;
 		}
