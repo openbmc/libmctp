@@ -252,6 +252,7 @@ int mctp_register_bus(struct mctp *mctp,
 	assert(mctp->n_busses == 0);
 	mctp->n_busses = 1;
 	mctp->busses = __mctp_alloc(sizeof(struct mctp_bus));
+	memset(mctp->busses, 0, sizeof(struct mctp_bus));
 	mctp->busses[0].binding = binding;
 	mctp->busses[0].eid = eid;
 	binding->bus = &mctp->busses[0];
@@ -269,6 +270,7 @@ int mctp_bridge_busses(struct mctp *mctp,
 {
 	assert(mctp->n_busses == 0);
 	mctp->busses = __mctp_alloc(2 * sizeof(struct mctp_bus));
+	memset(mctp->busses, 0, 2 * sizeof(struct mctp_bus));
 	mctp->n_busses = 2;
 	mctp->busses[0].binding = b1;
 	b1->bus = &mctp->busses[0];
