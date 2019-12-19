@@ -4,13 +4,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #ifdef MCTP_HAVE_FILEIO
+#include <unistd.h>
 #include <fcntl.h>
 #else
 static const size_t write(int fd, void *buf, size_t len)

@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #define pr_fmt(x) "astlpc: " x
 
@@ -16,6 +15,7 @@
 
 #ifdef MCTP_HAVE_FILEIO
 
+#include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
