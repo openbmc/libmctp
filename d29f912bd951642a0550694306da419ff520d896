@@ -1,0 +1,7 @@
+Code-Review+2: Jeremy Kerr <jk@ozlabs.org>
+Verified+1: Jeremy Kerr <jk@ozlabs.org>
+Submitted-by: Jeremy Kerr <jk@ozlabs.org>
+Submitted-at: Thu, 09 Jan 2020 00:47:31 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/libmctp/+/28314
+Project: openbmc/libmctp
+Branch: refs/heads/master
