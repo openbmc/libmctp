@@ -21,6 +21,19 @@ static const size_t write(int fd, void *buf, size_t len)
 
 #define pr_fmt(x) "serial: " x
 
+/* Post-condition: All bytes written or an error has occurred */
+#define mctp_write_all(fn, dst, src, len)				\
+({									\
+	ssize_t wrote;							\
+	while (len) {							\
+		wrote = fn(dst, src, len);				\
+		if (wrote < 0)						\
+			break;						\
+		len -= wrote;						\
+	}								\
+	len ? -1 : 0;							\
+})
+
 #include "libmctp.h"
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
@@ -139,12 +152,11 @@ static int mctp_binding_serial_tx(struct mctp_binding *b,
 
 	len += sizeof(*hdr) + sizeof(*tlr);
 
-	if (serial->tx_fn)
-		serial->tx_fn(serial->tx_fn_data, serial->txbuf, len);
-	else
-		write(serial->fd, serial->txbuf, len);
+	if (!serial->tx_fn)
+		return mctp_write_all(write, serial->fd, serial->txbuf, len);
 
-	return 0;
+	return mctp_write_all(serial->tx_fn, serial->tx_fn_data, serial->txbuf,
+			      len);
 }
 
 static void mctp_serial_finish_packet(struct mctp_binding_serial *serial,

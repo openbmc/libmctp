@@ -23,7 +23,8 @@ int mctp_serial_open_path(struct mctp_binding_serial *serial,
 void mctp_serial_open_fd(struct mctp_binding_serial *serial, int fd);
 
 /* direct function call IO */
-typedef int (*mctp_serial_tx_fn)(void *data, void *buf, size_t len);
+typedef int (*mctp_serial_tx_fn)(void *data, void *buf, size_t len)
+	__attribute__((warn_unused_result));
 void mctp_serial_set_tx_fn(struct mctp_binding_serial *serial,
 		mctp_serial_tx_fn fn, void *data);
 int mctp_serial_rx(struct mctp_binding_serial *serial,
