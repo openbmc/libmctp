@@ -139,10 +139,19 @@ static int mctp_binding_serial_tx(struct mctp_binding *b,
 
 	len += sizeof(*hdr) + sizeof(*tlr);
 
-	if (serial->tx_fn)
+	if (serial->tx_fn) {
 		serial->tx_fn(serial->tx_fn_data, serial->txbuf, len);
-	else
-		write(serial->fd, serial->txbuf, len);
+	} else {
+		while (len) {
+			ssize_t wrote;
+
+			wrote = write(serial->fd, serial->txbuf, len);
+			if (wrote < 0)
+				return -1;
+
+			len -= wrote;
+		}
+	}
 
 	return 0;
 }
