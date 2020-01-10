@@ -20,6 +20,18 @@ utils_mctp_demux_daemon_LDADD = libmctp.la
 
 pkgconfig_DATA = libmctp.pc
 
+if AUTOCONF_CODE_COVERAGE_2019_01_06
+include $(top_srcdir)/aminclude_static.am
+clean-local: code-coverage-clean
+distclean-local: code-coverage-dist-clean
+else
+@CODE_COVERAGE_RULES@
+endif
+
+AM_CPPFLAGS = $(CODE_COVERAGE_CPPFLAGS)
+AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
+AM_LDFLAGS = $(CODE_COVERAGE_LDFLAGS)
+
 TESTS = $(check_PROGRAMS)
 
 check_PROGRAMS = tests/test_eid tests/test_seq tests/test_bridge
