@@ -1,13 +1,16 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
 #include <stdarg.h>
-#include <stdio.h>
 
 #include "libmctp.h"
 #include "libmctp-log.h"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
+
+#ifdef MCTP_HAVE_STDIO
+#include <stdio.h>
 #endif
 
 #ifdef MCTP_HAVE_SYSLOG
@@ -34,10 +37,12 @@ void mctp_prlog(int level, const char *fmt, ...)
 	case MCTP_LOG_NONE:
 		break;
 	case MCTP_LOG_STDIO:
+#ifdef MCTP_HAVE_STDIO
 		if (level <= log_stdio_level) {
 			vfprintf(stderr, fmt, ap);
 			fputs("\n", stderr);
 		}
+#endif
 		break;
 	case MCTP_LOG_SYSLOG:
 #ifdef MCTP_HAVE_SYSLOG

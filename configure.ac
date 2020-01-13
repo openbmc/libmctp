@@ -23,6 +23,7 @@ PKG_INSTALLDIR
 # AC_ARG_WITH these in the future.
 AC_DEFINE([MCTP_HAVE_SYSLOG], [1], [Define to enable syslog])
 AC_DEFINE([MCTP_HAVE_FILEIO], [1], [Define to enable filesystem functions])
+AC_DEFINE([MCTP_HAVE_STDIO], [1], [Define to enable stdio functions])
 AC_DEFINE([MCTP_DEFAULT_ALLOC], [1],
     [Define to populate allocation functions to defaults (malloc/free)])
 
