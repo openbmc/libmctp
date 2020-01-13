@@ -7,13 +7,16 @@
 
 #ifndef container_of
 #define container_of(ptr, type, member) \
-    (type *)((char *)(ptr) - (char *)&((type *)0)->member)
+(type *)((char *)(ptr) - (char *)&((type *)0)->member)
 #endif
 
 /* test binding implementation */
+struct mctp_binding_test {
+	struct mctp_binding	binding;
+};
 
 /* standard binding interface */
-struct mctp_binding_test *mctp_binding_test_init(void);
+struct mctp_binding_test *mctp_binding_test_init(struct mctp_binding *base);
 void mctp_binding_test_register_bus(struct mctp_binding_test *binding,
 		struct mctp *mctp, mctp_eid_t eid);
 
@@ -27,5 +30,7 @@ void mctp_binding_test_rx_raw(struct mctp_binding_test *test,
 void mctp_test_stack_init(struct mctp **mctp,
 		struct mctp_binding_test **binding,
 		mctp_eid_t eid);
+void mctp_test_stack_destroy(struct mctp *mctp,
+		struct mctp_binding_test *binding);
 
 #endif /* _MCTP_TESTS_TEST_UTILS_H */

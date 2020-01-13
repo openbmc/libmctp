@@ -8,10 +8,6 @@
 
 #include "test-utils.h"
 
-struct mctp_binding_test {
-	struct mctp_binding	binding;
-};
-
 static int mctp_binding_test_tx(struct mctp_binding *b __attribute__((unused)),
 		struct mctp_pktbuf *pkt __attribute__((unused)))
 {
@@ -19,16 +15,24 @@ static int mctp_binding_test_tx(struct mctp_binding *b __attribute__((unused)),
 	assert(0);
 }
 
-struct mctp_binding_test *mctp_binding_test_init(void)
+struct mctp_binding_test *mctp_binding_test_init(struct mctp_binding *base)
 {
 	struct mctp_binding_test *test;
 
 	test = __mctp_alloc(sizeof(*test));
-	test->binding.name = "test";
-	test->binding.version = 1;
-	test->binding.tx = mctp_binding_test_tx;
-	test->binding.pkt_size = MCTP_BMTU;
-	test->binding.pkt_pad = 0;
+	if (!base) {
+		test->binding.name = "test";
+		test->binding.version = 1;
+		test->binding.tx = mctp_binding_test_tx;
+		test->binding.pkt_size = MCTP_BMTU;
+		test->binding.pkt_pad = 0;
+	} else {
+		test->binding.name = base->name ?: "test";
+		test->binding.version = base->version ?: 1;
+		test->binding.tx = base->tx ?: mctp_binding_test_tx;
+		test->binding.pkt_size = base->pkt_size ?: MCTP_BMTU;
+		test->binding.pkt_pad = base->pkt_pad ?: 0;
+	}
 	return test;
 }
 
@@ -56,8 +60,15 @@ void mctp_test_stack_init(struct mctp **mctp,
 	*mctp = mctp_init();
 	assert(*mctp);
 
-	*binding = mctp_binding_test_init();
+	*binding = mctp_binding_test_init(NULL);
 	assert(*binding);
 
 	mctp_binding_test_register_bus(*binding, *mctp, eid);
+}
+
+void mctp_test_stack_destroy(struct mctp *mctp,
+			     struct mctp_binding_test *binding)
+{
+	free(mctp);
+	free(binding);
 }

@@ -34,7 +34,8 @@ AM_LDFLAGS = $(CODE_COVERAGE_LDFLAGS)
 
 TESTS = $(check_PROGRAMS)
 
-check_PROGRAMS = tests/test_eid tests/test_seq tests/test_bridge
+check_PROGRAMS = tests/test_eid tests/test_seq tests/test_bridge \
+		 tests/test_pktbuf
 # We set a global LDADD here, as there's no way to specify it for all
 # tests. This means other targets' LDADDs need to be overridden.
 LDADD = tests/libtest-utils.a libmctp.la
