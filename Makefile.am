@@ -15,6 +15,11 @@ libmctp_la_SOURCES += astlpc.c
 include_HEADERS += libmctp-astlpc.h
 endif
 
+if HAVE_SYSTEMD
+systemdsystemunit_DATA = \
+	mctp-demux.service
+endif
+
 bin_PROGRAMS = utils/mctp-demux-daemon
 utils_mctp_demux_daemon_LDADD = libmctp.la
 
