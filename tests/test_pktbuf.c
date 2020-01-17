@@ -15,7 +15,7 @@ struct test_ctx {
 
 struct test_case {
 	int (*fn)(struct mctp_binding *binding);
-	struct mctp_binding binding;
+	struct mctp_binding_test binding;
 };
 
 static int test_mctp_pktbuf_alloc(struct mctp_binding *binding)
@@ -32,6 +32,12 @@ static int test_mctp_pktbuf_alloc(struct mctp_binding *binding)
 
 static const struct test_case tests[] = {
 	{ .fn = test_mctp_pktbuf_alloc, },
+	{
+		.fn = test_mctp_pktbuf_alloc,
+		.binding.binding = {
+			.pkt_size = 128,
+		},
+	},
 };
 
 int main(void)
@@ -41,7 +47,12 @@ int main(void)
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(tests); i++) {
-		mctp_test_stack_init(&ctx->mctp, &ctx->binding, local_eid);
+		struct test_case *t = &tests[i];
+		struct mctp_binding_test *b = &t->binding;
+
+		mctp_test_stack_init(&ctx->mctp, &b, local_eid);
+
+		ctx->binding = b;
 
 		tests[i].fn(&ctx->binding->binding);
 

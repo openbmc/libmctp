@@ -60,7 +60,7 @@ void mctp_test_stack_init(struct mctp **mctp,
 	*mctp = mctp_init();
 	assert(*mctp);
 
-	*binding = mctp_binding_test_init(NULL);
+	*binding = mctp_binding_test_init(binding ? &(*binding)->binding : NULL);
 	assert(*binding);
 
 	mctp_binding_test_register_bus(*binding, *mctp, eid);
