@@ -149,7 +149,7 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 		rc = astlpc->ops.kcs_read(astlpc->ops_data,
 				MCTP_ASTLPC_KCS_REG_STATUS, &status);
 		if (rc != 1) {
-			mctp_prwarn("KCE status read failed");
+			mctp_prwarn("KCS status read failed");
 			return -1;
 		}
 		if (!(status & KCS_STATUS_OBF))
