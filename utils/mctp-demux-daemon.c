@@ -291,7 +291,7 @@ static int socket_process(struct ctx *ctx)
 			ctx->n_clients * sizeof(struct client));
 
 	client = &ctx->clients[ctx->n_clients-1];
-	memset(client, 0, sizeof(client));
+	memset(client, 0, sizeof(*client));
 	client->active = true;
 	client->sock = fd;
 
