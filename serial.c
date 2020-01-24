@@ -322,6 +322,7 @@ int mctp_serial_rx(struct mctp_binding_serial *serial,
 		const void *buf, size_t len)
 {
 	mctp_rx_consume(serial, buf, len);
+	return 0;
 }
 
 static int mctp_serial_core_start(struct mctp_binding *binding)
