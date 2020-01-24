@@ -1,0 +1,9 @@
+Code-Review+1: Jet Lee <Jet_JC_Lee@wistron.com>
+Ok-To-Test+1: Andrew Jeffery <andrew@aj.id.au>
+Verified+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Code-Review+2: Jeremy Kerr <jk@ozlabs.org>
+Submitted-by: Andrew Jeffery <andrew@aj.id.au>
+Submitted-at: Fri, 24 Jan 2020 06:25:45 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/libmctp/+/28550
+Project: openbmc/libmctp
+Branch: refs/heads/master
