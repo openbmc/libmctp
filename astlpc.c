@@ -368,7 +368,6 @@ struct mctp_binding_astlpc *mctp_astlpc_init_ops(
 		void *ops_data, void *lpc_map)
 {
 	struct mctp_binding_astlpc *astlpc;
-	int rc;
 
 	astlpc = __mctp_astlpc_init();
 	if (!astlpc)
