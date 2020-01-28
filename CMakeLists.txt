@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 3.5 FATAL_ERROR)
 add_definitions (-DMCTP_LOG_STDERR)
 add_definitions (-DMCTP_HAVE_FILEIO)
 add_definitions (-DMCTP_HAVE_STDIO)
+add_definitions (-DMCTP_DEFAULT_ALLOC)
 
 add_library (libmctp STATIC alloc.c core.c log.c libmctp.h serial.c)
 
