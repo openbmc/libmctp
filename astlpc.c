@@ -356,7 +356,7 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(void)
 	astlpc->binding.version = 1;
 	astlpc->binding.tx = mctp_binding_astlpc_tx;
 	astlpc->binding.start = mctp_binding_astlpc_start;
-	astlpc->binding.pkt_size = MCTP_BMTU;
+	astlpc->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
 	astlpc->binding.pkt_pad = 0;
 	astlpc->lpc_map = NULL;
 
