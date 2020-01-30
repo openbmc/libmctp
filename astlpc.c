@@ -122,6 +122,13 @@ static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 	data = 0xff;
 	status |= KCS_STATUS_OBF;
 
+	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
+			status);
+	if (rc) {
+		mctp_prwarn("KCS status write failed");
+		return -1;
+	}
+
 	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
 			data);
 	if (rc) {
@@ -129,13 +136,6 @@ static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 		return -1;
 	}
 
-
-	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
-			status);
-	if (rc) {
-		mctp_prwarn("KCS status write failed");
-		return -1;
-	}
 	return 0;
 }
 
