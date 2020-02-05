@@ -6,6 +6,7 @@
 #include <err.h>
 #include <getopt.h>
 #include <poll.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -500,6 +501,7 @@ int main(int argc, char * const *argv)
 	ctx->clients = NULL;
 	ctx->n_clients = 0;
 	ctx->local_eid = local_eid_default;
+	ctx->verbose = false;
 
 	for (;;) {
 		rc = getopt_long(argc, argv, "e:v", options, NULL);
