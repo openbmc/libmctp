@@ -1,0 +1,9 @@
+Ok-To-Test+1: Andrew Jeffery <andrew@aj.id.au>
+Verified+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Code-Review+1: George Keishing <gkeishin@in.ibm.com>
+Code-Review+2: Andrew Jeffery <andrew@aj.id.au>
+Submitted-by: Andrew Jeffery <andrew@aj.id.au>
+Submitted-at: Wed, 05 Feb 2020 23:33:24 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/libmctp/+/29061
+Project: openbmc/libmctp
+Branch: refs/heads/master
