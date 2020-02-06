@@ -464,6 +464,9 @@ static int mctp_message_tx_on_bus(struct mctp *mctp, struct mctp_bus *bus,
 
 	max_payload_len = bus->binding->pkt_size - sizeof(*hdr);
 
+	mctp_prdebug("%s: Generating packets for transmission of %zu byte message from %hhu to %hhu",
+		     __func__, msg_len, src, dest);
+
 	/* queue up packets, each of max MCTP_MTU size */
 	for (p = 0, i = 0; p < msg_len; i++) {
 		payload_len = msg_len - p;
@@ -499,6 +502,8 @@ static int mctp_message_tx_on_bus(struct mctp *mctp, struct mctp_bus *bus,
 
 		p += payload_len;
 	}
+
+	mctp_prdebug("%s: Enqueued %d packets", __func__, i);
 
 	mctp_send_tx_queue(bus);
 
