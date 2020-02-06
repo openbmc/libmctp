@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <endian.h>
 #include <err.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -172,8 +173,14 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 {
 	struct mctp_binding_astlpc *astlpc = binding_to_astlpc(b);
 	uint32_t len;
+	struct mctp_hdr *hdr;
 
+	hdr = mctp_pktbuf_hdr(pkt);
 	len = mctp_pktbuf_size(pkt);
+
+	mctp_prdebug("%s: Transmitting %"PRIu32"-byte packet (%hhu, %hhu, 0x%hhx)",
+		     __func__, len, hdr->src, hdr->dest, hdr->flags_seq_tag);
+
 	if (len > rx_size - 4) {
 		mctp_prwarn("invalid TX len 0x%x", len);
 		return -1;
@@ -274,6 +281,8 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 		return -1;
 	}
 
+	mctp_prdebug("%s: status: 0x%hhx", __func__, status);
+
 	if (!(status & KCS_STATUS_IBF))
 		return 0;
 
@@ -283,6 +292,8 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 		mctp_prwarn("KCS data read error");
 		return -1;
 	}
+
+	mctp_prdebug("%s: data: 0x%hhx", __func__, data);
 
 	switch (data) {
 	case 0x0:
