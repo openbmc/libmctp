@@ -27,7 +27,7 @@ struct mctp_binding_astlpc_ops {
 };
 
 struct mctp_binding_astlpc *mctp_astlpc_init_ops(
-		struct mctp_binding_astlpc_ops *ops,
+		const struct mctp_binding_astlpc_ops *ops,
 		void *ops_data, void *lpc_map);
 
 struct mctp_binding *mctp_binding_astlpc_core(struct mctp_binding_astlpc *b);
