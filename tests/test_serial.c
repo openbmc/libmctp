@@ -34,6 +34,8 @@ static int mctp_binding_serial_pipe_tx(void *data, void *buf, size_t len)
 
 	rc = write(ctx->egress, buf, len);
 	assert(rc == len);
+
+	return rc;
 }
 
 uint8_t mctp_msg_src[2 * MCTP_BTU];
