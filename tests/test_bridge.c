@@ -35,7 +35,7 @@ static int mctp_binding_bridge_tx(struct mctp_binding *b,
 	return 0;
 }
 
-static int mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
+static void mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 		uint8_t key)
 {
 	struct mctp_pktbuf *pkt;
@@ -44,6 +44,7 @@ static int mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 
 	pkt = mctp_pktbuf_alloc(&binding->binding,
 			sizeof(struct mctp_hdr) + 1);
+	assert(pkt);
 
 	hdr = mctp_pktbuf_hdr(pkt);
 	hdr->flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM;
