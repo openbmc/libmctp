@@ -57,6 +57,8 @@ static int mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 
 	binding->rx_count++;
 	mctp_bus_rx(&binding->binding, pkt);
+
+	return 0;
 }
 
 static struct mctp_binding_bridge *mctp_binding_bridge_init(void)
