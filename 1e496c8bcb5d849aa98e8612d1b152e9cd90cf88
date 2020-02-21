@@ -1,0 +1,10 @@
+Ok-To-Test+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Verified+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Code-Review+1: Lei YU <mine260309@gmail.com>
+Code-Review+1: Deepak Kodihalli <dkodihal@in.ibm.com>
+Code-Review+2: Andrew Jeffery <andrew@aj.id.au>
+Submitted-by: Andrew Jeffery <andrew@aj.id.au>
+Submitted-at: Fri, 21 Feb 2020 03:13:32 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/libmctp/+/28520
+Project: openbmc/libmctp
+Branch: refs/heads/master
