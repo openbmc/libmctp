@@ -13,6 +13,7 @@
 
 #include <assert.h>
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -35,6 +36,8 @@ static int mctp_binding_serial_pipe_tx(void *data, void *buf, size_t len)
 
 uint8_t mctp_msg_src[2 * MCTP_BTU];
 
+static bool seen;
+
 static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
 {
 	uint8_t type;
@@ -45,13 +48,21 @@ static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
 
 	assert(sizeof(mctp_msg_src) == len);
 	assert(!memcmp(mctp_msg_src, msg, len));
+
+	seen = true;
 }
+
+struct serial_test {
+	struct mctp_binding_serial_pipe binding;
+	struct mctp *mctp;
+};
 
 int main(void)
 {
-	struct mctp_binding_serial_pipe _a, *a = &_a;
-	struct mctp_binding_serial_pipe _b, *b = &_b;
-	struct mctp *mctp;
+	struct serial_test scenario[2];
+
+	struct mctp_binding_serial_pipe *a = &scenario[0].binding;
+	struct mctp_binding_serial_pipe *b = &scenario[1].binding;
 	int p[2][2];
 	int rc;
 
@@ -66,10 +77,8 @@ int main(void)
 	rc = pipe(p[1]);
 	assert(!rc);
 
-	mctp = mctp_init();
-	assert(mctp);
-
-	mctp_set_rx_all(mctp, rx_message, NULL);
+	scenario[0].mctp = mctp_init();
+	assert(scenario[0].mctp);
 
 	/* Instantiate the A side of the serial pipe */
 	a->serial = mctp_serial_init();
@@ -78,23 +87,29 @@ int main(void)
 	a->egress = p[1][1];
 	mctp_serial_open_fd(a->serial, a->ingress);
 	mctp_serial_set_tx_fn(a->serial, mctp_binding_serial_pipe_tx, a);
-	mctp_register_bus(mctp, mctp_binding_serial_core(a->serial), 8);
+	mctp_register_bus(scenario[0].mctp, mctp_binding_serial_core(a->serial), 8);
 
 	/* Instantiate the B side of the serial pipe */
+	scenario[1].mctp = mctp_init();
+	assert(scenario[1].mctp);
+	mctp_set_rx_all(scenario[1].mctp, rx_message, NULL);
 	b->serial = mctp_serial_init();
 	assert(b->serial);
 	b->ingress = p[1][0];
 	b->egress = p[0][1];
 	mctp_serial_open_fd(b->serial, b->ingress);
 	mctp_serial_set_tx_fn(b->serial, mctp_binding_serial_pipe_tx, a);
-	mctp_register_bus(mctp, mctp_binding_serial_core(b->serial), 9);
+	mctp_register_bus(scenario[1].mctp, mctp_binding_serial_core(b->serial), 9);
 
 	/* Transmit a message from A to B */
-	rc = mctp_message_tx(mctp, 9, mctp_msg_src, sizeof(mctp_msg_src));
+	rc = mctp_message_tx(scenario[0].mctp, 9, mctp_msg_src, sizeof(mctp_msg_src));
 	assert(rc == 0);
 
+	seen = false;
 	/* Read the message at B from A */
 	mctp_serial_read(b->serial);
+
+	assert(seen);
 
 	return 0;
 }
