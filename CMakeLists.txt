@@ -15,9 +15,11 @@ enable_testing ()
 
 add_executable (test_eid tests/test_eid.c tests/test-utils.c)
 target_link_libraries (test_eid mctp)
+add_test (NAME eid COMMAND test_eid)
 
 add_executable (test_seq tests/test_seq.c tests/test-utils.c)
 target_link_libraries (test_seq mctp)
+add_test (NAME seq COMMAND test_seq)
 
 install (TARGETS mctp DESTINATION lib)
 install (FILES libmctp.h DESTINATION include)
