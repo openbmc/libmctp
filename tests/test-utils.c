@@ -17,6 +17,7 @@ static int mctp_binding_test_tx(struct mctp_binding *b __attribute__((unused)),
 {
 	/* we are not expecting TX packets */
 	assert(0);
+	return 0;
 }
 
 struct mctp_binding_test *mctp_binding_test_init(void)
