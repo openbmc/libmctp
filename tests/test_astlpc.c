@@ -211,5 +211,9 @@ int main(void)
 	/* Verify it's the packet we expect */
 	assert(!memcmp(mmio.lpc + RX_BUFFER_DATA, &msg[MCTP_BTU], MCTP_BTU));
 
+	mctp_astlpc_destroy(astlpc);
+	mctp_destroy(mctp);
+	free(mmio.lpc);
+
 	return 0;
 }
