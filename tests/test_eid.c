@@ -71,5 +71,8 @@ int main(void)
 
 	assert(ctx->rx_count == 0);
 
+	mctp_binding_test_destroy(ctx->binding);
+	mctp_destroy(ctx->mctp);
+
 	return EXIT_SUCCESS;
 }
