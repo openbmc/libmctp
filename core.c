@@ -201,6 +201,7 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 
 	if (ctx->buf_size + len > ctx->buf_alloc_size) {
 		size_t new_alloc_size;
+		void *lbuf;
 
 		/* @todo: finer-grained allocation, size limits */
 		if (!ctx->buf_alloc_size) {
@@ -208,8 +209,15 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 		} else {
 			new_alloc_size = ctx->buf_alloc_size * 2;
 		}
-		ctx->buf = __mctp_realloc(ctx->buf, new_alloc_size);
-		ctx->buf_alloc_size = new_alloc_size;
+
+		lbuf = __mctp_realloc(ctx->buf, new_alloc_size);
+		if (lbuf) {
+			ctx->buf = lbuf;
+			ctx->buf_alloc_size = new_alloc_size;
+		} else {
+			__mctp_free(ctx->buf);
+			return -1;
+		}
 	}
 
 	memcpy(ctx->buf + ctx->buf_size, mctp_pktbuf_data(pkt), len);
