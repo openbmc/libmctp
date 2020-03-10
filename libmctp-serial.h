@@ -12,6 +12,7 @@ extern "C" {
 struct mctp_binding_serial;
 
 struct mctp_binding_serial *mctp_serial_init(void);
+void mctp_serial_destroy(struct mctp_binding_serial *serial);
 
 struct mctp_binding *mctp_binding_serial_core(struct mctp_binding_serial *b);
 

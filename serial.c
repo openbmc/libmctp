@@ -356,3 +356,7 @@ struct mctp_binding_serial *mctp_serial_init(void)
 	return serial;
 }
 
+void mctp_serial_destroy(struct mctp_binding_serial *serial)
+{
+	__mctp_free(serial);
+}
