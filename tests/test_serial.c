@@ -65,8 +65,8 @@ int main(void)
 {
 	struct serial_test scenario[2];
 
-	struct mctp_binding_serial_pipe *a = &scenario[0].binding;
-	struct mctp_binding_serial_pipe *b = &scenario[1].binding;
+	struct mctp_binding_serial_pipe *a;
+	struct mctp_binding_serial_pipe *b;
 	int p[2][2];
 	int rc;
 
@@ -84,8 +84,9 @@ int main(void)
 	/* Instantiate the A side of the serial pipe */
 	scenario[0].mctp = mctp_init();
 	assert(scenario[0].mctp);
-	a->serial = mctp_serial_init();
-	assert(a->serial);
+	scenario[0].binding.serial = mctp_serial_init();
+	assert(scenario[0].binding.serial);
+	a = &scenario[0].binding;
 	a->ingress = p[0][0];
 	a->egress = p[1][1];
 	mctp_serial_open_fd(a->serial, a->ingress);
@@ -96,8 +97,9 @@ int main(void)
 	scenario[1].mctp = mctp_init();
 	assert(scenario[1].mctp);
 	mctp_set_rx_all(scenario[1].mctp, rx_message, NULL);
-	b->serial = mctp_serial_init();
-	assert(b->serial);
+	scenario[1].binding.serial = mctp_serial_init();
+	assert(scenario[1].binding.serial);
+	b = &scenario[1].binding;
 	b->ingress = p[1][0];
 	b->egress = p[0][1];
 	mctp_serial_open_fd(b->serial, b->ingress);
@@ -112,6 +114,11 @@ int main(void)
 	seen = false;
 	mctp_serial_read(b->serial);
 	assert(seen);
+
+	mctp_serial_destroy(scenario[1].binding.serial);
+	mctp_destroy(scenario[1].mctp);
+	mctp_serial_destroy(scenario[0].binding.serial);
+	mctp_destroy(scenario[0].mctp);
 
 	return 0;
 }
