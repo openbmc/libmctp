@@ -25,6 +25,7 @@ struct mctp_binding_test *mctp_binding_test_init(void)
 	struct mctp_binding_test *test;
 
 	test = __mctp_alloc(sizeof(*test));
+	memset(test, '\0', sizeof(*test));
 	test->binding.name = "test";
 	test->binding.version = 1;
 	test->binding.tx = mctp_binding_test_tx;
