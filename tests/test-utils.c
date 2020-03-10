@@ -34,6 +34,11 @@ struct mctp_binding_test *mctp_binding_test_init(void)
 	return test;
 }
 
+void mctp_binding_test_destroy(struct mctp_binding_test *test)
+{
+	__mctp_free(test);
+}
+
 void mctp_binding_test_rx_raw(struct mctp_binding_test *test,
 		void *buf, size_t len)
 {
