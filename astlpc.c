@@ -402,6 +402,13 @@ struct mctp_binding_astlpc *mctp_astlpc_init_ops(
 	return astlpc;
 }
 
+void mctp_astlpc_destroy(struct mctp_binding_astlpc *astlpc)
+{
+	if (astlpc->priv_hdr)
+		__mctp_free(astlpc->priv_hdr);
+	__mctp_free(astlpc);
+}
+
 #ifdef MCTP_HAVE_FILEIO
 static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 {
