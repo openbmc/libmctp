@@ -237,6 +237,21 @@ struct mctp *mctp_init(void)
 	return mctp;
 }
 
+void mctp_destroy(struct mctp *mctp)
+{
+	int i;
+
+	/* Cleanup message assembly contexts */
+	for (i = 0; i < ARRAY_SIZE(mctp->msg_ctxs); i++) {
+		struct mctp_msg_ctx *tmp = &mctp->msg_ctxs[i];
+		if (tmp->buf)
+			__mctp_free(tmp->buf);
+	}
+
+	__mctp_free(mctp->busses);
+	__mctp_free(mctp);
+}
+
 int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data)
 {
 	mctp->message_rx = fn;

@@ -60,6 +60,7 @@ struct mctp;
 struct mctp_bus;
 
 struct mctp *mctp_init(void);
+void mctp_destroy(struct mctp *mctp);
 
 /* Register a binding to the MCTP core, and creates a bus (populating
  * binding->bus).
