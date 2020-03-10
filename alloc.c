@@ -29,6 +29,7 @@ void *__mctp_alloc(size_t size)
 	if (alloc_ops.m_realloc)
 		return alloc_ops.m_realloc(NULL, size);
 	assert(0);
+	return NULL;
 }
 
 void __mctp_free(void *ptr)
@@ -46,6 +47,7 @@ void *__mctp_realloc(void *ptr, size_t size)
 	if (alloc_ops.m_realloc)
 		return alloc_ops.m_realloc(ptr, size);
 	assert(0);
+	return NULL;
 }
 
 void mctp_set_alloc_ops(void *(*m_alloc)(size_t),
