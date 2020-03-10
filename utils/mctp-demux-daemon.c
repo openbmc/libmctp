@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <err.h>
+#include <errno.h>
 #include <getopt.h>
 #include <poll.h>
 #include <stdbool.h>
@@ -326,7 +327,9 @@ static int client_process_recv(struct ctx *ctx, int idx)
 
 	len = recv(client->sock, NULL, 0, MSG_PEEK | MSG_TRUNC);
 	if (len < 0) {
-		warn("can't receive(peek) from client");
+		if (errno != ECONNRESET)
+			warn("can't receive (peek) from client");
+
 		rc = -1;
 		goto out_close;
 	}
@@ -346,7 +349,8 @@ static int client_process_recv(struct ctx *ctx, int idx)
 
 	rc = recv(client->sock, ctx->buf, ctx->buf_size, 0);
 	if (rc < 0) {
-		warn("can't receive from client");
+		if (errno != ECONNRESET)
+			warn("can't receive from client");
 		rc = -1;
 		goto out_close;
 	}
