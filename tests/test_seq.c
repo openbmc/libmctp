@@ -129,6 +129,9 @@ static void run_one_test(struct test_ctx *ctx, struct test *test)
 	/* ensure the payload data was reconstructed correctly */
 	for (i = 0; i < (int)ctx->rx_len; i++)
 		assert(ctx->rx_data[i] == i);
+
+	mctp_binding_test_destroy(ctx->binding);
+	mctp_destroy(ctx->mctp);
 }
 
 
