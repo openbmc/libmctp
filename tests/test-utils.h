@@ -14,6 +14,7 @@
 
 /* standard binding interface */
 struct mctp_binding_test *mctp_binding_test_init(void);
+void mctp_binding_test_destroy(struct mctp_binding_test *test);
 void mctp_binding_test_register_bus(struct mctp_binding_test *binding,
 		struct mctp *mctp, mctp_eid_t eid);
 
