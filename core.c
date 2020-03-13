@@ -14,6 +14,7 @@
 #include "libmctp.h"
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
+#include "libmctp-cmds.h"
 
 /* Internal data structures */
 
@@ -313,12 +314,85 @@ int mctp_bridge_busses(struct mctp *mctp,
 	return 0;
 }
 
-static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus,
-		mctp_eid_t src, mctp_eid_t dest, void *buf, size_t len)
+static inline bool mctp_ctrl_cmd_is_transport(struct mctp_ctrl_msg_hdr *hdr)
 {
+	return ((hdr->command_code >= MCTP_CTRL_CMD_FIRST_TRANSPORT) &&
+		(hdr->command_code <= MCTP_CTRL_CMD_LAST_TRANSPORT));
+}
+
+static bool mctp_ctrl_handle_msg(struct mctp *mctp, struct mctp_bus *bus,
+				 mctp_eid_t src, mctp_eid_t dest, void *buffer,
+				 size_t length)
+{
+	struct mctp_ctrl_msg_hdr *msg_hdr = buffer;
+
+	/*
+	 * Control message is received. If a transport control message handler
+	 * is provided, it will called. If there is no dedicated handler, this
+	 * function returns false and data can be handled by the generic
+	 * message handler. The transport control message handler will be
+	 * provided with messages in the command range 0xF0 - 0xFF.
+	 */
+	if (mctp_ctrl_cmd_is_transport(msg_hdr)) {
+		if (bus->binding->control_rx != NULL) {
+			/* MCTP bus binding handler */
+			bus->binding->control_rx(src,
+						 bus->binding->control_rx_data,
+						 buffer, length);
+			return true;
+		}
+	}
+
+	/*
+	 * Command was not handled, due to lack of specific callback.
+	 * It will be passed to regular message_rx handler.
+	 */
+	return false;
+}
+
+static inline bool mctp_rx_dest_is_local(struct mctp_bus *bus, mctp_eid_t dest)
+{
+	return dest == bus->eid || dest == MCTP_EID_NULL ||
+	       dest == MCTP_EID_BROADCAST;
+}
+
+static inline bool mctp_ctrl_cmd_is_request(struct mctp_ctrl_msg_hdr *hdr)
+{
+	return hdr->ic_msg_type == MCTP_CTRL_HDR_MSG_TYPE &&
+	       hdr->rq_dgram_inst & MCTP_CTRL_HDR_FLAG_REQUEST;
+}
+
+/*
+ * Receive the complete MCTP message and route it.
+ * Asserts:
+ *     'buf' is not NULL.
+ */
+static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus, mctp_eid_t src,
+		    mctp_eid_t dest, void *buf, size_t len)
+{
+	assert(buf != NULL);
+
 	if (mctp->route_policy == ROUTE_ENDPOINT &&
-			dest == bus->eid && mctp->message_rx)
-		mctp->message_rx(src, mctp->message_rx_data, buf, len);
+	    mctp_rx_dest_is_local(bus, dest)) {
+		/* Handle MCTP Control Messages: */
+		if (len >= sizeof(struct mctp_ctrl_msg_hdr)) {
+			struct mctp_ctrl_msg_hdr *msg_hdr = buf;
+
+			/*
+			 * Identify if this is a control request message.
+			 * See DSP0236 v1.3.0 sec. 11.5.
+			 */
+			if (mctp_ctrl_cmd_is_request(msg_hdr)) {
+				bool handled;
+				handled = mctp_ctrl_handle_msg(mctp, bus, src,
+							       dest, buf, len);
+				if (handled)
+					return;
+			}
+		}
+		if (mctp->message_rx)
+			mctp->message_rx(src, mctp->message_rx_data, buf, len);
+	}
 
 	if (mctp->route_policy == ROUTE_BRIDGE) {
 		int i;
