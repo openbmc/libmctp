@@ -101,6 +101,9 @@ struct mctp_binding {
 	int		(*start)(struct mctp_binding *binding);
 	int		(*tx)(struct mctp_binding *binding,
 				struct mctp_pktbuf *pkt);
+	mctp_rx_fn      control_rx;
+	void            *control_rx_data;
+
 };
 
 void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable);
