@@ -14,6 +14,10 @@ extern "C" {
 
 typedef uint8_t mctp_eid_t;
 
+/* Special Endpoint ID values */
+#define MCTP_EID_NULL 0
+#define MCTP_EID_BROADCAST 0xff
+
 /* MCTP packet definitions */
 struct mctp_hdr {
 	uint8_t	ver;
@@ -101,6 +105,9 @@ struct mctp_binding {
 	int		(*start)(struct mctp_binding *binding);
 	int		(*tx)(struct mctp_binding *binding,
 				struct mctp_pktbuf *pkt);
+	mctp_rx_fn      control_rx;
+	void            *control_rx_data;
+
 };
 
 void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable);
