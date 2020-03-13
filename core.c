@@ -14,6 +14,7 @@
 #include "libmctp.h"
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
+#include "libmctp-cmds.h"
 
 /* Internal data structures */
 
@@ -55,6 +56,10 @@ struct mctp {
 		ROUTE_ENDPOINT,
 		ROUTE_BRIDGE,
 	}			route_policy;
+	/* Control message RX callback. */
+	mctp_rx_fn              control_rx;
+	void                    *control_rx_data;
+
 };
 
 #ifndef BUILD_ASSERT
@@ -313,12 +318,50 @@ int mctp_bridge_busses(struct mctp *mctp,
 	return 0;
 }
 
-static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus,
-		mctp_eid_t src, mctp_eid_t dest, void *buf, size_t len)
+static inline bool mctp_rx_dest_is_local(struct mctp_bus *bus, mctp_eid_t dest)
 {
+	return dest == bus->eid ||
+	       dest == MCTP_EID_NULL ||
+	       dest == MCTP_EID_BROADCAST;
+}
+
+static inline bool mctp_ctrl_cmd_is_request(struct mctp_ctrl_msg_hdr *hdr)
+{
+	return hdr->ic_msg_type == MCTP_CTRL_HDR_MSG_TYPE &&
+	       hdr->rq_dgram_inst & MCTP_CTRL_HDR_FLAG_REQUEST;
+}
+
+/*
+ * Receive the complete MCTP message and route it.
+ * Asserts:
+ *     'buf' is not NULL.
+ */
+static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus,
+		    mctp_eid_t src, mctp_eid_t dest, void *buf, size_t len)
+{
+	assert(buf != NULL);
+
 	if (mctp->route_policy == ROUTE_ENDPOINT &&
-			dest == bus->eid && mctp->message_rx)
-		mctp->message_rx(src, mctp->message_rx_data, buf, len);
+	    mctp_rx_dest_is_local(bus, dest)) {
+		/* Handle MCTP Control Messages: */
+		if (len >= sizeof(struct mctp_ctrl_msg_hdr)) {
+			struct mctp_ctrl_msg_hdr *msg_hdr = buf;
+
+			/*
+			 * Identify if this is a control request message.
+			 * See DSP0236 v1.3.0 sec. 11.5.
+			 */
+			if (mctp_ctrl_cmd_is_request(msg_hdr)) {
+				bool handled;
+				handled = mctp_ctrl_handle_msg(mctp, bus, src,
+							       dest, buf, len);
+				if(handled)
+					return;
+			}
+		}
+		if (mctp->message_rx)
+			mctp->message_rx(src, mctp->message_rx_data, buf, len);
+	}
 
 	if (mctp->route_policy == ROUTE_BRIDGE) {
 		int i;
@@ -329,7 +372,7 @@ static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus,
 				continue;
 
 			mctp_message_tx_on_bus(mctp, dest_bus,
-					src, dest, buf, len);
+						src, dest, buf, len);
 		}
 
 	}
@@ -540,4 +583,78 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 
 	bus = find_bus_for_eid(mctp, eid);
 	return mctp_message_tx_on_bus(mctp, bus, bus->eid, eid, msg, msg_len);
+}
+
+static inline bool mctp_ctrl_cmd_is_control(struct mctp_ctrl_msg_hdr *hdr)
+{
+	return ((hdr->command_code > MCTP_CTRL_CMD_RESERVED) &&
+		(hdr->command_code < MCTP_CTRL_CMD_MAX));
+}
+
+static inline bool mctp_ctrl_cmd_is_transport(struct mctp_ctrl_msg_hdr *hdr)
+{
+	return ((hdr->command_code >= MCTP_CTRL_CMD_FIRST_TRANSPORT) &&
+		(hdr->command_code <= MCTP_CTRL_CMD_LAST_TRANSPORT));
+}
+
+static inline void mctp_ctrl_send_empty_response(struct mctp *mctp,
+						 mctp_eid_t src,
+						 uint8_t command_code,
+						 uint8_t response_code) {
+	struct mctp_ctrl_msg_hdr response_data;
+
+	memset(&response_data, 0, sizeof(response_data));
+	response_data.command_code = command_code;
+	response_data.completion_code = response_code;
+	response_data.ic_msg_type = MCTP_CTRL_HDR_MSG_TYPE;
+	mctp_message_tx(mctp, src, &response_data,
+			sizeof(response_data));
+}
+bool mctp_ctrl_handle_msg(struct mctp *mctp, struct mctp_bus *bus,
+			  mctp_eid_t src, mctp_eid_t dest, void *buffer,
+			  size_t length)
+{
+	struct mctp_ctrl_msg_hdr *msg_hdr = buffer;
+	/* Control message is received.
+	 * If dedicated control messages handler is provided, it will be used.
+	 * If there is no dedicated handler, this function returns false and
+	 * data can be handled by the generic message handler. There are two
+	 * control messages handlers available. First one is located in struct
+	 * mctp and handles command codes from 0x01 to 0x14 and the second one
+	 * is a part of struct mctp_binding, as 0xF0 - 0xFF command codes are
+	 * transport specific.
+	 */
+	if (mctp_ctrl_cmd_is_control(msg_hdr)) {
+		if (mctp->control_rx != NULL) {
+			/* MCTP endpoint handler */
+			mctp->control_rx(src, mctp->control_rx_data, buffer,
+					 length);
+			return true;
+		}
+	} else if (mctp_ctrl_cmd_is_transport(msg_hdr)) {
+		if (bus->binding->control_rx != NULL) {
+			/* MCTP bus binding handler */
+			bus->binding->control_rx(src,
+						 bus->binding->control_rx_data,
+						 buffer, length);
+			return true;
+		}
+	} else {
+		/* Unrecognized command code. */
+		mctp_ctrl_send_empty_response(mctp, src, msg_hdr->command_code,
+					      MCTP_CTRL_CC_ERROR_UNSUPPORTED_CMD);
+		return true;
+	}
+	/*
+	 * Command was not handled, due to lack of specific callback.
+	 * It will be passed to regular message_rx handler.
+	 */
+	return false;
+}
+
+int mctp_set_rx_ctrl(struct mctp *mctp, mctp_rx_fn fn, void *data)
+{
+	mctp->control_rx = fn;
+	mctp->control_rx_data = data;
+	return 0;
 }
