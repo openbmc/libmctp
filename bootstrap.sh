@@ -4,7 +4,6 @@ set -eu
 
 autoreconf -f -i
 
-
 BOOTSTRAP_MODE=""
 
 if [ $# -gt 0 ];
@@ -15,10 +14,12 @@ fi
 
 case "${BOOTSTRAP_MODE}" in
     dev)
-        FLAGS="-fsanitize=address,leak,undefined -Wformat -Werror=format-security -Werror=array-bounds -ggdb"
+        FLAGS="-Wformat -Werror=format-security"
+        FLAGS="${FLAGS} -Werror=array-bounds"
+        FLAGS="${FLAGS} -fsanitize=address,leak,undefined"
+        FLAGS="${FLAGS} -ggdb"
         ./configure \
             CFLAGS="${FLAGS}" \
-            CXXFLAGS="${FLAGS}" \
             --enable-code-coverage \
             "$@"
         ;;
