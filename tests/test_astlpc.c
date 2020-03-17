@@ -98,28 +98,30 @@ int mctp_astlpc_mmio_kcs_write(void *data, enum mctp_binding_astlpc_kcs_reg reg,
 
 	return 0;
 }
-int mctp_astlpc_mmio_lpc_read(void *data, void *buf, off_t offset, size_t len)
+int mctp_astlpc_mmio_lpc_read(void *data, void *buf, long offset, size_t len)
 {
 	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
 
+	assert(offset >= 0L);
 	assert(offset + len < mmio->lpc_size);
 
 	memcpy(buf, mmio->lpc + offset, len);
 
-	mctp_prdebug("%s: %zu bytes from 0x%zx", __func__, len, offset);
+	mctp_prdebug("%s: %zu bytes from 0x%lx", __func__, len, offset);
 
 	return 0;
 }
 
-int mctp_astlpc_mmio_lpc_write(void *data, void *buf, off_t offset, size_t len)
+int mctp_astlpc_mmio_lpc_write(void *data, void *buf, long offset, size_t len)
 {
 	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
 
+	assert(offset >= 0L);
 	assert(offset + len < mmio->lpc_size);
 
 	memcpy(mmio->lpc + offset, buf, len);
 
-	mctp_prdebug("%s: %zu bytes to 0x%zx", __func__, len, offset);
+	mctp_prdebug("%s: %zu bytes to 0x%lx", __func__, len, offset);
 
 	return 0;
 }

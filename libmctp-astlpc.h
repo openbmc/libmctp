@@ -7,7 +7,6 @@
 extern "C" {
 #endif
 
-#include <unistd.h>
 #include <libmctp.h>
 
 struct mctp_binding_astlpc;
@@ -22,8 +21,8 @@ struct mctp_binding_astlpc_ops {
 			uint8_t *val);
 	int	(*kcs_write)(void *data, enum mctp_binding_astlpc_kcs_reg reg,
 			uint8_t val);
-	int	(*lpc_read)(void *data, void *buf, off_t offset, size_t len);
-	int	(*lpc_write)(void *data, void *buf, off_t offset, size_t len);
+	int	(*lpc_read)(void *data, void *buf, long offset, size_t len);
+	int	(*lpc_write)(void *data, void *buf, long offset, size_t len);
 };
 
 struct mctp_binding_astlpc *mctp_astlpc_init_ops(
