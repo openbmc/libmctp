@@ -1,7 +1,14 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
-#include <assert.h>
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#if HAVE_ENDIAN_H
 #include <endian.h>
+#endif
+
+#include <assert.h>
 #include <err.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -9,10 +16,6 @@
 #include <string.h>
 
 #define pr_fmt(x) "astlpc: " x
-
-#if HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #include "libmctp.h"
 #include "libmctp-alloc.h"
