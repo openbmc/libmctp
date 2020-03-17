@@ -15,6 +15,8 @@ AC_PROG_MAKE_SET
 # libtool init
 LT_INIT
 
+AC_CHECK_HEADERS_ONCE([endian.h])
+
 # pkg-config
 PKG_PROG_PKG_CONFIG
 PKG_INSTALLDIR
