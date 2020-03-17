@@ -16,6 +16,7 @@ AC_PROG_MAKE_SET
 LT_INIT
 
 AC_CHECK_HEADERS_ONCE([endian.h])
+AC_CHECK_HEADERS_ONCE([unistd.h fcntl.h])
 
 # pkg-config
 PKG_PROG_PKG_CONFIG
@@ -40,13 +41,87 @@ AS_IF([test "x$with_systemdsystemunitdir" != "xno"],
 )
 AM_CONDITIONAL([HAVE_SYSTEMD], [test "x$with_systemdsystemunitdir" != "xno"])
 
-# Set defaults for standard library compiles. We may want to
-# AC_ARG_WITH these in the future.
-AC_DEFINE([MCTP_HAVE_SYSLOG], [1], [Define to enable syslog])
-AC_DEFINE([MCTP_HAVE_FILEIO], [1], [Define to enable filesystem functions])
-AC_DEFINE([MCTP_HAVE_STDIO], [1], [Define to enable stdio functions])
-AC_DEFINE([MCTP_DEFAULT_ALLOC], [1],
-    [Define to populate allocation functions to defaults (malloc/free)])
+AC_ARG_WITH([syslog],
+            [AS_HELP_STRING([--with-syslog], [Support logging to syslog])],
+            [],
+            [with_syslog=check])
+
+AS_IF([test "x$with_syslog" != "xno"],
+      [AC_COMPILE_IFELSE(
+       [AC_LANG_PROGRAM([[
+#include <stdarg.h>
+#include <syslog.h>
+
+void check_vsyslog(int level, const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vsyslog(0, fmt, ap);
+    va_end(ap);
+}
+        ]],[[
+    check_vsyslog(0, "\n");
+        ]])],
+       [AC_DEFINE([MCTP_HAVE_SYSLOG], [1], [Define to enable syslog])],
+       [])],
+      [])
+
+AC_ARG_WITH([fileio],
+            [AS_HELP_STRING([--with-fileio],
+                            [Support interfaces based on file-descriptors])],
+            [],
+            [with_fileio=check])
+
+AS_IF([test "x$with_fileio" = "xcheck"],
+      [AC_DEFINE([MCTP_HAVE_FILEIO], [(HAVE_UNISTD_H && HAVE_FCNTL_H)],
+                 [Support interfaces based on file-descriptors])],
+      [AS_IF([test "x$with_fileio" = "xyes"],
+             [AC_DEFINE([MCTP_HAVE_FILEIO], [1],
+                        [Support interfaces based on file-descriptors])],
+             [])])
+
+AC_ARG_WITH([stdio],
+            [AS_HELP_STRING([--with-stdio], [Support logging to stdio])],
+            [],
+            [with_stdio=check])
+
+AS_IF([test "x$with_stdio" != "xno"],
+      [AC_COMPILE_IFELSE(
+       [AC_LANG_PROGRAM([[
+#include <stdarg.h>
+#include <stdio.h>
+void check_vprintf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vprintf(fmt, ap);
+    va_end(ap);
+}
+        ]],[[
+    check_vprintf("\n");
+        ]])],
+       [AC_DEFINE([MCTP_HAVE_STDIO], [1], [Define to enable stdio functions])],
+       [])],
+      [])
+
+AC_ARG_WITH([default-alloc],
+            [AS_HELP_STRING([--with-default-alloc],
+                            [Use libc malloc and free for heap memory])],
+            [],
+            [with_default_alloc=check])
+
+AS_IF([test "x$with_default_alloc" != "xno"],
+      [AC_LINK_IFELSE(
+       [AC_LANG_PROGRAM([[
+#include <stdlib.h>
+        ]], [[
+free(malloc(4096));
+        ]])],
+       [AC_DEFINE([MCTP_DEFAULT_ALLOC],
+                  [1],
+                  [Define to use libc malloc and free for heap memory])],
+       [])],
+      [])
 
 # Enable all bindings. AC_ARG_ENABLE in future.
 AM_CONDITIONAL([LIBMCTP_BINDING_serial], [true])
