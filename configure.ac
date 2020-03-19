@@ -126,6 +126,7 @@ free(malloc(4096));
 # Enable all bindings. AC_ARG_ENABLE in future.
 AM_CONDITIONAL([LIBMCTP_BINDING_serial], [true])
 AM_CONDITIONAL([LIBMCTP_BINDING_astlpc], [true])
+AM_CONDITIONAL([LIBMCTP_BINDING_astpcie], [true])
 
 AX_CODE_COVERAGE
 m4_ifdef([_AX_CODE_COVERAGE_RULES],
