@@ -21,6 +21,7 @@
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
 #include "libmctp-astlpc.h"
+#include "container_of.h"
 
 #ifdef MCTP_HAVE_FILEIO
 
@@ -59,11 +60,6 @@ struct mctp_binding_astlpc {
 	/* temporary transmit buffer */
 	uint8_t			txbuf[256];
 };
-
-#ifndef container_of
-#define container_of(ptr, type, member) \
-	(type *)((char *)(ptr) - (char *)&((type *)0)->member)
-#endif
 
 #define binding_to_astlpc(b) \
 	container_of(b, struct mctp_binding_astlpc, binding)

@@ -6,6 +6,7 @@
 
 #include "libmctp-astlpc.h"
 #include "libmctp-log.h"
+#include "container_of.h"
 
 #ifdef NDEBUG
 #undef NDEBUG
@@ -57,11 +58,6 @@ struct mctp_binding_astlpc_mmio {
 	size_t lpc_size;
 	uint8_t *lpc;
 };
-
-#ifndef container_of
-#define container_of(ptr, type, member) \
-	(type *)((char *)(ptr) - (char *)&((type *)0)->member)
-#endif
 
 #define binding_to_mmio(b) \
 	container_of(b, struct mctp_binding_astlpc_mmio, astlpc)
