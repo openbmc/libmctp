@@ -15,6 +15,11 @@ libmctp_la_SOURCES += astlpc.c
 include_HEADERS += libmctp-astlpc.h
 endif
 
+if LIBMCTP_BINDING_pcie
+libmctp_la_SOURCES += pcie.c
+include_HEADERS += libmctp-pcie.h
+endif
+
 if HAVE_SYSTEMD
 systemdsystemunit_DATA = \
 	mctp-demux.service
@@ -40,7 +45,8 @@ AM_LDFLAGS = $(CODE_COVERAGE_LDFLAGS)
 TESTS = $(check_PROGRAMS)
 
 check_PROGRAMS = tests/test_eid tests/test_seq tests/test_bridge \
-		 tests/test_astlpc tests/test_serial
+		 tests/test_astlpc tests/test_serial \
+		 tests/test_pcie
 # We set a global LDADD here, as there's no way to specify it for all
 # tests. This means other targets' LDADDs need to be overridden.
 LDADD = tests/libtest-utils.a libmctp.la
