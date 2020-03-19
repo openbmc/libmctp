@@ -4,11 +4,7 @@
 #define _MCTP_TESTS_TEST_UTILS_H
 
 #include <libmctp.h>
-
-#ifndef container_of
-#define container_of(ptr, type, member) \
-    (type *)((char *)(ptr) - (char *)&((type *)0)->member)
-#endif
+#include <container_of.h>
 
 /* test binding implementation */
 
