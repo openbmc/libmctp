@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "690f5974_b36a06fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2020-03-24T08:26:22Z",
+      "side": 1,
+      "message": "Shouldn\u0027t it be hardware dependent? I believe this implementation will dependent on HW interface of MCTP Controller on PCIe. If that\u0027s the case you should rename files, structures and mention that in the commit message. Please, see astlpc for reference.",
+      "revId": "588ec97fb6c105a7a4c0fedd83623a02d74fda66",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
