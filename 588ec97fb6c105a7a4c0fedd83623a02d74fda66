@@ -16,6 +16,24 @@
       "revId": "588ec97fb6c105a7a4c0fedd83623a02d74fda66",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5cfe53a_ac6bd4b2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000460
+      },
+      "writtenOn": "2020-03-24T08:35:43Z",
+      "side": 1,
+      "message": "ast2600pcie for example? Quite long IMO. It there a plan to support various ast HW versions? Leaving astpcie will suggest so.",
+      "parentUuid": "690f5974_b36a06fe",
+      "revId": "588ec97fb6c105a7a4c0fedd83623a02d74fda66",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
