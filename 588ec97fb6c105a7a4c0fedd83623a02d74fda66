@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "edd68db7_4d57f2f9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-25T06:11:58Z",
+      "side": 1,
+      "message": "It\u0027s not clear to me yet where the boundaries for this implementation lie. I assume there\u0027s going to be an associated kernel driver that exposes an interface that the binding implementation backs onto. This is how the astlpc binding works for the most part (though it has the ability to be used in standalone environments also). What we need is for that kernel interface to have well-defined semantics that are portable across hardware implementations. As such the implementation here should just concern itself with the PCIe VDM binding semantics and not the nuances of the hardware and as a consequence I don\u0027t think the bare \u0027pcie\u0027 name is a bad start.\n\nHowever, I need more details on how this is actually going to work in practice. I\u0027d hate to see it using `/dev/mem` or the like to gain access to the PCIe MCTP device on the ASPEED SoCs.",
+      "parentUuid": "d5cfe53a_ac6bd4b2",
+      "revId": "588ec97fb6c105a7a4c0fedd83623a02d74fda66",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "354aaf52_fb898bc8",
         "filename": "pcie.c",
         "patchSetId": 1
