@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "004ff968_9edd5540",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2020-03-25T09:19:05Z",
+      "side": 1,
+      "message": "We are working on MCTP driver for AST2600 with simple interface (think read / write, single client, raw data). Not quite as bad as /dev/mem, but not ideal either ;)\nWe didn\u0027t plan to be portable across different HW on the kernel side - moving that to libmctp side for now (different bindings for different HW - trying to be mostly compatible, but no promises), mainly because of the future socket based approach, which would do just that (unified interface for userspace for anything MCTP). We would then just modify the driver to fit into that interface.",
+      "parentUuid": "edd68db7_4d57f2f9",
+      "revId": "588ec97fb6c105a7a4c0fedd83623a02d74fda66",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "354aaf52_fb898bc8",
         "filename": "pcie.c",
         "patchSetId": 1
