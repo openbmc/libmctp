@@ -38,6 +38,7 @@ static const size_t write(int fd, void *buf, size_t len)
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
 #include "libmctp-serial.h"
+#include "container_of.h"
 
 struct mctp_binding_serial {
 	struct mctp_binding	binding;
@@ -66,11 +67,6 @@ struct mctp_binding_serial {
 	/* temporary transmit buffer */
 	uint8_t			txbuf[256];
 };
-
-#ifndef container_of
-#define container_of(ptr, type, member) \
-	(type *)((char *)(ptr) - (char *)&((type *)0)->member)
-#endif
 
 #define binding_to_serial(b) \
 	container_of(b, struct mctp_binding_serial, binding)
