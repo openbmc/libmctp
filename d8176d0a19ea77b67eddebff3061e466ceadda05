@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "c4f3d379_f52d3819",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2020-03-26T12:04:53Z",
+      "side": 1,
+      "message": "We are not mapping MMIO registers. The kernel driver takes care of handling the HW and exposes an interface allowing you to receive and transmit MCTP frames. We just don\u0027t want to make promises that the interface will be stable for various types of HW today.\nSo 1) is in kernel, and 2) is in userspace (which means that this is already separated I guess...).",
+      "parentUuid": "73fb9fe2_8b3754f7",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 66
+      },
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9588db07_b62766db",
         "filename": "astlpc.c",
         "patchSetId": 4
