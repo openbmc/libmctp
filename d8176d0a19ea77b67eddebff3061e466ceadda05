@@ -1,0 +1,239 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0923020e_985c6ef5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "Can you please use Gerrit\u0027s \"Work In Progress\" state instead? You can switch to it using the triple-dot menu in the top right of the patch screen of the new Gerrit interface.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 5
+      },
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2620dd32_9e34706c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "As I understand it your kernel driver is just going to allow userspace to e.g. mmap() the MMIO space of the MCTP device on the AST BMCs. So really what we have in userspace are two things:\n\n1. A driver for the MCTP device\n2. An implementation of the MCTP PCIe VDM bindings\n\nIt might be useful to consider separating the two, though I\u0027m not sure how just yet. I know we started it with the astlpc binding implementation, but I\u0027d like to avoid a grave-yard of \"bindings\" that are really also drivers and can\u0027t be ported between hardware implementations.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 66
+      },
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9588db07_b62766db",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "Please separate out the extraction of container_of() into a separate commit",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 25
+      },
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef72c1c2_6eb09071",
+        "filename": "astpcie.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "Please address my previous comment about including config.h before anything else.",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 6
+      },
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "344ff6ae_84dc4f0a",
+        "filename": "astpcie.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "If this is the private header then I think we\u0027re better off calling it \u0027astpcie.h\u0027 and making sure it\u0027s not installed by the build system",
+      "range": {
+        "startLine": 17,
+        "startChar": 10,
+        "endLine": 17,
+        "endChar": 32
+      },
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23a8ecb7_81335e15",
+        "filename": "astpcie.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "Drop this onto a separate line to avoid exceeding 80 chars",
+      "range": {
+        "startLine": 19,
+        "startChar": 30,
+        "endLine": 19,
+        "endChar": 83
+      },
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89651f7d_be59488b",
+        "filename": "container_of.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "Please drop this one. The file is short enough that it\u0027s unnecessary.\n\nPlease also note the request to extract this change out into its own commit",
+      "range": {
+        "startLine": 9,
+        "startChar": 6,
+        "endLine": 9,
+        "endChar": 25
+      },
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c609595_25dad757",
+        "filename": "libmctp-astpcie-bind.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "just a thought, it might be better to make this the last member of the struct. That way overflows avoid overwriting the rx_pkt pointer and if necessary we could make the buffer variable in size.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 52
+      },
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3dd6822_8e0a527f",
+        "filename": "serial.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "Separate this out into the commit dedicated to refactoring container_of()",
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1a792468_3b567773",
+        "filename": "tests/test-utils.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "Separate this out into the commit refactoring container_of()",
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2eadd457_2509427a",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-26T00:34:26Z",
+      "side": 1,
+      "message": "Separate this out into the commit refactoring container_of()",
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
