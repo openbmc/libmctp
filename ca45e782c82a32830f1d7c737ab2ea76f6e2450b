@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d8343c7d_0557703a",
+        "filename": "astpcie.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-27T00:25:11Z",
+      "side": 1,
+      "message": "See comment on the file",
+      "range": {
+        "startLine": 17,
+        "startChar": 10,
+        "endLine": 17,
+        "endChar": 14
+      },
+      "revId": "ca45e782c82a32830f1d7c737ab2ea76f6e2450b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "302ffa67_e1c80fda",
+        "filename": "prv-astpcie.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-27T00:25:11Z",
+      "side": 1,
+      "message": "Can we just call it \u0027astpcie.h\u0027 to align with astpcie.c? \u0027prv\u0027 seems like an awkward contraction, and we can just a) document that the convention for naming public api headers is to prefix them with \u0027libmctp-\u0027 and b) document private headers with a comment inside the file.",
+      "revId": "ca45e782c82a32830f1d7c737ab2ea76f6e2450b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d865425_14195dd0",
+        "filename": "prv-astpcie.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-27T00:25:11Z",
+      "side": 1,
+      "message": "Rename this to whatever we rename the file to",
+      "range": {
+        "startLine": 3,
+        "startChar": 9,
+        "endLine": 3,
+        "endChar": 29
+      },
+      "revId": "ca45e782c82a32830f1d7c737ab2ea76f6e2450b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46942353_4119e39a",
+        "filename": "prv-astpcie.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-27T00:25:11Z",
+      "side": 1,
+      "message": "MCTP_ASTPCIE_BINDING_DEFAULT_BUF should be defined in this header no? I\u0027d very much like to avoid an ordering dependency between the C file including this header and the structures defined in it.",
+      "range": {
+        "startLine": 15,
+        "startChar": 18,
+        "endLine": 15,
+        "endChar": 50
+      },
+      "revId": "ca45e782c82a32830f1d7c737ab2ea76f6e2450b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bfa6f416_b84b4790",
+        "filename": "prv-astpcie.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-27T00:25:11Z",
+      "side": 1,
+      "message": "Can drop this too given the length of the file",
+      "range": {
+        "startLine": 18,
+        "startChar": 6,
+        "endLine": 18,
+        "endChar": 33
+      },
+      "revId": "ca45e782c82a32830f1d7c737ab2ea76f6e2450b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e23531ac_ee83cef3",
+        "filename": "tests/test_astpcie.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-27T00:25:11Z",
+      "side": 1,
+      "message": "See comment on file",
+      "range": {
+        "startLine": 22,
+        "startChar": 10,
+        "endLine": 22,
+        "endChar": 14
+      },
+      "revId": "ca45e782c82a32830f1d7c737ab2ea76f6e2450b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
