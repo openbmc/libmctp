@@ -120,6 +120,30 @@
     },
     {
       "key": {
+        "uuid": "9e81ce4b_907c909f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-03-27T00:01:37Z",
+      "side": 1,
+      "message": "Ah, I see. I guess I tried to infer too much from my understanding of your previous comments.\n\nIf the framing is taken care of by the hardware then we\u0027re not implementing a binding as much as an adapter for the kernel interface. I guess we stick with astpcie for the moment then and think about how best to organise it all as we accrue implementations.",
+      "parentUuid": "c4f3d379_f52d3819",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 66
+      },
+      "revId": "d8176d0a19ea77b67eddebff3061e466ceadda05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9588db07_b62766db",
         "filename": "astlpc.c",
         "patchSetId": 4
