@@ -17,11 +17,10 @@
 #include <syslog.h>
 #endif
 
-enum {
-	MCTP_LOG_NONE,
-	MCTP_LOG_STDIO,
-	MCTP_LOG_SYSLOG,
-	MCTP_LOG_CUSTOM,
+enum { MCTP_LOG_NONE,
+       MCTP_LOG_STDIO,
+       MCTP_LOG_SYSLOG,
+       MCTP_LOG_CUSTOM,
 } log_type = MCTP_LOG_NONE;
 
 static int log_stdio_level;

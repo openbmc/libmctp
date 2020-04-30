@@ -18,7 +18,7 @@ static const uint8_t echo_req = 1;
 static const uint8_t echo_resp = 2;
 
 struct ctx {
-	struct mctp	*mctp;
+	struct mctp *mctp;
 };
 
 static void tx_message(struct ctx *ctx, mctp_eid_t eid, void *msg, size_t len)
@@ -28,7 +28,7 @@ static void tx_message(struct ctx *ctx, mctp_eid_t eid, void *msg, size_t len)
 	type = len > 0 ? *(uint8_t *)(msg) : 0x00;
 
 	fprintf(stderr, "TX: dest EID 0x%02x: %zd bytes, first byte [0x%02x]\n",
-			eid, len, type);
+		eid, len, type);
 	mctp_message_tx(ctx->mctp, eid, msg, len);
 }
 
@@ -40,7 +40,7 @@ static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
 	type = len > 0 ? *(uint8_t *)(msg) : 0x00;
 
 	fprintf(stderr, "RX: src EID 0x%02x: %zd bytes, first byte [0x%02x]\n",
-			eid, len, type);
+		eid, len, type);
 
 	if (type == echo_req) {
 		*(uint8_t *)(msg) = echo_resp;
@@ -105,9 +105,7 @@ int main(void)
 			break;
 
 #endif
-
 	}
 
 	return EXIT_SUCCESS;
-
 }

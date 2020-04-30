@@ -9,12 +9,11 @@
 
 #include "test-utils.h"
 
-
 struct test_ctx {
-	struct mctp			*mctp;
-	struct mctp_binding_test	*binding;
-	int				rx_count;
-	mctp_eid_t			src_eid;
+	struct mctp *mctp;
+	struct mctp_binding_test *binding;
+	int rx_count;
+	mctp_eid_t src_eid;
 };
 
 static void test_rx(uint8_t eid, void *data, void *msg, size_t len)
@@ -28,8 +27,7 @@ static void test_rx(uint8_t eid, void *data, void *msg, size_t len)
 	ctx->src_eid = eid;
 }
 
-static void create_packet(struct mctp_hdr *pkt,
-		mctp_eid_t src, mctp_eid_t dest)
+static void create_packet(struct mctp_hdr *pkt, mctp_eid_t src, mctp_eid_t dest)
 {
 	memset(pkt, 0, sizeof(*pkt));
 	pkt->src = src;
@@ -44,8 +42,8 @@ int main(void)
 	const mctp_eid_t remote_eid = 9;
 	const mctp_eid_t other_eid = 10;
 	struct {
-		struct mctp_hdr	hdr;
-		uint8_t		payload[1];
+		struct mctp_hdr hdr;
+		uint8_t payload[1];
 	} pktbuf;
 
 	mctp_test_stack_init(&ctx->mctp, &ctx->binding, local_eid);

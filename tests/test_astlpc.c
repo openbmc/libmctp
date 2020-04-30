@@ -12,7 +12,7 @@
 #undef NDEBUG
 #endif
 
-#define RX_BUFFER_DATA	0x100 + 4 + 4
+#define RX_BUFFER_DATA 0x100 + 4 + 4
 
 #include <assert.h>
 #include <stdint.h>
@@ -22,33 +22,33 @@
 
 /* Hack: Needs to be in sync with astlpc.c */
 struct mctp_binding_astlpc {
-	struct mctp_binding	binding;
+	struct mctp_binding binding;
 
 	union {
-		void			*lpc_map;
-		struct mctp_lpcmap_hdr	*lpc_hdr;
+		void *lpc_map;
+		struct mctp_lpcmap_hdr *lpc_hdr;
 	};
 
 	/* direct ops data */
-	struct mctp_binding_astlpc_ops	ops;
-	void			*ops_data;
-	struct mctp_lpcmap_hdr	*priv_hdr;
+	struct mctp_binding_astlpc_ops ops;
+	void *ops_data;
+	struct mctp_lpcmap_hdr *priv_hdr;
 
 	/* fileio ops data */
-	void			*lpc_map_base;
-	int			kcs_fd;
-	uint8_t			kcs_status;
+	void *lpc_map_base;
+	int kcs_fd;
+	uint8_t kcs_status;
 
-	bool			running;
+	bool running;
 
 	/* temporary transmit buffer */
-	uint8_t			txbuf[256];
+	uint8_t txbuf[256];
 };
 
-#define KCS_STATUS_BMC_READY		0x80
-#define KCS_STATUS_CHANNEL_ACTIVE	0x40
-#define KCS_STATUS_IBF			0x02
-#define KCS_STATUS_OBF			0x01
+#define KCS_STATUS_BMC_READY 0x80
+#define KCS_STATUS_CHANNEL_ACTIVE 0x40
+#define KCS_STATUS_IBF 0x02
+#define KCS_STATUS_OBF 0x01
 
 struct mctp_binding_astlpc_mmio {
 	struct mctp_binding_astlpc astlpc;
@@ -59,17 +59,18 @@ struct mctp_binding_astlpc_mmio {
 	uint8_t *lpc;
 };
 
-#define binding_to_mmio(b) \
+#define binding_to_mmio(b)                                                     \
 	container_of(b, struct mctp_binding_astlpc_mmio, astlpc)
 
 int mctp_astlpc_mmio_kcs_read(void *data, enum mctp_binding_astlpc_kcs_reg reg,
-		uint8_t *val)
+			      uint8_t *val)
 {
 	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
 
 	*val = mmio->kcs[reg];
 
-	mctp_prdebug("%s: 0x%hhx from %s", __func__, *val, reg ? "status" : "data");
+	mctp_prdebug("%s: 0x%hhx from %s", __func__, *val,
+		     reg ? "status" : "data");
 
 	if (reg == MCTP_ASTLPC_KCS_REG_DATA)
 		mmio->kcs[MCTP_ASTLPC_KCS_REG_STATUS] &= ~KCS_STATUS_IBF;
@@ -78,7 +79,7 @@ int mctp_astlpc_mmio_kcs_read(void *data, enum mctp_binding_astlpc_kcs_reg reg,
 }
 
 int mctp_astlpc_mmio_kcs_write(void *data, enum mctp_binding_astlpc_kcs_reg reg,
-		uint8_t val)
+			       uint8_t val)
 {
 	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
 
@@ -90,7 +91,8 @@ int mctp_astlpc_mmio_kcs_write(void *data, enum mctp_binding_astlpc_kcs_reg reg,
 	else
 		mmio->kcs[reg] = val;
 
-	mctp_prdebug("%s: 0x%hhx to %s", __func__, val, reg ? "status" : "data");
+	mctp_prdebug("%s: 0x%hhx to %s", __func__, val,
+		     reg ? "status" : "data");
 
 	return 0;
 }
@@ -128,8 +130,7 @@ static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
 
 	type = *(uint8_t *)msg;
 
-	mctp_prdebug("MCTP message received: len %zd, type %d",
-			len, type);
+	mctp_prdebug("MCTP message received: len %zd, type %d", len, type);
 }
 
 const struct mctp_binding_astlpc_ops mctp_binding_astlpc_mmio_ops = {
@@ -160,13 +161,14 @@ int main(void)
 
 	mctp_set_rx_all(mctp, rx_message, NULL);
 
-	astlpc = mctp_astlpc_init_ops(&mctp_binding_astlpc_mmio_ops, &mmio, NULL);
+	astlpc = mctp_astlpc_init_ops(&mctp_binding_astlpc_mmio_ops, &mmio,
+				      NULL);
 
 	mctp_register_bus(mctp, &astlpc->binding, 8);
 
 	/* Verify the binding was initialised */
 	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
-	
+
 	/* Host sends channel init command */
 	mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] |= KCS_STATUS_IBF;
 	mmio.kcs[MCTP_ASTLPC_KCS_REG_DATA] = 0x00;
@@ -176,7 +178,8 @@ int main(void)
 
 	/* Host receives init response */
 	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
-	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_CHANNEL_ACTIVE);
+	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] &
+	       KCS_STATUS_CHANNEL_ACTIVE);
 
 	/* Host dequeues data */
 	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0xff);

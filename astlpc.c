@@ -38,69 +38,68 @@ static const char *lpc_path = "/dev/aspeed-lpc-ctrl";
 #endif
 
 struct mctp_binding_astlpc {
-	struct mctp_binding	binding;
+	struct mctp_binding binding;
 
 	union {
-		void			*lpc_map;
-		struct mctp_lpcmap_hdr	*lpc_hdr;
+		void *lpc_map;
+		struct mctp_lpcmap_hdr *lpc_hdr;
 	};
 
 	/* direct ops data */
-	struct mctp_binding_astlpc_ops	ops;
-	void			*ops_data;
-	struct mctp_lpcmap_hdr	*priv_hdr;
+	struct mctp_binding_astlpc_ops ops;
+	void *ops_data;
+	struct mctp_lpcmap_hdr *priv_hdr;
 
 	/* fileio ops data */
-	void			*lpc_map_base;
-	int			kcs_fd;
-	uint8_t			kcs_status;
+	void *lpc_map_base;
+	int kcs_fd;
+	uint8_t kcs_status;
 
-	bool			running;
+	bool running;
 
 	/* temporary transmit buffer */
-	uint8_t			txbuf[256];
+	uint8_t txbuf[256];
 };
 
-#define binding_to_astlpc(b) \
+#define binding_to_astlpc(b)                                                   \
 	container_of(b, struct mctp_binding_astlpc, binding)
 
-#define MCTP_MAGIC	0x4d435450
-#define BMC_VER_MIN	1
-#define BMC_VER_CUR	1
+#define MCTP_MAGIC 0x4d435450
+#define BMC_VER_MIN 1
+#define BMC_VER_CUR 1
 
 struct mctp_lpcmap_hdr {
-	uint32_t	magic;
+	uint32_t magic;
 
-	uint16_t	bmc_ver_min;
-	uint16_t	bmc_ver_cur;
-	uint16_t	host_ver_min;
-	uint16_t	host_ver_cur;
-	uint16_t	negotiated_ver;
-	uint16_t	pad0;
+	uint16_t bmc_ver_min;
+	uint16_t bmc_ver_cur;
+	uint16_t host_ver_min;
+	uint16_t host_ver_cur;
+	uint16_t negotiated_ver;
+	uint16_t pad0;
 
-	uint32_t	rx_offset;
-	uint32_t	rx_size;
-	uint32_t	tx_offset;
-	uint32_t	tx_size;
+	uint32_t rx_offset;
+	uint32_t rx_size;
+	uint32_t tx_offset;
+	uint32_t tx_size;
 } __attribute__((packed));
 
 /* layout of TX/RX areas */
-static const uint32_t	rx_offset = 0x100;
-static const uint32_t	rx_size   = 0x100;
-static const uint32_t	tx_offset = 0x200;
-static const uint32_t	tx_size   = 0x100;
+static const uint32_t rx_offset = 0x100;
+static const uint32_t rx_size = 0x100;
+static const uint32_t tx_offset = 0x200;
+static const uint32_t tx_size = 0x100;
 
-#define LPC_WIN_SIZE                (1 * 1024 * 1024)
+#define LPC_WIN_SIZE (1 * 1024 * 1024)
 
-enum {
-	KCS_REG_DATA = 0,
-	KCS_REG_STATUS = 1,
+enum { KCS_REG_DATA = 0,
+       KCS_REG_STATUS = 1,
 };
 
-#define KCS_STATUS_BMC_READY		0x80
-#define KCS_STATUS_CHANNEL_ACTIVE	0x40
-#define KCS_STATUS_IBF			0x02
-#define KCS_STATUS_OBF			0x01
+#define KCS_STATUS_BMC_READY 0x80
+#define KCS_STATUS_CHANNEL_ACTIVE 0x40
+#define KCS_STATUS_IBF 0x02
+#define KCS_STATUS_OBF 0x01
 
 static bool lpc_direct(struct mctp_binding_astlpc *astlpc)
 {
@@ -108,7 +107,7 @@ static bool lpc_direct(struct mctp_binding_astlpc *astlpc)
 }
 
 static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
-		uint8_t status)
+				      uint8_t status)
 {
 	uint8_t data;
 	int rc;
@@ -123,14 +122,14 @@ static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 	status |= KCS_STATUS_OBF;
 
 	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
-			status);
+				   status);
 	if (rc) {
 		mctp_prwarn("KCS status write failed");
 		return -1;
 	}
 
 	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
-			data);
+				   data);
 	if (rc) {
 		mctp_prwarn("KCS dummy data write failed");
 		return -1;
@@ -140,14 +139,14 @@ static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 }
 
 static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
-		uint8_t data)
+				uint8_t data)
 {
 	uint8_t status;
 	int rc;
 
 	for (;;) {
 		rc = astlpc->ops.kcs_read(astlpc->ops_data,
-				MCTP_ASTLPC_KCS_REG_STATUS, &status);
+					  MCTP_ASTLPC_KCS_REG_STATUS, &status);
 		if (rc) {
 			mctp_prwarn("KCS status read failed");
 			return -1;
@@ -158,7 +157,7 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 	}
 
 	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
-			data);
+				   data);
 	if (rc) {
 		mctp_prwarn("KCS data write failed");
 		return -1;
@@ -168,7 +167,7 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 }
 
 static int mctp_binding_astlpc_tx(struct mctp_binding *b,
-		struct mctp_pktbuf *pkt)
+				  struct mctp_pktbuf *pkt)
 {
 	struct mctp_binding_astlpc *astlpc = binding_to_astlpc(b);
 	uint32_t len;
@@ -177,7 +176,8 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 	hdr = mctp_pktbuf_hdr(pkt);
 	len = mctp_pktbuf_size(pkt);
 
-	mctp_prdebug("%s: Transmitting %"PRIu32"-byte packet (%hhu, %hhu, 0x%hhx)",
+	mctp_prdebug("%s: Transmitting %" PRIu32
+		     "-byte packet (%hhu, %hhu, 0x%hhx)",
 		     __func__, len, hdr->src, hdr->dest, hdr->flags_seq_tag);
 
 	if (len > rx_size - 4) {
@@ -188,13 +188,13 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 	if (lpc_direct(astlpc)) {
 		*(uint32_t *)(astlpc->lpc_map + rx_offset) = htobe32(len);
 		memcpy(astlpc->lpc_map + rx_offset + 4, mctp_pktbuf_hdr(pkt),
-				len);
+		       len);
 	} else {
 		uint32_t tmp = htobe32(len);
 		astlpc->ops.lpc_write(astlpc->ops_data, &tmp, rx_offset,
-				sizeof(tmp));
+				      sizeof(tmp));
 		astlpc->ops.lpc_write(astlpc->ops_data, mctp_pktbuf_hdr(pkt),
-				rx_offset + 4, len);
+				      rx_offset + 4, len);
 	}
 
 	mctp_binding_set_tx_enabled(b, false);
@@ -211,13 +211,13 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 	} else {
 		uint16_t ver = htobe16(1);
 		astlpc->ops.lpc_write(astlpc->ops_data, &ver,
-				offsetof(struct mctp_lpcmap_hdr,
-					negotiated_ver),
-				sizeof(ver));
+				      offsetof(struct mctp_lpcmap_hdr,
+					       negotiated_ver),
+				      sizeof(ver));
 	}
-	mctp_astlpc_kcs_set_status(astlpc,
-			KCS_STATUS_BMC_READY | KCS_STATUS_CHANNEL_ACTIVE |
-			KCS_STATUS_OBF);
+	mctp_astlpc_kcs_set_status(astlpc, KCS_STATUS_BMC_READY |
+						   KCS_STATUS_CHANNEL_ACTIVE |
+						   KCS_STATUS_OBF);
 
 	mctp_binding_set_tx_enabled(&astlpc->binding, true);
 }
@@ -230,8 +230,8 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	if (lpc_direct(astlpc)) {
 		len = *(uint32_t *)(astlpc->lpc_map + tx_offset);
 	} else {
-		astlpc->ops.lpc_read(astlpc->ops_data, &len,
-				tx_offset, sizeof(len));
+		astlpc->ops.lpc_read(astlpc->ops_data, &len, tx_offset,
+				     sizeof(len));
 	}
 	len = be32toh(len);
 
@@ -250,11 +250,11 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 		goto out_complete;
 
 	if (lpc_direct(astlpc)) {
-		memcpy(mctp_pktbuf_hdr(pkt),
-				astlpc->lpc_map + tx_offset + 4, len);
+		memcpy(mctp_pktbuf_hdr(pkt), astlpc->lpc_map + tx_offset + 4,
+		       len);
 	} else {
 		astlpc->ops.lpc_read(astlpc->ops_data, mctp_pktbuf_hdr(pkt),
-				tx_offset + 4, len);
+				     tx_offset + 4, len);
 	}
 
 	mctp_bus_rx(&astlpc->binding, pkt);
@@ -274,7 +274,7 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 	int rc;
 
 	rc = astlpc->ops.kcs_read(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
-			&status);
+				  &status);
 	if (rc) {
 		mctp_prwarn("KCS read error");
 		return -1;
@@ -286,7 +286,7 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 		return 0;
 
 	rc = astlpc->ops.kcs_read(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
-			&data);
+				  &data);
 	if (rc) {
 		mctp_prwarn("KCS data read error");
 		return -1;
@@ -338,8 +338,8 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 
 	/* set status indicating that the BMC is now active */
 	status = KCS_STATUS_BMC_READY | KCS_STATUS_OBF;
-	rc = astlpc->ops.kcs_write(astlpc->ops_data,
-			MCTP_ASTLPC_KCS_REG_STATUS, status);
+	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
+				   status);
 	if (rc) {
 		mctp_prwarn("KCS write failed");
 	}
@@ -349,8 +349,8 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 
 static int mctp_binding_astlpc_start(struct mctp_binding *b)
 {
-	struct mctp_binding_astlpc *astlpc = container_of(b,
-			struct mctp_binding_astlpc, binding);
+	struct mctp_binding_astlpc *astlpc =
+		container_of(b, struct mctp_binding_astlpc, binding);
 
 	return mctp_astlpc_init_bmc(astlpc);
 }
@@ -378,9 +378,9 @@ struct mctp_binding *mctp_binding_astlpc_core(struct mctp_binding_astlpc *b)
 	return &b->binding;
 }
 
-struct mctp_binding_astlpc *mctp_astlpc_init_ops(
-		const struct mctp_binding_astlpc_ops *ops,
-		void *ops_data, void *lpc_map)
+struct mctp_binding_astlpc *
+mctp_astlpc_init_ops(const struct mctp_binding_astlpc_ops *ops, void *ops_data,
+		     void *lpc_map)
 {
 	struct mctp_binding_astlpc *astlpc;
 
@@ -434,14 +434,14 @@ static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 		return -1;
 	}
 
-	astlpc->lpc_map_base = mmap(NULL, map.size, PROT_READ | PROT_WRITE,
-			MAP_SHARED, fd, 0);
+	astlpc->lpc_map_base =
+		mmap(NULL, map.size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	if (astlpc->lpc_map_base == MAP_FAILED) {
 		mctp_prwarn("LPC mmap failed");
 		rc = -1;
 	} else {
-		astlpc->lpc_map = astlpc->lpc_map_base +
-			map.size - LPC_WIN_SIZE;
+		astlpc->lpc_map =
+			astlpc->lpc_map_base + map.size - LPC_WIN_SIZE;
 	}
 
 	close(fd);
@@ -459,7 +459,8 @@ static int mctp_astlpc_init_fileio_kcs(struct mctp_binding_astlpc *astlpc)
 }
 
 static int __mctp_astlpc_fileio_kcs_read(void *arg,
-		enum mctp_binding_astlpc_kcs_reg reg, uint8_t *val)
+					 enum mctp_binding_astlpc_kcs_reg reg,
+					 uint8_t *val)
 {
 	struct mctp_binding_astlpc *astlpc = arg;
 	off_t offset = reg;
@@ -471,7 +472,8 @@ static int __mctp_astlpc_fileio_kcs_read(void *arg,
 }
 
 static int __mctp_astlpc_fileio_kcs_write(void *arg,
-		enum mctp_binding_astlpc_kcs_reg reg, uint8_t val)
+					  enum mctp_binding_astlpc_kcs_reg reg,
+					  uint8_t val)
 {
 	struct mctp_binding_astlpc *astlpc = arg;
 	off_t offset = reg;
@@ -517,15 +519,14 @@ struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 	return astlpc;
 }
 #else
-struct mctp_binding_astlpc * __attribute__((const))
-	mctp_astlpc_init_fileio(void)
+struct mctp_binding_astlpc *__attribute__((const)) mctp_astlpc_init_fileio(void)
 {
 	mctp_prerr("Missing support for file IO");
 	return NULL;
 }
 
-int __attribute__((const)) mctp_astlpc_get_fd(
-		struct mctp_binding_astlpc *astlpc __attribute__((unused)))
+int __attribute__((const))
+mctp_astlpc_get_fd(struct mctp_binding_astlpc *astlpc __attribute__((unused)))
 {
 	mctp_prerr("Missing support for file IO");
 	return -1;
