@@ -20,6 +20,27 @@ struct mctp_ctrl_msg_hdr {
 	uint8_t completion_code;
 };
 
+/*TODO: Need to combine this structure with the above one.*/
+struct mctp_ctrl_hdr {
+	uint8_t ic_msg_type;
+	uint8_t rq_dgram_inst;
+	uint8_t command_code;
+} __attribute__((__packed__));
+
+typedef enum {
+	set_eid,
+	force_eid,
+	reset_eid,
+	set_discovered_flag
+} mctp_ctrl_cc_set_eid_op;
+
+struct mctp_ctrl_cmd_set_eid {
+	struct mctp_ctrl_hdr ctrl_msg_hdr;
+	mctp_ctrl_cc_set_eid_op operation : 2;
+	uint8_t : 6;
+	uint8_t eid;
+} __attribute__((__packed__));
+
 #define MCTP_CTRL_HDR_MSG_TYPE         0
 #define MCTP_CTRL_HDR_FLAG_REQUEST     (1<<7)
 #define MCTP_CTRL_HDR_FLAG_DGRAM       (1<<6)
@@ -67,11 +88,18 @@ struct mctp_ctrl_msg_hdr {
 #define MCTP_CTRL_CC_ERROR_UNSUPPORTED_CMD  0x05
 /* 0x80 - 0xFF are command specific */
 
+#define MCTP_CTRL_CC_SET_EID_OP_MASK 0x03
 
 bool mctp_ctrl_handle_msg(struct mctp *mctp, struct mctp_bus *bus,
 			  mctp_eid_t src, mctp_eid_t dest, void *buffer, size_t length);
 
 int mctp_set_rx_ctrl(struct mctp *mctp, mctp_rx_fn fn, void *data);
+
+bool encode_ctrl_cmd_header(struct mctp_ctrl_hdr *mctp_ctrl_hdr,
+			    uint8_t rq_dgram_inst);
+
+bool encode_ctrl_cmd_set_eid(struct mctp_ctrl_cmd_set_eid *set_eid_cmd,
+			     mctp_ctrl_cc_set_eid_op op, uint8_t eid);
 
 #ifdef __cplusplus
 }
