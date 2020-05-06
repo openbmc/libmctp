@@ -19,17 +19,16 @@ struct mctp_binding *mctp_binding_serial_core(struct mctp_binding_serial *b);
 /* file-based IO */
 int mctp_serial_get_fd(struct mctp_binding_serial *serial);
 int mctp_serial_read(struct mctp_binding_serial *serial);
-int mctp_serial_open_path(struct mctp_binding_serial *serial,
-		const char *path);
+int mctp_serial_open_path(struct mctp_binding_serial *serial, const char *path);
 void mctp_serial_open_fd(struct mctp_binding_serial *serial, int fd);
 
 /* direct function call IO */
 typedef int (*mctp_serial_tx_fn)(void *data, void *buf, size_t len)
 	__attribute__((warn_unused_result));
 void mctp_serial_set_tx_fn(struct mctp_binding_serial *serial,
-		mctp_serial_tx_fn fn, void *data);
-int mctp_serial_rx(struct mctp_binding_serial *serial,
-		const void *buf, size_t len);
+			   mctp_serial_tx_fn fn, void *data);
+int mctp_serial_rx(struct mctp_binding_serial *serial, const void *buf,
+		   size_t len);
 
 #ifdef __cplusplus
 }
