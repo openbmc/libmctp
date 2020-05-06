@@ -21,7 +21,7 @@ static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
 int main(void)
 {
 	struct mctp_binding_serial *serial[2];
-	mctp_eid_t eids[] = {8, 9};
+	mctp_eid_t eids[] = { 8, 9 };
 	struct pollfd pollfds[3];
 	int rc, n, mctp_fds[2];
 	struct mctp *mctp[2];
@@ -93,5 +93,4 @@ int main(void)
 	}
 
 	return EXIT_SUCCESS;
-
 }
