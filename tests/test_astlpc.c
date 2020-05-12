@@ -29,8 +29,9 @@
 
 struct mctp_binding_astlpc_mmio {
 	struct mctp_binding_astlpc astlpc;
+	bool bmc;
 
-	uint8_t kcs[2];
+	uint8_t (*kcs)[2];
 
 	size_t lpc_size;
 	uint8_t *lpc;
@@ -45,12 +46,14 @@ static int mctp_astlpc_mmio_kcs_read(void *data,
 {
 	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
 
-	*val = mmio->kcs[reg];
+	*val = (*mmio->kcs)[reg];
 
 	mctp_prdebug("%s: 0x%hhx from %s", __func__, *val, reg ? "status" : "data");
 
-	if (reg == MCTP_ASTLPC_KCS_REG_DATA)
-		mmio->kcs[MCTP_ASTLPC_KCS_REG_STATUS] &= ~KCS_STATUS_IBF;
+	if (reg == MCTP_ASTLPC_KCS_REG_DATA) {
+		uint8_t flag = mmio->bmc ? KCS_STATUS_IBF : KCS_STATUS_OBF;
+		(*mmio->kcs)[MCTP_ASTLPC_KCS_REG_STATUS] &= ~flag;
+	}
 
 	return 0;
 }
@@ -60,14 +63,21 @@ static int mctp_astlpc_mmio_kcs_write(void *data,
 				      uint8_t val)
 {
 	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
+	uint8_t *regp;
 
-	if (reg == MCTP_ASTLPC_KCS_REG_DATA)
-		mmio->kcs[MCTP_ASTLPC_KCS_REG_STATUS] |= KCS_STATUS_OBF;
+	assert(reg == MCTP_ASTLPC_KCS_REG_DATA ||
+	       reg == MCTP_ASTLPC_KCS_REG_STATUS);
 
+	if (reg == MCTP_ASTLPC_KCS_REG_DATA) {
+		uint8_t flag = mmio->bmc ? KCS_STATUS_OBF : KCS_STATUS_IBF;
+		(*mmio->kcs)[MCTP_ASTLPC_KCS_REG_STATUS] |= flag;
+	}
+
+	regp = &(*mmio->kcs)[reg];
 	if (reg == MCTP_ASTLPC_KCS_REG_STATUS)
-		mmio->kcs[reg] = (val & ~0xbU) | (val & mmio->kcs[reg] & 1);
+		*regp = (val & ~0xbU) | (val & *regp & 1);
 	else
-		mmio->kcs[reg] = val;
+		*regp = val;
 
 	mctp_prdebug("%s: 0x%hhx to %s", __func__, val, reg ? "status" : "data");
 
@@ -118,79 +128,124 @@ static const struct mctp_binding_astlpc_ops mctp_binding_astlpc_mmio_ops = {
 	.lpc_write = mctp_astlpc_mmio_lpc_write,
 };
 
-int main(void)
-{
+struct astlpc_endpoint {
 	struct mctp_binding_astlpc_mmio mmio;
 	struct mctp_binding_astlpc *astlpc;
-	uint8_t msg[2 * MCTP_BTU];
 	struct mctp *mctp;
+};
+
+static void endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
+			  uint8_t mode, uint8_t (*kcs)[2], void *lpc_mem,
+			  size_t lpc_size)
+{
+	/*
+	 * Configure the direction of the KCS interface so we know whether to
+	 * set or clear IBF or OBF on writes or reads.
+	 */
+	ep->mmio.bmc = (mode == MCTP_BINDING_ASTLPC_MODE_BMC);
+
+	ep->mctp = mctp_init();
+	assert(ep->mctp);
+
+	mctp_set_rx_all(ep->mctp, rx_message, NULL);
+
+	/* Inject KCS registers */
+	ep->mmio.kcs = kcs;
+
+	/* Inject the heap allocation as the LPC mapping */
+	ep->mmio.lpc_size = lpc_size;
+	ep->mmio.lpc = lpc_mem;
+
+	/* Initialise the binding */
+	ep->astlpc = mctp_astlpc_init(mode, MCTP_BTU, NULL,
+				      &mctp_binding_astlpc_mmio_ops, &ep->mmio);
+
+	mctp_register_bus(ep->mctp, &ep->astlpc->binding, eid);
+}
+
+static void endpoint_destroy(struct astlpc_endpoint *ep)
+{
+	mctp_astlpc_destroy(ep->astlpc);
+	mctp_destroy(ep->mctp);
+}
+
+int main(void)
+{
+	uint8_t msg[2 * MCTP_BTU];
+	struct astlpc_endpoint bmc, host;
+	size_t lpc_size;
+	uint8_t kcs[2] = { 0 };
+	void *lpc_mem;
 	int rc;
+
+	/* Test harness initialisation */
 
 	memset(&msg[0], 0x5a, MCTP_BTU);
 	memset(&msg[MCTP_BTU], 0xa5, MCTP_BTU);
 
-	mmio.lpc_size = 1 * 1024 * 1024;
-	mmio.lpc = calloc(1, mmio.lpc_size);
+	lpc_size = 1 * 1024 * 1024;
+	lpc_mem = calloc(1, lpc_size);
+	assert(lpc_mem);
 
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
 
-	mctp = mctp_init();
-	assert(mctp);
+	/* BMC initialisation */
+	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem,
+		      lpc_size);
 
-	mctp_set_rx_all(mctp, rx_message, NULL);
+	/* Verify the BMC binding was initialised */
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
 
-	astlpc = mctp_astlpc_init_ops(&mctp_binding_astlpc_mmio_ops, &mmio, NULL);
+	/* Host initialisation */
+	endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs, lpc_mem,
+		      lpc_size);
 
-	mctp_register_bus(mctp, &astlpc->binding, 8);
-
-	/* Verify the binding was initialised */
-	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
-	
 	/* Host sends channel init command */
-	mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] |= KCS_STATUS_IBF;
-	mmio.kcs[MCTP_ASTLPC_KCS_REG_DATA] = 0x00;
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x00);
 
-	/* Receive host init */
-	mctp_astlpc_poll(astlpc);
+	/* BMC receives host channel init request */
+	mctp_astlpc_poll(bmc.astlpc);
 
-	/* Host receives init response */
-	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
-	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_CHANNEL_ACTIVE);
+	/* BMC sends init response */
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_CHANNEL_ACTIVE);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0xff);
 
 	/* Host dequeues data */
-	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0xff);
-	mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] &= ~KCS_STATUS_OBF;
+	mctp_astlpc_poll(host.astlpc);
 
 	/* BMC sends a message */
-	rc = mctp_message_tx(mctp, 9, msg, sizeof(msg));
+	rc = mctp_message_tx(bmc.mctp, 9, msg, sizeof(msg));
 	assert(rc == 0);
-
-	/* Host receives a message */
-	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
-	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
 
 	/* Verify it's the packet we expect */
-	assert(!memcmp(mmio.lpc + RX_BUFFER_DATA, &msg[0], MCTP_BTU));
+	assert(!memcmp(lpc_mem + RX_BUFFER_DATA, &msg[0], MCTP_BTU));
+
+	/* Host receives a packet */
+	mctp_astlpc_poll(host.astlpc);
 
 	/* Host returns Rx area ownership to BMC */
-	mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] &= ~KCS_STATUS_OBF;
-	mmio.kcs[MCTP_ASTLPC_KCS_REG_DATA] = 0x02;
-	mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] |= KCS_STATUS_IBF;
+	assert(!(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF));
+	assert(kcs[MCTP_ASTLPC_KCS_REG_DATA] = 0x02);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
 
 	/* BMC dequeues ownership hand-over and sends the queued packet */
-	rc = mctp_astlpc_poll(astlpc);
+	rc = mctp_astlpc_poll(bmc.astlpc);
 	assert(rc == 0);
 
 	/* Host receives a message */
-	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
-	assert(mmio.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
 
 	/* Verify it's the packet we expect */
-	assert(!memcmp(mmio.lpc + RX_BUFFER_DATA, &msg[MCTP_BTU], MCTP_BTU));
+	assert(!memcmp(lpc_mem + RX_BUFFER_DATA, &msg[MCTP_BTU], MCTP_BTU));
 
-	mctp_astlpc_destroy(astlpc);
-	mctp_destroy(mctp);
-	free(mmio.lpc);
+	endpoint_destroy(&bmc);
+	endpoint_destroy(&host);
+	free(lpc_mem);
 
 	return 0;
 }
