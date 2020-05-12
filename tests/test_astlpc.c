@@ -160,7 +160,9 @@ int main(void)
 
 	mctp_set_rx_all(mctp, rx_message, NULL);
 
-	astlpc = mctp_astlpc_init_ops(&mctp_binding_astlpc_mmio_ops, &mmio, NULL);
+	astlpc = mctp_astlpc_init_ops(astlpc_mode_bus_owner,
+				      &mctp_binding_astlpc_mmio_ops, &mmio,
+				      NULL);
 
 	mctp_register_bus(mctp, &astlpc->binding, 8);
 
