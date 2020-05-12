@@ -118,7 +118,8 @@ int mctp_astlpc_mmio_lpc_read(void *data, void *buf, long offset, size_t len)
 	return 0;
 }
 
-int mctp_astlpc_mmio_lpc_write(void *data, void *buf, long offset, size_t len)
+int mctp_astlpc_mmio_lpc_write(void *data, const void *buf, long offset,
+			       size_t len)
 {
 	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
 
@@ -150,7 +151,12 @@ static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
 	test->count++;
 }
 
-static const struct mctp_binding_astlpc_ops mctp_binding_astlpc_mmio_ops = {
+static const struct mctp_binding_astlpc_ops astlpc_direct_mmio_ops = {
+	.kcs_read = mctp_astlpc_mmio_kcs_read,
+	.kcs_write = mctp_astlpc_mmio_kcs_write,
+};
+
+static const struct mctp_binding_astlpc_ops astlpc_indirect_mmio_ops = {
 	.kcs_read = mctp_astlpc_mmio_kcs_read,
 	.kcs_write = mctp_astlpc_mmio_kcs_write,
 	.lpc_read = mctp_astlpc_mmio_lpc_read,
@@ -158,8 +164,7 @@ static const struct mctp_binding_astlpc_ops mctp_binding_astlpc_mmio_ops = {
 };
 
 static void endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
-			  uint8_t mode, uint8_t (*kcs)[2], void *lpc_mem,
-			  size_t lpc_size)
+			  uint8_t mode, uint8_t (*kcs)[2], void *lpc_mem)
 {
 	/*
 	 * Configure the direction of the KCS interface so we know whether to
@@ -173,13 +178,9 @@ static void endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
 	/* Inject KCS registers */
 	ep->mmio.kcs = kcs;
 
-	/* Inject the heap allocation as the LPC mapping */
-	ep->mmio.lpc_size = lpc_size;
-	ep->mmio.lpc = lpc_mem;
-
 	/* Initialise the binding */
 	ep->astlpc = mctp_astlpc_init(mode, MCTP_BTU, lpc_mem,
-				      &mctp_binding_astlpc_mmio_ops, &ep->mmio);
+				      &astlpc_direct_mmio_ops, &ep->mmio);
 
 	mctp_register_bus(ep->mctp, &ep->astlpc->binding, eid);
 }
@@ -192,18 +193,16 @@ static void endpoint_destroy(struct astlpc_endpoint *ep)
 
 static void network_init(struct astlpc_test *ctx)
 {
-	const size_t lpc_size = 1 * 1024 * 1024;
-
-	ctx->lpc_mem = calloc(1, lpc_size);
+	ctx->lpc_mem = calloc(1, 1 * 1024 * 1024);
 	assert(ctx->lpc_mem);
 
 	/* BMC initialisation */
 	endpoint_init(&ctx->bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &ctx->kcs,
-		      ctx->lpc_mem, lpc_size);
+		      ctx->lpc_mem);
 
 	/* Host initialisation */
 	endpoint_init(&ctx->host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &ctx->kcs,
-		      ctx->lpc_mem, lpc_size);
+		      ctx->lpc_mem);
 
 	/* BMC processes host channel init request, alerts host */
 	mctp_astlpc_poll(ctx->bmc.astlpc);
@@ -366,7 +365,7 @@ static void astlpc_test_host_before_bmc(void)
 
 	/* Initialise the binding */
 	astlpc = mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU, NULL,
-				  &mctp_binding_astlpc_mmio_ops, &mmio);
+				  &astlpc_direct_mmio_ops, &mmio);
 
 	/* Register the binding to trigger the start-up sequence */
 	rc = mctp_register_bus(mctp, &astlpc->binding, 8);
@@ -382,24 +381,20 @@ static void astlpc_test_simple_init(void)
 {
 	struct astlpc_endpoint bmc, host;
 	uint8_t kcs[2] = { 0 };
-	size_t lpc_size;
 	void *lpc_mem;
 
 	/* Test harness initialisation */
-	lpc_size = 1 * 1024 * 1024;
-	lpc_mem = calloc(1, lpc_size);
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem,
-		      lpc_size);
+	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem);
 
 	/* Verify the BMC binding was initialised */
 	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
 
 	/* Host initialisation */
-	endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs, lpc_mem,
-		      lpc_size);
+	endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs, lpc_mem);
 
 	/* Host sends channel init command */
 	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
@@ -421,6 +416,72 @@ static void astlpc_test_simple_init(void)
 	free(lpc_mem);
 }
 
+static void astlpc_test_simple_indirect_message_bmc_to_host(void)
+{
+	struct astlpc_test ctx = { 0 };
+	uint8_t kcs[2] = { 0 };
+	uint8_t msg[MCTP_BTU];
+	int rc;
+
+	ctx.lpc_mem = calloc(1, LPC_WIN_SIZE);
+	assert(ctx.lpc_mem);
+
+	/* Test message data */
+	memset(&msg[0], 0x5a, MCTP_BTU);
+
+	/* Manually set up the network so we can inject the indirect ops */
+
+	/* BMC initialisation */
+	ctx.bmc.mmio.bmc = true;
+	ctx.bmc.mctp = mctp_init();
+	assert(ctx.bmc.mctp);
+	ctx.bmc.mmio.kcs = &kcs;
+	ctx.bmc.mmio.lpc = ctx.lpc_mem;
+	ctx.bmc.mmio.lpc_size = LPC_WIN_SIZE;
+	ctx.bmc.astlpc =
+		mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU, NULL,
+				 &astlpc_indirect_mmio_ops, &ctx.bmc.mmio);
+	mctp_register_bus(ctx.bmc.mctp, &ctx.bmc.astlpc->binding, 8);
+
+	/* Host initialisation */
+	ctx.host.mmio.bmc = false;
+	ctx.host.mctp = mctp_init();
+	assert(ctx.host.mctp);
+	ctx.host.mmio.kcs = &kcs;
+	ctx.host.mmio.lpc = ctx.lpc_mem;
+	ctx.host.mmio.lpc_size = LPC_WIN_SIZE;
+	ctx.host.astlpc =
+		mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU, NULL,
+				 &astlpc_indirect_mmio_ops, &ctx.host.mmio);
+	mctp_register_bus(ctx.host.mctp, &ctx.host.astlpc->binding, 9);
+
+	/* BMC processes host channel init request, alerts host */
+	mctp_astlpc_poll(ctx.bmc.astlpc);
+
+	/* Host dequeues channel init result */
+	mctp_astlpc_poll(ctx.host.astlpc);
+
+	ctx.msg = &msg[0];
+	ctx.count = 0;
+	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
+
+	/* BMC sends the single-packet message */
+	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
+	assert(rc == 0);
+
+	/* Host receives the single-packet message */
+	rc = mctp_astlpc_poll(ctx.host.astlpc);
+	assert(rc == 0);
+	assert(ctx.count == 1);
+
+	/* BMC dequeues ownership hand-over and sends the queued packet */
+	rc = mctp_astlpc_poll(ctx.bmc.astlpc);
+	assert(rc == 0);
+
+	/* Can still tear-down the network in the normal fashion */
+	network_destroy(&ctx);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -432,6 +493,7 @@ static const struct {
 	TEST_CASE(astlpc_test_simple_message_bmc_to_host),
 	TEST_CASE(astlpc_test_simple_message_host_to_bmc),
 	TEST_CASE(astlpc_test_packetised_message_bmc_to_host),
+	TEST_CASE(astlpc_test_simple_indirect_message_bmc_to_host)
 };
 /* clang-format on */
 
