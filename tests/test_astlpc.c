@@ -27,9 +27,6 @@ struct mctp_binding_astlpc_mmio {
 	bool bmc;
 
 	uint8_t (*kcs)[2];
-
-	size_t lpc_size;
-	uint8_t *lpc;
 };
 
 #define binding_to_mmio(b) \
@@ -76,33 +73,6 @@ int mctp_astlpc_mmio_kcs_write(void *data, enum mctp_binding_astlpc_kcs_reg reg,
 
 	return 0;
 }
-int mctp_astlpc_mmio_lpc_read(void *data, void *buf, long offset, size_t len)
-{
-	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
-
-	mctp_prdebug("%s: %zu bytes from 0x%lx", __func__, len, offset);
-
-	assert(offset >= 0L);
-	assert(offset + len < mmio->lpc_size);
-
-	memcpy(buf, mmio->lpc + offset, len);
-
-	return 0;
-}
-
-int mctp_astlpc_mmio_lpc_write(void *data, void *buf, long offset, size_t len)
-{
-	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
-
-	mctp_prdebug("%s: %zu bytes to 0x%lx", __func__, len, offset);
-
-	assert(offset >= 0L);
-	assert(offset + len < mmio->lpc_size);
-
-	memcpy(mmio->lpc + offset, buf, len);
-
-	return 0;
-}
 
 static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
 {
@@ -117,8 +87,6 @@ static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
 const struct mctp_binding_astlpc_ops mctp_binding_astlpc_mmio_ops = {
 	.kcs_read = mctp_astlpc_mmio_kcs_read,
 	.kcs_write = mctp_astlpc_mmio_kcs_write,
-	.lpc_read = mctp_astlpc_mmio_lpc_read,
-	.lpc_write = mctp_astlpc_mmio_lpc_write,
 };
 
 struct astlpc_test {
@@ -129,7 +97,7 @@ struct astlpc_test {
 
 void initialise_endpoint(struct astlpc_test *ep, mctp_eid_t eid,
 			 enum mctp_binding_astlpc_mode mode, uint8_t (*kcs)[2],
-			 void *lpc_mem, size_t lpc_size)
+			 void *lpc_mem)
 {
 	/*
 	 * Configure the direction of the KCS interface so we know whether to
@@ -146,13 +114,9 @@ void initialise_endpoint(struct astlpc_test *ep, mctp_eid_t eid,
 	/* Inject KCS registers */
 	ep->mmio.kcs = kcs;
 
-	/* Inject the heap allocation as the LPC mapping */
-	ep->mmio.lpc_size = lpc_size;
-	ep->mmio.lpc = lpc_mem;
-
 	/* Initialise the binding */
 	ep->astlpc = mctp_astlpc_init_ops(mode, &mctp_binding_astlpc_mmio_ops,
-					  &ep->mmio, NULL);
+					  &ep->mmio, lpc_mem);
 
 	mctp_register_bus(ep->mctp, &ep->astlpc->binding, eid);
 }
@@ -171,22 +135,19 @@ int main(void)
 	memset(&msg[0], 0x5a, MCTP_BTU);
 	memset(&msg[MCTP_BTU], 0xa5, MCTP_BTU);
 
-	lpc_size = 1 * 1024 * 1024;
-	lpc_mem = calloc(1, lpc_size);
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
 	assert(lpc_mem);
 
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
 
 	/* Bus owner (BMC) initialisation */
-	initialise_endpoint(&bmc, 8, astlpc_mode_bus_owner, &kcs, lpc_mem,
-			    lpc_size);
+	initialise_endpoint(&bmc, 8, astlpc_mode_bus_owner, &kcs, lpc_mem);
 
 	/* Verify the BMC binding was initialised */
 	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
 
 	/* Device (Host) initialisation */
-	initialise_endpoint(&host, 9, astlpc_mode_device, &kcs, lpc_mem,
-			    lpc_size);
+	initialise_endpoint(&host, 9, astlpc_mode_device, &kcs, lpc_mem);
 
 	/* Host sends channel init command */
 	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
