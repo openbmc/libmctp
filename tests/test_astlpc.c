@@ -20,35 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Hack: Needs to be in sync with astlpc.c */
-struct mctp_binding_astlpc {
-	struct mctp_binding	binding;
-
-	union {
-		void			*lpc_map;
-		struct mctp_lpcmap_hdr	*lpc_hdr;
-	};
-
-	/* direct ops data */
-	struct mctp_binding_astlpc_ops	ops;
-	void			*ops_data;
-	struct mctp_lpcmap_hdr	*priv_hdr;
-
-	/* fileio ops data */
-	void			*lpc_map_base;
-	int			kcs_fd;
-	uint8_t			kcs_status;
-
-	bool			running;
-
-	/* temporary transmit buffer */
-	uint8_t			txbuf[256];
-};
-
-#define KCS_STATUS_BMC_READY		0x80
-#define KCS_STATUS_CHANNEL_ACTIVE	0x40
-#define KCS_STATUS_IBF			0x02
-#define KCS_STATUS_OBF			0x01
+#include "astlpc.c"
 
 struct mctp_binding_astlpc_mmio {
 	struct mctp_binding_astlpc astlpc;
