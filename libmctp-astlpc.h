@@ -20,12 +20,12 @@ enum mctp_binding_astlpc_kcs_reg {
 };
 
 struct mctp_binding_astlpc_ops {
-	int	(*kcs_read)(void *data, enum mctp_binding_astlpc_kcs_reg reg,
+	int (*kcs_read)(void *data, enum mctp_binding_astlpc_kcs_reg reg,
 			uint8_t *val);
-	int	(*kcs_write)(void *data, enum mctp_binding_astlpc_kcs_reg reg,
-			uint8_t val);
-	int	(*lpc_read)(void *data, void *buf, long offset, size_t len);
-	int	(*lpc_write)(void *data, void *buf, long offset, size_t len);
+	int (*kcs_write)(void *data, enum mctp_binding_astlpc_kcs_reg reg,
+			 uint8_t val);
+	int (*lpc_read)(void *data, void *buf, long offset, size_t len);
+	int (*lpc_write)(void *data, const void *buf, long offset, size_t len);
 };
 
 #define MCTP_BINDING_ASTLPC_MODE_BMC 0
