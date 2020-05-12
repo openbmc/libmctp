@@ -40,10 +40,17 @@ static const char *lpc_path = "/dev/aspeed-lpc-ctrl";
 struct mctp_binding_astlpc {
 	struct mctp_binding	binding;
 
+	uint32_t rx_offset;
+	uint32_t rx_size;
+	uint32_t tx_offset;
+	uint32_t tx_size;
+
 	union {
 		void			*lpc_map;
 		struct mctp_lpcmap_hdr	*lpc_hdr;
 	};
+
+	enum mctp_binding_astlpc_mode mode;
 
 	/* direct ops data */
 	struct mctp_binding_astlpc_ops	ops;
@@ -64,9 +71,11 @@ struct mctp_binding_astlpc {
 #define binding_to_astlpc(b) \
 	container_of(b, struct mctp_binding_astlpc, binding)
 
-#define MCTP_MAGIC	0x4d435450
-#define BMC_VER_MIN	1
-#define BMC_VER_CUR	1
+/* clang-format off */
+#define ASTLPC_MCTP_MAGIC	0x4d435450
+#define ASTLPC_VER_MIN	1
+#define ASTLPC_VER_CUR	1
+/* clang-format on */
 
 struct mctp_lpcmap_hdr {
 	uint32_t	magic;
@@ -105,6 +114,135 @@ enum {
 static bool lpc_direct(struct mctp_binding_astlpc *astlpc)
 {
 	return astlpc->lpc_map != NULL;
+}
+
+static int mctp_astlpc_init_bus_owner(struct mctp_binding_astlpc *astlpc)
+{
+	struct mctp_lpcmap_hdr *hdr;
+	uint8_t status;
+	int rc;
+
+	/* Flip the buffers as the names are defined in terms of the host */
+	astlpc->rx_offset = tx_offset;
+	astlpc->rx_size = tx_size;
+	astlpc->tx_offset = rx_offset;
+	astlpc->tx_size = rx_size;
+
+	if (lpc_direct(astlpc))
+		hdr = astlpc->lpc_hdr;
+	else
+		hdr = astlpc->priv_hdr;
+
+	hdr->magic = htobe32(ASTLPC_MCTP_MAGIC);
+	hdr->bmc_ver_min = htobe16(ASTLPC_VER_MIN);
+	hdr->bmc_ver_cur = htobe16(ASTLPC_VER_CUR);
+
+	/* Flip the buffers back as we're now describing the host's
+	 * configuration to the host */
+	hdr->rx_offset = htobe32(astlpc->tx_offset);
+	hdr->rx_size = htobe32(astlpc->tx_size);
+	hdr->tx_offset = htobe32(astlpc->rx_offset);
+	hdr->tx_size = htobe32(astlpc->rx_size);
+
+	if (!lpc_direct(astlpc))
+		astlpc->ops.lpc_write(astlpc->ops_data, hdr, 0, sizeof(*hdr));
+
+	/* set status indicating that the BMC is now active */
+	status = KCS_STATUS_BMC_READY | KCS_STATUS_OBF;
+	/* XXX: Should we be calling mctp_astlpc_kcs_set_status() instead? */
+	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
+				   status);
+	if (rc) {
+		mctp_prwarn("KCS write failed");
+	}
+
+	return rc;
+}
+
+static int mctp_binding_astlpc_start_bus_owner(struct mctp_binding *b)
+{
+	struct mctp_binding_astlpc *astlpc =
+		container_of(b, struct mctp_binding_astlpc, binding);
+
+	return mctp_astlpc_init_bus_owner(astlpc);
+}
+
+static int mctp_astlpc_init_device(struct mctp_binding_astlpc *astlpc)
+{
+	struct mctp_lpcmap_hdr *hdr;
+	uint8_t status;
+	int rc;
+
+	if (lpc_direct(astlpc)) {
+		hdr = astlpc->lpc_hdr;
+	} else {
+		hdr = astlpc->priv_hdr;
+		astlpc->ops.lpc_read(astlpc->ops_data, hdr, 0, sizeof(*hdr));
+	}
+
+	astlpc->rx_offset = be32toh(hdr->rx_offset);
+	astlpc->rx_size = be32toh(hdr->rx_size);
+	astlpc->tx_offset = be32toh(hdr->tx_offset);
+	astlpc->tx_size = be32toh(hdr->tx_size);
+
+	hdr->host_ver_min = htobe16(ASTLPC_VER_MIN);
+	if (!lpc_direct(astlpc))
+		astlpc->ops.lpc_write(astlpc->ops_data, &hdr->host_ver_min,
+				      offsetof(struct mctp_lpcmap_hdr,
+					       host_ver_min),
+				      sizeof(hdr->host_ver_min));
+
+	hdr->host_ver_cur = htobe16(ASTLPC_VER_CUR);
+	if (!lpc_direct(astlpc))
+		astlpc->ops.lpc_write(astlpc->ops_data, &hdr->host_ver_cur,
+				      offsetof(struct mctp_lpcmap_hdr,
+					       host_ver_cur),
+				      sizeof(hdr->host_ver_cur));
+
+	/* Send channel init command */
+	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
+				   0x0);
+	if (rc) {
+		mctp_prwarn("KCS write failed");
+	}
+
+	return rc;
+}
+
+static int mctp_binding_astlpc_start_device(struct mctp_binding *b)
+{
+	struct mctp_binding_astlpc *astlpc =
+		container_of(b, struct mctp_binding_astlpc, binding);
+
+	return mctp_astlpc_init_device(astlpc);
+}
+
+static bool __mctp_astlpc_kcs_ready(struct mctp_binding_astlpc *astlpc,
+				    uint8_t status, bool is_write)
+{
+	bool is_bus_owner;
+	bool ready_state;
+	uint8_t flag;
+
+	is_bus_owner = (astlpc->mode == astlpc_mode_bus_owner);
+
+	/* XXX: Conflate bus owner with the BMC for the moment */
+	flag = (is_bus_owner ^ is_write) ? KCS_STATUS_IBF : KCS_STATUS_OBF;
+	ready_state = is_write ? 0 : 1;
+
+	return !!(status & flag) == ready_state;
+}
+
+static inline bool
+mctp_astlpc_kcs_read_ready(struct mctp_binding_astlpc *astlpc, uint8_t status)
+{
+	return __mctp_astlpc_kcs_ready(astlpc, status, false);
+}
+
+static inline bool
+mctp_astlpc_kcs_write_ready(struct mctp_binding_astlpc *astlpc, uint8_t status)
+{
+	return __mctp_astlpc_kcs_ready(astlpc, status, true);
 }
 
 static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
@@ -152,7 +290,7 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 			mctp_prwarn("KCS status read failed");
 			return -1;
 		}
-		if (!(status & KCS_STATUS_OBF))
+		if (mctp_astlpc_kcs_write_ready(astlpc, status))
 			break;
 		/* todo: timeout */
 	}
@@ -186,15 +324,16 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 	}
 
 	if (lpc_direct(astlpc)) {
-		*(uint32_t *)(astlpc->lpc_map + rx_offset) = htobe32(len);
-		memcpy(astlpc->lpc_map + rx_offset + 4, mctp_pktbuf_hdr(pkt),
-				len);
+		*(uint32_t *)(astlpc->lpc_map + astlpc->tx_offset) =
+			htobe32(len);
+		memcpy(astlpc->lpc_map + astlpc->tx_offset + 4,
+		       mctp_pktbuf_hdr(pkt), len);
 	} else {
 		uint32_t tmp = htobe32(len);
-		astlpc->ops.lpc_write(astlpc->ops_data, &tmp, rx_offset,
-				sizeof(tmp));
+		astlpc->ops.lpc_write(astlpc->ops_data, &tmp, astlpc->tx_offset,
+				      sizeof(tmp));
 		astlpc->ops.lpc_write(astlpc->ops_data, mctp_pktbuf_hdr(pkt),
-				rx_offset + 4, len);
+				      astlpc->tx_offset + 4, len);
 	}
 
 	mctp_binding_set_tx_enabled(b, false);
@@ -228,10 +367,10 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	uint32_t len;
 
 	if (lpc_direct(astlpc)) {
-		len = *(uint32_t *)(astlpc->lpc_map + tx_offset);
+		len = *(uint32_t *)(astlpc->lpc_map + astlpc->rx_offset);
 	} else {
-		astlpc->ops.lpc_read(astlpc->ops_data, &len,
-				tx_offset, sizeof(len));
+		astlpc->ops.lpc_read(astlpc->ops_data, &len, astlpc->rx_offset,
+				     sizeof(len));
 	}
 	len = be32toh(len);
 
@@ -251,10 +390,10 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 
 	if (lpc_direct(astlpc)) {
 		memcpy(mctp_pktbuf_hdr(pkt),
-				astlpc->lpc_map + tx_offset + 4, len);
+		       astlpc->lpc_map + astlpc->rx_offset + 4, len);
 	} else {
 		astlpc->ops.lpc_read(astlpc->ops_data, mctp_pktbuf_hdr(pkt),
-				tx_offset + 4, len);
+				     astlpc->rx_offset + 4, len);
 	}
 
 	mctp_bus_rx(&astlpc->binding, pkt);
@@ -282,7 +421,7 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 
 	mctp_prdebug("%s: status: 0x%hhx", __func__, status);
 
-	if (!(status & KCS_STATUS_IBF))
+	if (!mctp_astlpc_kcs_read_ready(astlpc, status))
 		return 0;
 
 	rc = astlpc->ops.kcs_read(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
@@ -313,62 +452,35 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 	return 0;
 }
 
-static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
-{
-	struct mctp_lpcmap_hdr *hdr;
-	uint8_t status;
-	int rc;
-
-	if (lpc_direct(astlpc))
-		hdr = astlpc->lpc_hdr;
-	else
-		hdr = astlpc->priv_hdr;
-
-	hdr->magic = htobe32(MCTP_MAGIC);
-	hdr->bmc_ver_min = htobe16(BMC_VER_MIN);
-	hdr->bmc_ver_cur = htobe16(BMC_VER_CUR);
-
-	hdr->rx_offset = htobe32(rx_offset);
-	hdr->rx_size = htobe32(rx_size);
-	hdr->tx_offset = htobe32(tx_offset);
-	hdr->tx_size = htobe32(tx_size);
-
-	if (!lpc_direct(astlpc))
-		astlpc->ops.lpc_write(astlpc->ops_data, hdr, 0, sizeof(*hdr));
-
-	/* set status indicating that the BMC is now active */
-	status = KCS_STATUS_BMC_READY | KCS_STATUS_OBF;
-	rc = astlpc->ops.kcs_write(astlpc->ops_data,
-			MCTP_ASTLPC_KCS_REG_STATUS, status);
-	if (rc) {
-		mctp_prwarn("KCS write failed");
-	}
-
-	return rc;
-}
-
-static int mctp_binding_astlpc_start(struct mctp_binding *b)
-{
-	struct mctp_binding_astlpc *astlpc = container_of(b,
-			struct mctp_binding_astlpc, binding);
-
-	return mctp_astlpc_init_bmc(astlpc);
-}
-
 /* allocate and basic initialisation */
-static struct mctp_binding_astlpc *__mctp_astlpc_init(void)
+static struct mctp_binding_astlpc *
+__mctp_astlpc_init(enum mctp_binding_astlpc_mode mode)
 {
 	struct mctp_binding_astlpc *astlpc;
 
+	assert((mode == astlpc_mode_bus_owner) || (mode == astlpc_mode_device));
+
 	astlpc = __mctp_alloc(sizeof(*astlpc));
+	if (!astlpc)
+		return NULL;
+
 	memset(astlpc, 0, sizeof(*astlpc));
+	astlpc->mode = mode;
+	astlpc->lpc_map = NULL;
 	astlpc->binding.name = "astlpc";
 	astlpc->binding.version = 1;
-	astlpc->binding.tx = mctp_binding_astlpc_tx;
-	astlpc->binding.start = mctp_binding_astlpc_start;
 	astlpc->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
 	astlpc->binding.pkt_pad = 0;
-	astlpc->lpc_map = NULL;
+	astlpc->binding.tx = mctp_binding_astlpc_tx;
+	if (mode == astlpc_mode_bus_owner)
+		astlpc->binding.start = mctp_binding_astlpc_start_bus_owner;
+	else if (mode == astlpc_mode_device)
+		astlpc->binding.start = mctp_binding_astlpc_start_device;
+	else {
+		mctp_prerr("%s: Invalid mode: %d\n", __func__, mode);
+		__mctp_free(astlpc);
+		return NULL;
+	}
 
 	return astlpc;
 }
@@ -378,13 +490,14 @@ struct mctp_binding *mctp_binding_astlpc_core(struct mctp_binding_astlpc *b)
 	return &b->binding;
 }
 
-struct mctp_binding_astlpc *mctp_astlpc_init_ops(
-		const struct mctp_binding_astlpc_ops *ops,
-		void *ops_data, void *lpc_map)
+struct mctp_binding_astlpc *
+mctp_astlpc_init_ops(enum mctp_binding_astlpc_mode mode,
+		     const struct mctp_binding_astlpc_ops *ops, void *ops_data,
+		     void *lpc_map)
 {
 	struct mctp_binding_astlpc *astlpc;
 
-	astlpc = __mctp_astlpc_init();
+	astlpc = __mctp_astlpc_init(mode);
 	if (!astlpc)
 		return NULL;
 
@@ -492,7 +605,11 @@ struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 	struct mctp_binding_astlpc *astlpc;
 	int rc;
 
-	astlpc = __mctp_astlpc_init();
+	/*
+	 * If we're doing file IO then we're very likely not running
+	 * freestanding, so lets assume that we're on the BMC (bus-owner) side
+	 */
+	astlpc = __mctp_astlpc_init(astlpc_mode_bus_owner);
 	if (!astlpc)
 		return NULL;
 
