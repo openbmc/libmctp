@@ -58,7 +58,7 @@ int mctp_astlpc_mmio_kcs_write(void *data, enum mctp_binding_astlpc_kcs_reg reg,
 		mmio->kcs[MCTP_ASTLPC_KCS_REG_STATUS] |= KCS_STATUS_OBF;
 
 	if (reg == MCTP_ASTLPC_KCS_REG_STATUS)
-		mmio->kcs[reg] = val & ~0xaU;
+		mmio->kcs[reg] = (val & ~0xbU) | (val & mmio->kcs[reg] & 1);
 	else
 		mmio->kcs[reg] = val;
 
