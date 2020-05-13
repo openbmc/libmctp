@@ -65,7 +65,7 @@ static int mctp_astlpc_mmio_kcs_write(void *data,
 		mmio->kcs[MCTP_ASTLPC_KCS_REG_STATUS] |= KCS_STATUS_OBF;
 
 	if (reg == MCTP_ASTLPC_KCS_REG_STATUS)
-		mmio->kcs[reg] = val & ~0xaU;
+		mmio->kcs[reg] = (val & ~0xbU) | (val & mmio->kcs[reg] & 1);
 	else
 		mmio->kcs[reg] = val;
 
@@ -131,6 +131,8 @@ int main(void)
 
 	memset(&msg[0], 0x5a, MCTP_BTU);
 	memset(&msg[MCTP_BTU], 0xa5, MCTP_BTU);
+	mmio.kcs[MCTP_ASTLPC_KCS_REG_STATUS] = 0;
+	mmio.kcs[MCTP_ASTLPC_KCS_REG_DATA] = 0;
 
 	mmio.lpc_size = 1 * 1024 * 1024;
 	mmio.lpc = calloc(1, mmio.lpc_size);
