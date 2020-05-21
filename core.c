@@ -52,10 +52,13 @@ struct mctp {
 	 */
 	struct mctp_msg_ctx	msg_ctxs[16];
 
-	enum {
-		ROUTE_ENDPOINT,
-		ROUTE_BRIDGE,
-	}			route_policy;
+	enum { ROUTE_ENDPOINT,
+	       ROUTE_BRIDGE,
+	} route_policy;
+
+	/* Control message RX callback. */
+	mctp_rx_fn control_rx;
+	void *control_rx_data;
 };
 
 #ifndef BUILD_ASSERT
@@ -320,20 +323,48 @@ static inline bool mctp_ctrl_cmd_is_transport(struct mctp_ctrl_msg_hdr *hdr)
 		(hdr->command_code <= MCTP_CTRL_CMD_LAST_TRANSPORT));
 }
 
+static inline bool mctp_ctrl_cmd_is_control(struct mctp_ctrl_msg_hdr *hdr)
+{
+	return ((hdr->command_code > MCTP_CTRL_CMD_RESERVED) &&
+		(hdr->command_code < MCTP_CTRL_CMD_MAX));
+}
+
+static inline void mctp_ctrl_send_empty_response(struct mctp *mctp,
+						 mctp_eid_t src,
+						 uint8_t command_code,
+						 uint8_t response_code)
+{
+	struct mctp_ctrl_msg_hdr response_data;
+
+	memset(&response_data, 0, sizeof(response_data));
+	response_data.command_code = command_code;
+	response_data.completion_code = response_code;
+	response_data.ic_msg_type = MCTP_CTRL_HDR_MSG_TYPE;
+	mctp_message_tx(mctp, src, &response_data, sizeof(response_data));
+}
+
 static bool mctp_ctrl_handle_msg(struct mctp *mctp, struct mctp_bus *bus,
 				 mctp_eid_t src, mctp_eid_t dest, void *buffer,
 				 size_t length)
 {
 	struct mctp_ctrl_msg_hdr *msg_hdr = buffer;
 
-	/*
-	 * Control message is received. If a transport control message handler
-	 * is provided, it will called. If there is no dedicated handler, this
+	/* Control message is received. If dedicated control messages handler
+	 * is provided, it will be used. If there is no dedicated handler, this
 	 * function returns false and data can be handled by the generic
-	 * message handler. The transport control message handler will be
-	 * provided with messages in the command range 0xF0 - 0xFF.
+	 * message handler. There are two control messages handlers available.
+	 * First one is located in struct mctp and handles command codes from
+	 * 0x01 to 0x14 and the second one is a part of struct mctp_binding, as
+	 * 0xF0 - 0xFF command codes are transport specific.
 	 */
-	if (mctp_ctrl_cmd_is_transport(msg_hdr)) {
+	if (mctp_ctrl_cmd_is_control(msg_hdr)) {
+		if (mctp->control_rx != NULL) {
+			/* MCTP endpoint handler */
+			mctp->control_rx(src, mctp->control_rx_data, buffer,
+					 length);
+			return true;
+		}
+	} else if (mctp_ctrl_cmd_is_transport(msg_hdr)) {
 		if (bus->binding->control_rx != NULL) {
 			/* MCTP bus binding handler */
 			bus->binding->control_rx(src,
@@ -341,6 +372,12 @@ static bool mctp_ctrl_handle_msg(struct mctp *mctp, struct mctp_bus *bus,
 						 buffer, length);
 			return true;
 		}
+	} else {
+		/* Unrecognized command code. */
+		mctp_ctrl_send_empty_response(
+			mctp, src, msg_hdr->command_code,
+			MCTP_CTRL_CC_ERROR_UNSUPPORTED_CMD);
+		return true;
 	}
 
 	/*
@@ -348,6 +385,13 @@ static bool mctp_ctrl_handle_msg(struct mctp *mctp, struct mctp_bus *bus,
 	 * It will be passed to regular message_rx handler.
 	 */
 	return false;
+}
+
+int mctp_set_rx_ctrl(struct mctp *mctp, mctp_rx_fn fn, void *data)
+{
+	mctp->control_rx = fn;
+	mctp->control_rx_data = data;
+	return 0;
 }
 
 static inline bool mctp_rx_dest_is_local(struct mctp_bus *bus, mctp_eid_t dest)

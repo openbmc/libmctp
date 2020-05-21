@@ -90,6 +90,7 @@ typedef void (*mctp_rx_fn)(uint8_t src_eid, void *data,
 		void *msg, size_t len);
 
 int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data);
+int mctp_set_rx_ctrl(struct mctp *mctp, mctp_rx_fn fn, void *data);
 
 int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 		void *msg, size_t msg_len);
