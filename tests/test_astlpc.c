@@ -20,10 +20,15 @@
 #endif
 
 #include <assert.h>
+#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+#endif
 
 struct mctp_binding_astlpc_mmio {
 	struct mctp_binding_astlpc astlpc;
@@ -346,13 +351,37 @@ static void astlpc_test_simple_init(void)
 	free(lpc_mem);
 }
 
+/* clang-format off */
+#define TEST_CASE(test) { #test, test }
+static const struct {
+	const char *name;
+	void (*test)(void);
+} astlpc_tests[] = {
+	TEST_CASE(astlpc_test_simple_init),
+	TEST_CASE(astlpc_test_simple_message_bmc_to_host),
+	TEST_CASE(astlpc_test_packetised_message_bmc_to_host),
+};
+/* clang-format on */
+
+#ifndef BUILD_ASSERT
+#define BUILD_ASSERT(x)                                                        \
+	do {                                                                   \
+		(void)sizeof(char[0 - (!(x))]);                                \
+	} while (0)
+#endif
+
 int main(void)
 {
+	size_t i;
+
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
 
-	astlpc_test_simple_init();
-	astlpc_test_simple_message_bmc_to_host();
-	astlpc_test_packetised_message_bmc_to_host();
+	BUILD_ASSERT(ARRAY_SIZE(astlpc_tests) < SIZE_MAX);
+	for (i = 0; i < ARRAY_SIZE(astlpc_tests); i++) {
+		mctp_prlog(MCTP_LOG_DEBUG, "begin: %s", astlpc_tests[i].name);
+		astlpc_tests[i].test();
+		mctp_prlog(MCTP_LOG_DEBUG, "end: %s\n", astlpc_tests[i].name);
+	}
 
 	return 0;
 }
