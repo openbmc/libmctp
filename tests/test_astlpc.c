@@ -244,18 +244,9 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 	/* BMC sends a message */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
 	assert(rc == 0);
-	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
-	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
-
-	astlpc_assert_tx_packet(&ctx.bmc, &msg[0], MCTP_BTU);
 
 	/* Host receives the first packet */
 	mctp_astlpc_poll(ctx.host.astlpc);
-
-	/* Host returns Rx area ownership to BMC */
-	assert(!(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF));
-	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x02);
-	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
 
 	/* BMC dequeues ownership hand-over and sends the queued packet */
 	rc = mctp_astlpc_poll(ctx.bmc.astlpc);
@@ -274,6 +265,46 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 	network_destroy(&ctx);
 }
 
+static void astlpc_test_simple_message_bmc_to_host(void)
+{
+	struct astlpc_test ctx = { 0 };
+	uint8_t msg[MCTP_BTU];
+	int rc;
+
+	/* Test harness initialisation */
+
+	network_init(&ctx);
+
+	memset(&msg[0], 0x5a, MCTP_BTU);
+
+	ctx.msg = &msg[0];
+	ctx.count = 0;
+	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
+
+	/* BMC sends the single-packet message */
+	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
+	assert(rc == 0);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
+
+	astlpc_assert_tx_packet(&ctx.bmc, &msg[0], MCTP_BTU);
+
+	/* Host receives the single-packet message */
+	mctp_astlpc_poll(ctx.host.astlpc);
+	assert(ctx.count == 1);
+
+	/* Host returns Rx area ownership to BMC */
+	assert(!(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF));
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x02);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
+
+	/* BMC dequeues ownership hand-over and sends the queued packet */
+	rc = mctp_astlpc_poll(ctx.bmc.astlpc);
+	assert(rc == 0);
+
+	network_destroy(&ctx);
+}
+
 static void astlpc_test_simple_init(void)
 {
 	struct astlpc_endpoint bmc, host;
@@ -286,14 +317,14 @@ static void astlpc_test_simple_init(void)
 	lpc_mem = calloc(1, lpc_size);
 	assert(lpc_mem);
 
-	/* Bus owner (BMC) initialisation */
+	/* BMC initialisation */
 	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem,
 		      lpc_size);
 
 	/* Verify the BMC binding was initialised */
 	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
 
-	/* Device (Host) initialisation */
+	/* Host initialisation */
 	endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs, lpc_mem,
 		      lpc_size);
 
@@ -322,6 +353,7 @@ int main(void)
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
 
 	astlpc_test_simple_init();
+	astlpc_test_simple_message_bmc_to_host();
 	astlpc_test_packetised_message_bmc_to_host();
 
 	return 0;
