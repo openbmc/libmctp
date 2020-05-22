@@ -271,6 +271,46 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 	network_destroy(&ctx);
 }
 
+static void astlpc_test_simple_message_host_to_bmc(void)
+{
+	struct astlpc_test ctx;
+	uint8_t msg[MCTP_BTU];
+	int rc;
+
+	/* Test harness initialisation */
+
+	network_init(&ctx);
+
+	memset(&msg[0], 0xa5, MCTP_BTU);
+
+	ctx.msg = &msg[0];
+	ctx.count = 0;
+	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
+
+	/* Host sends the single-packet message */
+	rc = mctp_message_tx(ctx.host.mctp, 8, msg, sizeof(msg));
+	assert(rc == 0);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
+
+	astlpc_assert_tx_packet(&ctx.host, &msg[0], MCTP_BTU);
+
+	/* BMC receives the single-packet message */
+	mctp_astlpc_poll(ctx.bmc.astlpc);
+	assert(ctx.count == 1);
+
+	/* BMC returns Tx area ownership to Host */
+	assert(!(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF));
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] = 0x02);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
+
+	/* Host dequeues ownership hand-over and sends the queued packet */
+	rc = mctp_astlpc_poll(ctx.host.astlpc);
+	assert(rc == 0);
+
+	network_destroy(&ctx);
+}
+
 static void astlpc_test_simple_message_bmc_to_host(void)
 {
 	struct astlpc_test ctx;
@@ -363,6 +403,7 @@ static const struct {
 } astlpc_tests[] = {
 	TEST_CASE(astlpc_test_simple_init),
 	TEST_CASE(astlpc_test_simple_message_bmc_to_host),
+	TEST_CASE(astlpc_test_simple_message_host_to_bmc),
 	TEST_CASE(astlpc_test_packetised_message_bmc_to_host),
 };
 /* clang-format on */
