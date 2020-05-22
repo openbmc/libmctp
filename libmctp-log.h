@@ -8,10 +8,17 @@
 void mctp_prlog(int level, const char *fmt, ...)
 	__attribute__((format(printf, 2, 3)));
 
-#define mctp_prerr(fmt, ...)  mctp_prlog(MCTP_LOG_ERR, fmt, ##__VA_ARGS__)
-#define mctp_prwarn(fmt, ...) mctp_prlog(MCTP_LOG_WARNING, fmt, ##__VA_ARGS__)
-#define mctp_prinfo(fmt, ...) mctp_prlog(MCTP_LOG_INFO, fmt, ##__VA_ARGS__)
-#define mctp_prdebug(fmt, ...)  mctp_prlog(MCTP_LOG_DEBUG, fmt, ##__VA_ARGS__)
+#ifndef pr_fmt
+#define pr_fmt(x) x
+#endif
 
+#define mctp_prerr(fmt, ...)                                                   \
+	mctp_prlog(MCTP_LOG_ERR, pr_fmt(fmt), ##__VA_ARGS__)
+#define mctp_prwarn(fmt, ...)                                                  \
+	mctp_prlog(MCTP_LOG_WARNING, pr_fmt(fmt), ##__VA_ARGS__)
+#define mctp_prinfo(fmt, ...)                                                  \
+	mctp_prlog(MCTP_LOG_INFO, pr_fmt(fmt), ##__VA_ARGS__)
+#define mctp_prdebug(fmt, ...)                                                 \
+	mctp_prlog(MCTP_LOG_DEBUG, pr_fmt(fmt), ##__VA_ARGS__)
 
 #endif /* _LIBMCTP_LOG_H */
