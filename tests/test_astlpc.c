@@ -35,7 +35,23 @@ struct mctp_binding_astlpc_mmio {
 	uint8_t *lpc;
 };
 
-#define binding_to_mmio(b) \
+struct astlpc_endpoint {
+	struct mctp_binding_astlpc_mmio mmio;
+	struct mctp_binding_astlpc *astlpc;
+	struct mctp *mctp;
+};
+
+struct astlpc_test {
+	struct astlpc_endpoint bmc;
+	struct astlpc_endpoint host;
+	uint8_t kcs[2];
+	uint8_t *lpc_mem;
+
+	void *msg;
+	uint8_t count;
+};
+
+#define binding_to_mmio(b)                                                     \
 	container_of(b, struct mctp_binding_astlpc_mmio, astlpc)
 
 static int mctp_astlpc_mmio_kcs_read(void *data,
@@ -114,12 +130,17 @@ int mctp_astlpc_mmio_lpc_write(void *data, void *buf, long offset, size_t len)
 static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
 		       size_t len)
 {
-	uint8_t type;
+	struct astlpc_test *test = data;
 
-	type = *(uint8_t *)msg;
+	mctp_prdebug("MCTP message received: msg: %p, len %zd", msg, len);
 
-	mctp_prdebug("MCTP message received: len %zd, type %d",
-			len, type);
+	assert(len > 0);
+	assert(msg);
+	assert(test);
+	assert(test->msg);
+	assert(!memcmp(test->msg, msg, len));
+
+	test->count++;
 }
 
 static const struct mctp_binding_astlpc_ops mctp_binding_astlpc_mmio_ops = {
@@ -127,12 +148,6 @@ static const struct mctp_binding_astlpc_ops mctp_binding_astlpc_mmio_ops = {
 	.kcs_write = mctp_astlpc_mmio_kcs_write,
 	.lpc_read = mctp_astlpc_mmio_lpc_read,
 	.lpc_write = mctp_astlpc_mmio_lpc_write,
-};
-
-struct astlpc_endpoint {
-	struct mctp_binding_astlpc_mmio mmio;
-	struct mctp_binding_astlpc *astlpc;
-	struct mctp *mctp;
 };
 
 static void endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
@@ -147,8 +162,6 @@ static void endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
 
 	ep->mctp = mctp_init();
 	assert(ep->mctp);
-
-	mctp_set_rx_all(ep->mctp, rx_message, NULL);
 
 	/* Inject KCS registers */
 	ep->mmio.kcs = kcs;
@@ -169,13 +182,6 @@ static void endpoint_destroy(struct astlpc_endpoint *ep)
 	mctp_astlpc_destroy(ep->astlpc);
 	mctp_destroy(ep->mctp);
 }
-
-struct astlpc_test {
-	struct astlpc_endpoint bmc;
-	struct astlpc_endpoint host;
-	uint8_t kcs[2];
-	uint8_t *lpc_mem;
-};
 
 static void network_init(struct astlpc_test *ctx)
 {
@@ -224,10 +230,14 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 
 	/* Test harness initialisation */
 
+	network_init(&ctx);
+
 	memset(&msg[0], 0x5a, MCTP_BTU);
 	memset(&msg[MCTP_BTU], 0xa5, MCTP_BTU);
 
-	network_init(&ctx);
+	ctx.msg = &msg[0];
+	ctx.count = 0;
+	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
 
 	/* BMC sends a message */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
@@ -254,6 +264,10 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
 
 	astlpc_assert_tx_packet(&ctx.bmc, &msg[MCTP_BTU], MCTP_BTU);
+
+	/* Host receives final packet */
+	mctp_astlpc_poll(ctx.host.astlpc);
+	assert(ctx.count == 1);
 
 	network_destroy(&ctx);
 }
