@@ -19,8 +19,6 @@
 #undef NDEBUG
 #endif
 
-#define RX_BUFFER_DATA	0x100 + 4 + 4
-
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -157,7 +155,7 @@ static void endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
 	ep->mmio.lpc = lpc_mem;
 
 	/* Initialise the binding */
-	ep->astlpc = mctp_astlpc_init(mode, MCTP_BTU, NULL,
+	ep->astlpc = mctp_astlpc_init(mode, MCTP_BTU, lpc_mem,
 				      &mctp_binding_astlpc_mmio_ops, &ep->mmio);
 
 	mctp_register_bus(ep->mctp, &ep->astlpc->binding, eid);
@@ -209,6 +207,14 @@ static void network_destroy(struct astlpc_test *ctx)
 	free(ctx->lpc_mem);
 }
 
+static void astlpc_assert_tx_packet(struct astlpc_endpoint *src,
+				    const void *expected, size_t len)
+{
+	const size_t tx_body = src->astlpc->layout.tx.offset + 4 + 4;
+	const void *test = ((char *)src->astlpc->lpc_map) + tx_body;
+	assert(!memcmp(test, expected, len));
+}
+
 static void astlpc_test_packetised_message_bmc_to_host(void)
 {
 	uint8_t msg[2 * MCTP_BTU];
@@ -228,10 +234,9 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
 
-	/* Verify it's the packet we expect */
-	assert(!memcmp(ctx.lpc_mem + RX_BUFFER_DATA, &msg[0], MCTP_BTU));
+	astlpc_assert_tx_packet(&ctx.bmc, &msg[0], MCTP_BTU);
 
-	/* Host receives a packet */
+	/* Host receives the first packet */
 	mctp_astlpc_poll(ctx.host.astlpc);
 
 	/* Host returns Rx area ownership to BMC */
@@ -243,12 +248,11 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 	rc = mctp_astlpc_poll(ctx.bmc.astlpc);
 	assert(rc == 0);
 
-	/* Host receives a message */
+	/* Host receives the next packet */
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
 
-	/* Verify it's the packet we expect */
-	assert(!memcmp(ctx.lpc_mem + RX_BUFFER_DATA, &msg[MCTP_BTU], MCTP_BTU));
+	astlpc_assert_tx_packet(&ctx.bmc, &msg[MCTP_BTU], MCTP_BTU);
 
 	network_destroy(&ctx);
 }
