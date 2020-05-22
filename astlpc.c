@@ -75,6 +75,22 @@ struct mctp_binding_astlpc {
 #define binding_to_astlpc(b)                                                   \
 	container_of(b, struct mctp_binding_astlpc, binding)
 
+#define astlpc_prlog(ctx, lvl, fmt, ...)                                       \
+	do {                                                                   \
+		bool __bmc = ((ctx)->mode == MCTP_BINDING_ASTLPC_MODE_BMC);    \
+		mctp_prlog(lvl, pr_fmt("%s: " fmt), __bmc ? "bmc" : "host",    \
+			   ##__VA_ARGS__);                                     \
+	} while (0)
+
+#define astlpc_prerr(ctx, fmt, ...)                                            \
+	astlpc_prlog(ctx, MCTP_LOG_ERR, fmt, ##__VA_ARGS__)
+#define astlpc_prwarn(ctx, fmt, ...)                                           \
+	astlpc_prlog(ctx, MCTP_LOG_WARNING, fmt, ##__VA_ARGS__)
+#define astlpc_prinfo(ctx, fmt, ...)                                           \
+	astlpc_prlog(ctx, MCTP_LOG_INFO, fmt, ##__VA_ARGS__)
+#define astlpc_prdebug(ctx, fmt, ...)                                          \
+	astlpc_prlog(ctx, MCTP_LOG_DEBUG, fmt, ##__VA_ARGS__)
+
 /* clang-format off */
 #define ASTLPC_MCTP_MAGIC	0x4d435450
 #define ASTLPC_VER_MIN	1
@@ -161,7 +177,7 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
 				   status);
 	if (rc) {
-		mctp_prwarn("KCS write failed");
+		astlpc_prwarn(astlpc, "KCS write failed");
 	}
 
 	return rc;
@@ -223,7 +239,7 @@ static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
 				   0x0);
 	if (rc) {
-		mctp_prwarn("KCS write failed");
+		astlpc_prwarn(astlpc, "KCS write failed");
 	}
 
 	return rc;
@@ -281,14 +297,14 @@ static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
 			status);
 	if (rc) {
-		mctp_prwarn("KCS status write failed");
+		astlpc_prwarn(astlpc, "KCS status write failed");
 		return -1;
 	}
 
 	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
 			data);
 	if (rc) {
-		mctp_prwarn("KCS dummy data write failed");
+		astlpc_prwarn(astlpc, "KCS dummy data write failed");
 		return -1;
 	}
 
@@ -305,7 +321,7 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 		rc = astlpc->ops.kcs_read(astlpc->ops_data,
 				MCTP_ASTLPC_KCS_REG_STATUS, &status);
 		if (rc) {
-			mctp_prwarn("KCS status read failed");
+			astlpc_prwarn(astlpc, "KCS status read failed");
 			return -1;
 		}
 		if (mctp_astlpc_kcs_write_ready(astlpc, status))
@@ -316,7 +332,7 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
 			data);
 	if (rc) {
-		mctp_prwarn("KCS data write failed");
+		astlpc_prwarn(astlpc, "KCS data write failed");
 		return -1;
 	}
 
@@ -333,11 +349,13 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 	hdr = mctp_pktbuf_hdr(pkt);
 	len = mctp_pktbuf_size(pkt);
 
-	mctp_prdebug("%s: Transmitting %"PRIu32"-byte packet (%hhu, %hhu, 0x%hhx)",
-		     __func__, len, hdr->src, hdr->dest, hdr->flags_seq_tag);
+	astlpc_prdebug(astlpc,
+		       "%s: Transmitting %" PRIu32
+		       "-byte packet (%hhu, %hhu, 0x%hhx)",
+		       __func__, len, hdr->src, hdr->dest, hdr->flags_seq_tag);
 
 	if (len > ASTLPC_BODY_SIZE(astlpc->layout.tx.size)) {
-		mctp_prwarn("invalid TX len 0x%x", len);
+		astlpc_prwarn(astlpc, "invalid TX len 0x%x", len);
 		return -1;
 	}
 
@@ -393,12 +411,12 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	len = be32toh(len);
 
 	if (len > ASTLPC_BODY_SIZE(astlpc->layout.rx.size)) {
-		mctp_prwarn("invalid RX len 0x%x", len);
+		astlpc_prwarn(astlpc, "invalid RX len 0x%x", len);
 		return;
 	}
 
 	if (len > astlpc->binding.pkt_size) {
-		mctp_prwarn("invalid RX len 0x%x", len);
+		astlpc_prwarn(astlpc, "invalid RX len 0x%x", len);
 		return;
 	}
 
@@ -457,11 +475,11 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 	rc = astlpc->ops.kcs_read(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
 			&status);
 	if (rc) {
-		mctp_prwarn("KCS read error");
+		astlpc_prwarn(astlpc, "KCS read error");
 		return -1;
 	}
 
-	mctp_prdebug("%s: status: 0x%hhx", __func__, status);
+	astlpc_prdebug(astlpc, "%s: status: 0x%hhx", __func__, status);
 
 	if (!mctp_astlpc_kcs_read_ready(astlpc, status))
 		return 0;
@@ -469,11 +487,11 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 	rc = astlpc->ops.kcs_read(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
 			&data);
 	if (rc) {
-		mctp_prwarn("KCS data read error");
+		astlpc_prwarn(astlpc, "KCS data read error");
 		return -1;
 	}
 
-	mctp_prdebug("%s: data: 0x%hhx", __func__, data);
+	astlpc_prdebug(astlpc, "%s: data: 0x%hhx", __func__, data);
 
 	switch (data) {
 	case 0x0:
@@ -492,7 +510,7 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 
 		return mctp_astlpc_update_channel(astlpc, status);
 	default:
-		mctp_prwarn("unknown message 0x%x", data);
+		astlpc_prwarn(astlpc, "unknown message 0x%x", data);
 	}
 	return 0;
 }
@@ -523,7 +541,7 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(uint8_t mode,
 	else if (mode == MCTP_BINDING_ASTLPC_MODE_HOST)
 		astlpc->binding.start = mctp_binding_astlpc_start_host;
 	else {
-		mctp_prerr("%s: Invalid mode: %d\n", __func__, mode);
+		astlpc_prerr(astlpc, "%s: Invalid mode: %d\n", __func__, mode);
 		__mctp_free(astlpc);
 		return NULL;
 	}
@@ -602,13 +620,13 @@ static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 
 	fd = open(lpc_path, O_RDWR | O_SYNC);
 	if (fd < 0) {
-		mctp_prwarn("LPC open (%s) failed", lpc_path);
+		astlpc_prwarn(astlpc, "LPC open (%s) failed", lpc_path);
 		return -1;
 	}
 
 	rc = ioctl(fd, ASPEED_LPC_CTRL_IOCTL_GET_SIZE, &map);
 	if (rc) {
-		mctp_prwarn("LPC GET_SIZE failed");
+		astlpc_prwarn(astlpc, "LPC GET_SIZE failed");
 		close(fd);
 		return -1;
 	}
@@ -616,7 +634,7 @@ static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 	astlpc->lpc_map_base = mmap(NULL, map.size, PROT_READ | PROT_WRITE,
 			MAP_SHARED, fd, 0);
 	if (astlpc->lpc_map_base == MAP_FAILED) {
-		mctp_prwarn("LPC mmap failed");
+		astlpc_prwarn(astlpc, "LPC mmap failed");
 		rc = -1;
 	} else {
 		astlpc->lpc_map = astlpc->lpc_map_base +
@@ -703,14 +721,14 @@ struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 struct mctp_binding_astlpc * __attribute__((const))
 	mctp_astlpc_init_fileio(void)
 {
-	mctp_prerr("Missing support for file IO");
+	astlpc_prerr(astlpc, "Missing support for file IO");
 	return NULL;
 }
 
 int __attribute__((const)) mctp_astlpc_get_fd(
 		struct mctp_binding_astlpc *astlpc __attribute__((unused)))
 {
-	mctp_prerr("Missing support for file IO");
+	astlpc_prerr(astlpc, "Missing support for file IO");
 	return -1;
 }
 #endif
