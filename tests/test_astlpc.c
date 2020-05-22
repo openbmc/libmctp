@@ -194,24 +194,12 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem,
 		      lpc_size);
 
-	/* Verify the BMC binding was initialised */
-	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
-
 	/* Host initialisation */
 	endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs, lpc_mem,
 		      lpc_size);
 
-	/* Host sends channel init command */
-	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
-	assert(kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x00);
-
 	/* BMC receives host channel init request */
 	mctp_astlpc_poll(bmc.astlpc);
-
-	/* BMC sends init response */
-	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
-	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_CHANNEL_ACTIVE);
-	assert(kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0xff);
 
 	/* Host dequeues data */
 	mctp_astlpc_poll(host.astlpc);
@@ -249,10 +237,54 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 	free(lpc_mem);
 }
 
+static void astlpc_test_simple_init(void)
+{
+	struct astlpc_endpoint bmc, host;
+	uint8_t kcs[2] = { 0 };
+	size_t lpc_size;
+	void *lpc_mem;
+
+	/* Test harness initialisation */
+	lpc_size = 1 * 1024 * 1024;
+	lpc_mem = calloc(1, lpc_size);
+	assert(lpc_mem);
+
+	/* Bus owner (BMC) initialisation */
+	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem,
+		      lpc_size);
+
+	/* Verify the BMC binding was initialised */
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
+
+	/* Device (Host) initialisation */
+	endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs, lpc_mem,
+		      lpc_size);
+
+	/* Host sends channel init command */
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x00);
+
+	/* BMC receives host channel init request */
+	mctp_astlpc_poll(bmc.astlpc);
+
+	/* BMC sends init response */
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_CHANNEL_ACTIVE);
+	assert(kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0xff);
+
+	/* Host dequeues data */
+	mctp_astlpc_poll(host.astlpc);
+
+	endpoint_destroy(&bmc);
+	endpoint_destroy(&host);
+	free(lpc_mem);
+}
+
 int main(void)
 {
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
 
+	astlpc_test_simple_init();
 	astlpc_test_packetised_message_bmc_to_host();
 
 	return 0;
