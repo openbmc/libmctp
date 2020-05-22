@@ -168,7 +168,7 @@ static void endpoint_destroy(struct astlpc_endpoint *ep)
 	mctp_destroy(ep->mctp);
 }
 
-int main(void)
+static void astlpc_test_packetised_message_bmc_to_host(void)
 {
 	uint8_t msg[2 * MCTP_BTU];
 	struct astlpc_endpoint bmc, host;
@@ -185,8 +185,6 @@ int main(void)
 	lpc_size = 1 * 1024 * 1024;
 	lpc_mem = calloc(1, lpc_size);
 	assert(lpc_mem);
-
-	mctp_set_log_stdio(MCTP_LOG_DEBUG);
 
 	/* Bus owner (BMC) initialisation */
 	endpoint_init(&bmc, 8, astlpc_mode_bus_owner, &kcs, lpc_mem, lpc_size);
@@ -243,6 +241,13 @@ int main(void)
 	endpoint_destroy(&bmc);
 	endpoint_destroy(&host);
 	free(lpc_mem);
+}
+
+int main(void)
+{
+	mctp_set_log_stdio(MCTP_LOG_DEBUG);
+
+	astlpc_test_packetised_message_bmc_to_host();
 
 	return 0;
 }
