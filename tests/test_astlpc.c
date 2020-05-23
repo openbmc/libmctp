@@ -163,8 +163,8 @@ static const struct mctp_binding_astlpc_ops astlpc_indirect_mmio_ops = {
 	.lpc_write = mctp_astlpc_mmio_lpc_write,
 };
 
-static void endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
-			  uint8_t mode, uint8_t (*kcs)[2], void *lpc_mem)
+static int endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
+			 uint8_t mode, uint8_t (*kcs)[2], void *lpc_mem)
 {
 	/*
 	 * Configure the direction of the KCS interface so we know whether to
@@ -182,7 +182,7 @@ static void endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
 	ep->astlpc = mctp_astlpc_init(mode, MCTP_BTU, lpc_mem,
 				      &astlpc_direct_mmio_ops, &ep->mmio);
 
-	mctp_register_bus(ep->mctp, &ep->astlpc->binding, eid);
+	return mctp_register_bus(ep->mctp, &ep->astlpc->binding, eid);
 }
 
 static void endpoint_destroy(struct astlpc_endpoint *ep)
@@ -193,17 +193,21 @@ static void endpoint_destroy(struct astlpc_endpoint *ep)
 
 static void network_init(struct astlpc_test *ctx)
 {
+	int rc;
+
 	ctx->lpc_mem = calloc(1, 1 * 1024 * 1024);
 	assert(ctx->lpc_mem);
 
 	/* BMC initialisation */
-	endpoint_init(&ctx->bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &ctx->kcs,
-		      ctx->lpc_mem);
+	rc = endpoint_init(&ctx->bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC,
+			   &ctx->kcs, ctx->lpc_mem);
+	assert(!rc);
 	assert(ctx->kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
 
 	/* Host initialisation */
-	endpoint_init(&ctx->host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &ctx->kcs,
-		      ctx->lpc_mem);
+	rc = endpoint_init(&ctx->host, 9, MCTP_BINDING_ASTLPC_MODE_HOST,
+			   &ctx->kcs, ctx->lpc_mem);
+	assert(!rc);
 
 	/* BMC processes host channel init request, alerts host */
 	mctp_astlpc_poll(ctx->bmc.astlpc);
@@ -379,24 +383,141 @@ static void astlpc_test_host_before_bmc(void)
 	mctp_destroy(mctp);
 }
 
-static void astlpc_test_simple_init(void)
+static void astlpc_test_bad_version(void)
+{
+	assert(0 ==
+	       mctp_astlpc_negotiate_version(ASTLPC_VER_BAD, ASTLPC_VER_CUR,
+					     ASTLPC_VER_MIN, ASTLPC_VER_CUR));
+	assert(0 ==
+	       mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_BAD,
+					     ASTLPC_VER_MIN, ASTLPC_VER_CUR));
+	assert(0 ==
+	       mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_CUR,
+					     ASTLPC_VER_BAD, ASTLPC_VER_CUR));
+	assert(0 ==
+	       mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_CUR,
+					     ASTLPC_VER_MIN, ASTLPC_VER_BAD));
+	assert(0 == mctp_astlpc_negotiate_version(
+			    ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR, ASTLPC_VER_MIN,
+			    ASTLPC_VER_CUR + 1));
+	assert(0 == mctp_astlpc_negotiate_version(
+			    ASTLPC_VER_MIN, ASTLPC_VER_CUR + 1,
+			    ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR));
+}
+
+static void astlpc_test_incompatible_versions(void)
+{
+	assert(0 == mctp_astlpc_negotiate_version(
+			    ASTLPC_VER_CUR, ASTLPC_VER_CUR, ASTLPC_VER_CUR + 1,
+			    ASTLPC_VER_CUR + 1));
+	assert(0 == mctp_astlpc_negotiate_version(
+			    ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR + 1,
+			    ASTLPC_VER_CUR, ASTLPC_VER_CUR));
+}
+
+static void astlpc_test_choose_bmc_ver_cur(void)
+{
+	assert(2 == mctp_astlpc_negotiate_version(1, 2, 2, 3));
+}
+
+static void astlpc_test_choose_host_ver_cur(void)
+{
+	assert(2 == mctp_astlpc_negotiate_version(2, 3, 1, 2));
+}
+
+static void astlpc_test_version_host_fails_negotiation(void)
 {
 	struct astlpc_endpoint bmc, host;
+	struct mctp_lpcmap_hdr *hdr;
 	uint8_t kcs[2] = { 0 };
 	void *lpc_mem;
+	int rc;
 
 	/* Test harness initialisation */
 	lpc_mem = calloc(1, 1 * 1024 * 1024);
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs,
+			   lpc_mem);
+	assert(!rc);
+
+	/* Now the BMC is initialised, break its version announcement */
+	hdr = lpc_mem;
+	hdr->bmc_ver_cur = ASTLPC_VER_BAD;
+
+	/* Host initialisation */
+	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs,
+			   lpc_mem);
+	assert(rc < 0);
+
+	endpoint_destroy(&bmc);
+	endpoint_destroy(&host);
+	free(lpc_mem);
+}
+
+static void astlpc_test_version_bmc_fails_negotiation(void)
+{
+	struct astlpc_endpoint bmc, host;
+	struct mctp_lpcmap_hdr *hdr;
+	uint8_t kcs[2] = { 0 };
+	void *lpc_mem;
+	int rc;
+
+	/* Test harness initialisation */
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(lpc_mem);
+
+	/* BMC initialisation */
+	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs,
+			   lpc_mem);
+	assert(!rc);
+
+	/* Host initialisation */
+	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs,
+			   lpc_mem);
+	assert(!rc);
+
+	/* Now the host is initialised, break its version announcement */
+	hdr = lpc_mem;
+	hdr->host_ver_cur = ASTLPC_VER_BAD;
+
+	/* Poll the BMC to detect the broken host version */
+	mctp_astlpc_poll(bmc.astlpc);
+	assert(!(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_CHANNEL_ACTIVE));
+
+	/* Poll the host so it detects failed negotiation */
+	rc = mctp_astlpc_poll(host.astlpc);
+	assert(rc < 0);
+
+	endpoint_destroy(&bmc);
+	endpoint_destroy(&host);
+	free(lpc_mem);
+}
+
+static void astlpc_test_simple_init(void)
+{
+	struct astlpc_endpoint bmc, host;
+	uint8_t kcs[2] = { 0 };
+	void *lpc_mem;
+	int rc;
+
+	/* Test harness initialisation */
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(lpc_mem);
+
+	/* BMC initialisation */
+	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs,
+			   lpc_mem);
+	assert(!rc);
 
 	/* Verify the BMC binding was initialised */
 	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
 
 	/* Host initialisation */
-	endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs, lpc_mem);
+	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs,
+			   lpc_mem);
+	assert(!rc);
 
 	/* Host sends channel init command */
 	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
@@ -514,8 +635,9 @@ static void astlpc_test_host_tx_bmc_gone(void)
 	astlpc_assert_tx_packet(&ctx.host, &unwritten[0], MCTP_BTU);
 
 	/* BMC comes back */
-	endpoint_init(&ctx.bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &ctx.kcs,
-		      ctx.lpc_mem);
+	rc = endpoint_init(&ctx.bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &ctx.kcs,
+			   ctx.lpc_mem);
+	assert(!rc);
 	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
 
 	/* Host triggers channel init */
@@ -546,7 +668,9 @@ static void astlpc_test_poll_not_ready(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs,
+			   lpc_mem);
+	assert(!rc);
 
 	/* Check for a command despite none present */
 	rc = mctp_astlpc_poll(bmc.astlpc);
@@ -570,7 +694,9 @@ static void astlpc_test_undefined_command(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs,
+			   lpc_mem);
+	assert(!rc);
 
 	/* 0x5a isn't legal in v1 or v2 */
 	kcs[MCTP_ASTLPC_KCS_REG_DATA] = 0x5a;
@@ -593,6 +719,12 @@ static const struct {
 	void (*test)(void);
 } astlpc_tests[] = {
 	TEST_CASE(astlpc_test_simple_init),
+	TEST_CASE(astlpc_test_bad_version),
+	TEST_CASE(astlpc_test_incompatible_versions),
+	TEST_CASE(astlpc_test_choose_bmc_ver_cur),
+	TEST_CASE(astlpc_test_choose_host_ver_cur),
+	TEST_CASE(astlpc_test_version_host_fails_negotiation),
+	TEST_CASE(astlpc_test_version_bmc_fails_negotiation),
 	TEST_CASE(astlpc_test_host_before_bmc),
 	TEST_CASE(astlpc_test_simple_message_bmc_to_host),
 	TEST_CASE(astlpc_test_simple_message_host_to_bmc),

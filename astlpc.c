@@ -55,6 +55,7 @@ struct mctp_binding_astlpc {
 	struct mctp_astlpc_layout layout;
 
 	uint8_t mode;
+	uint16_t version;
 
 	/* direct ops data */
 	struct mctp_binding_astlpc_ops ops;
@@ -88,6 +89,7 @@ struct mctp_binding_astlpc {
 
 /* clang-format off */
 #define ASTLPC_MCTP_MAGIC	0x4d435450
+#define ASTLPC_VER_BAD	0
 #define ASTLPC_VER_MIN	1
 #define ASTLPC_VER_CUR	1
 
@@ -250,10 +252,44 @@ static int mctp_binding_astlpc_start_bmc(struct mctp_binding *b)
 	return mctp_astlpc_init_bmc(astlpc);
 }
 
+static bool mctp_astlpc_validate_version(uint16_t bmc_ver_min,
+					 uint16_t bmc_ver_cur,
+					 uint16_t host_ver_min,
+					 uint16_t host_ver_cur)
+{
+	if (!(bmc_ver_min && bmc_ver_cur && host_ver_min && host_ver_cur)) {
+		mctp_prerr("Invalid version present in [%" PRIu16 ", %" PRIu16
+			   "], [%" PRIu16 ", %" PRIu16 "]",
+			   bmc_ver_min, bmc_ver_cur, host_ver_min,
+			   host_ver_cur);
+		return false;
+	} else if (bmc_ver_min > bmc_ver_cur) {
+		mctp_prerr("Invalid bmc version range [%" PRIu16 ", %" PRIu16
+			   "]",
+			   bmc_ver_min, bmc_ver_cur);
+		return false;
+	} else if (host_ver_min > host_ver_cur) {
+		mctp_prerr("Invalid host version range [%" PRIu16 ", %" PRIu16
+			   "]",
+			   host_ver_min, host_ver_cur);
+		return false;
+	} else if ((host_ver_cur < bmc_ver_min) ||
+		   (host_ver_min > bmc_ver_cur)) {
+		mctp_prerr(
+			"Unable to satisfy version negotiation with ranges [%" PRIu16
+			", %" PRIu16 "] and [%" PRIu16 ", %" PRIu16 "]",
+			bmc_ver_min, bmc_ver_cur, host_ver_min, host_ver_cur);
+		return false;
+	}
+
+	return true;
+}
+
 static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 {
 	const uint16_t ver_min_be = htobe16(ASTLPC_VER_MIN);
 	const uint16_t ver_cur_be = htobe16(ASTLPC_VER_CUR);
+	uint16_t bmc_ver_min, bmc_ver_cur;
 	struct mctp_lpcmap_hdr hdr;
 	uint8_t status;
 	int rc;
@@ -275,6 +311,15 @@ static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 	astlpc->layout.rx.size = be32toh(hdr.rx_size);
 	astlpc->layout.tx.offset = be32toh(hdr.tx_offset);
 	astlpc->layout.tx.size = be32toh(hdr.tx_size);
+
+	bmc_ver_min = be16toh(hdr.bmc_ver_min);
+	bmc_ver_cur = be16toh(hdr.bmc_ver_cur);
+
+	if (!mctp_astlpc_validate_version(bmc_ver_min, bmc_ver_cur,
+					  ASTLPC_VER_MIN, ASTLPC_VER_CUR)) {
+		astlpc_prerr(astlpc, "Cannot negotiate with invalid versions");
+		return -EINVAL;
+	}
 
 	mctp_astlpc_lpc_write(astlpc, &ver_min_be,
 			      offsetof(struct mctp_lpcmap_hdr, host_ver_min),
@@ -385,19 +430,56 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 	return 0;
 }
 
+static uint16_t mctp_astlpc_negotiate_version(uint16_t bmc_ver_min,
+					      uint16_t bmc_ver_cur,
+					      uint16_t host_ver_min,
+					      uint16_t host_ver_cur)
+{
+	if (!mctp_astlpc_validate_version(bmc_ver_min, bmc_ver_cur,
+					  host_ver_min, host_ver_cur))
+		return ASTLPC_VER_BAD;
+
+	if (bmc_ver_cur < host_ver_cur)
+		return bmc_ver_cur;
+
+	return host_ver_cur;
+}
+
 static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 {
-	/* todo: actual version negotiation */
-	uint16_t negotiated = htobe16(1);
-	mctp_astlpc_lpc_write(astlpc, &negotiated,
+	uint16_t negotiated, negotiated_be;
+	struct mctp_lpcmap_hdr hdr;
+	uint8_t status;
+
+	mctp_astlpc_lpc_read(astlpc, &hdr, 0, sizeof(hdr));
+
+	/* Version negotiation */
+	negotiated =
+		mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_CUR,
+					      be16toh(hdr.host_ver_min),
+					      be16toh(hdr.host_ver_cur));
+
+	/* Populate the negotiated version */
+	astlpc->version = negotiated;
+	negotiated_be = htobe16(negotiated);
+	mctp_astlpc_lpc_write(astlpc, &negotiated_be,
 			      offsetof(struct mctp_lpcmap_hdr, negotiated_ver),
-			      sizeof(negotiated));
+			      sizeof(negotiated_be));
 
-	mctp_astlpc_kcs_set_status(astlpc, KCS_STATUS_BMC_READY |
-						   KCS_STATUS_CHANNEL_ACTIVE |
-						   KCS_STATUS_OBF);
+	/* Finalise the configuration */
+	status = KCS_STATUS_BMC_READY | KCS_STATUS_OBF;
+	if (negotiated > 0) {
+		astlpc_prinfo(astlpc, "Negotiated binding version %" PRIu16,
+			      negotiated);
+		status |= KCS_STATUS_CHANNEL_ACTIVE;
+	} else {
+		astlpc_prerr(astlpc, "Failed to initialise channel\n");
+	}
 
-	mctp_binding_set_tx_enabled(&astlpc->binding, true);
+	mctp_astlpc_kcs_set_status(astlpc, status);
+
+	mctp_binding_set_tx_enabled(&astlpc->binding,
+				    status & KCS_STATUS_CHANNEL_ACTIVE);
 }
 
 static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
@@ -439,6 +521,32 @@ static void mctp_astlpc_tx_complete(struct mctp_binding_astlpc *astlpc)
 	mctp_binding_set_tx_enabled(&astlpc->binding, true);
 }
 
+static int mctp_astlpc_finalise_channel(struct mctp_binding_astlpc *astlpc)
+{
+	uint16_t negotiated;
+	int rc;
+
+	rc = mctp_astlpc_lpc_read(astlpc, &negotiated,
+				  offsetof(struct mctp_lpcmap_hdr,
+					   negotiated_ver),
+				  sizeof(negotiated));
+	if (rc < 0)
+		return rc;
+
+	negotiated = be16toh(negotiated);
+
+	if (negotiated == ASTLPC_VER_BAD || negotiated < ASTLPC_VER_MIN ||
+	    negotiated > ASTLPC_VER_CUR) {
+		astlpc_prerr(astlpc, "Failed to negotiate version, got: %u\n",
+			     negotiated);
+		return -EINVAL;
+	}
+
+	astlpc->version = negotiated;
+
+	return 0;
+}
+
 static int mctp_astlpc_update_channel(struct mctp_binding_astlpc *astlpc,
 				      uint8_t status)
 {
@@ -461,9 +569,14 @@ static int mctp_astlpc_update_channel(struct mctp_binding_astlpc *astlpc,
 		}
 	}
 
-	if (updated & KCS_STATUS_CHANNEL_ACTIVE)
-		mctp_binding_set_tx_enabled(&astlpc->binding,
-					    status & KCS_STATUS_CHANNEL_ACTIVE);
+	if (astlpc->version == 0 || updated & KCS_STATUS_CHANNEL_ACTIVE) {
+		bool enable;
+
+		rc = mctp_astlpc_finalise_channel(astlpc);
+		enable = (status & KCS_STATUS_CHANNEL_ACTIVE) && rc == 0;
+
+		mctp_binding_set_tx_enabled(&astlpc->binding, enable);
+	}
 
 	astlpc->kcs_status = status;
 
