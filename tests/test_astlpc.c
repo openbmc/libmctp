@@ -62,8 +62,9 @@ struct mctp_binding_astlpc_mmio {
 #define binding_to_mmio(b) \
 	container_of(b, struct mctp_binding_astlpc_mmio, astlpc)
 
-int mctp_astlpc_mmio_kcs_read(void *data, enum mctp_binding_astlpc_kcs_reg reg,
-		uint8_t *val)
+static int mctp_astlpc_mmio_kcs_read(void *data,
+				     enum mctp_binding_astlpc_kcs_reg reg,
+				     uint8_t *val)
 {
 	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
 
@@ -77,8 +78,9 @@ int mctp_astlpc_mmio_kcs_read(void *data, enum mctp_binding_astlpc_kcs_reg reg,
 	return 0;
 }
 
-int mctp_astlpc_mmio_kcs_write(void *data, enum mctp_binding_astlpc_kcs_reg reg,
-		uint8_t val)
+static int mctp_astlpc_mmio_kcs_write(void *data,
+				      enum mctp_binding_astlpc_kcs_reg reg,
+				      uint8_t val)
 {
 	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
 
@@ -135,7 +137,7 @@ static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
 			len, type);
 }
 
-const struct mctp_binding_astlpc_ops mctp_binding_astlpc_mmio_ops = {
+static const struct mctp_binding_astlpc_ops mctp_binding_astlpc_mmio_ops = {
 	.kcs_read = mctp_astlpc_mmio_kcs_read,
 	.kcs_write = mctp_astlpc_mmio_kcs_write,
 	.lpc_read = mctp_astlpc_mmio_lpc_read,
