@@ -348,6 +348,34 @@ static void astlpc_test_simple_message_bmc_to_host(void)
 	network_destroy(&ctx);
 }
 
+static void astlpc_test_host_before_bmc(void)
+{
+	struct mctp_binding_astlpc_mmio mmio = { 0 };
+	struct mctp_binding_astlpc *astlpc;
+	uint8_t kcs[2] = { 0 };
+	struct mctp *mctp;
+	int rc;
+
+	mctp = mctp_init();
+	assert(mctp);
+
+	/* Inject KCS registers */
+	mmio.kcs = &kcs;
+
+	/* Initialise the binding */
+	astlpc = mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU, NULL,
+				  &mctp_binding_astlpc_mmio_ops, &mmio);
+
+	/* Register the binding to trigger the start-up sequence */
+	rc = mctp_register_bus(mctp, &astlpc->binding, 8);
+
+	/* Start-up should fail as we haven't initialised the BMC */
+	assert(rc < 0);
+
+	mctp_astlpc_destroy(astlpc);
+	mctp_destroy(mctp);
+}
+
 static void astlpc_test_simple_init(void)
 {
 	struct astlpc_endpoint bmc, host;
@@ -398,6 +426,7 @@ static const struct {
 	void (*test)(void);
 } astlpc_tests[] = {
 	TEST_CASE(astlpc_test_simple_init),
+	TEST_CASE(astlpc_test_host_before_bmc),
 	TEST_CASE(astlpc_test_simple_message_bmc_to_host),
 	TEST_CASE(astlpc_test_simple_message_host_to_bmc),
 	TEST_CASE(astlpc_test_packetised_message_bmc_to_host),
