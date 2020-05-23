@@ -61,7 +61,6 @@ struct mctp_binding_astlpc {
 	void *ops_data;
 
 	/* fileio ops data */
-	void *lpc_map_base;
 	int kcs_fd;
 	uint8_t kcs_status;
 
@@ -629,6 +628,7 @@ static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 		.offset = 0,
 		.size = 0
 	};
+	void *lpc_map_base;
 	int fd, rc;
 
 	fd = open(lpc_path, O_RDWR | O_SYNC);
@@ -644,14 +644,13 @@ static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 		return -1;
 	}
 
-	astlpc->lpc_map_base = mmap(NULL, map.size, PROT_READ | PROT_WRITE,
-			MAP_SHARED, fd, 0);
-	if (astlpc->lpc_map_base == MAP_FAILED) {
+	lpc_map_base =
+		mmap(NULL, map.size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	if (lpc_map_base == MAP_FAILED) {
 		astlpc_prwarn(astlpc, "LPC mmap failed");
 		rc = -1;
 	} else {
-		astlpc->lpc_map = astlpc->lpc_map_base +
-			map.size - LPC_WIN_SIZE;
+		astlpc->lpc_map = lpc_map_base + map.size - LPC_WIN_SIZE;
 	}
 
 	close(fd);
