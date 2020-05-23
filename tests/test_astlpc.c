@@ -162,8 +162,8 @@ static const struct mctp_binding_astlpc_ops astlpc_indirect_mmio_ops = {
 	.lpc_write = mctp_astlpc_mmio_lpc_write,
 };
 
-static void endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
-			  uint8_t mode, uint8_t (*kcs)[2], void *lpc_mem)
+static int endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
+			 uint8_t mode, uint8_t (*kcs)[2], void *lpc_mem)
 {
 	/*
 	 * Configure the direction of the KCS interface so we know whether to
@@ -181,7 +181,7 @@ static void endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
 	ep->astlpc = mctp_astlpc_init(mode, MCTP_BTU, lpc_mem,
 				      &astlpc_direct_mmio_ops, &ep->mmio);
 
-	mctp_register_bus(ep->mctp, &ep->astlpc->binding, eid);
+	return mctp_register_bus(ep->mctp, &ep->astlpc->binding, eid);
 }
 
 static void endpoint_destroy(struct astlpc_endpoint *ep)
@@ -379,6 +379,112 @@ static void astlpc_test_host_before_bmc(void)
 
 	mctp_astlpc_destroy(astlpc);
 	mctp_destroy(mctp);
+}
+
+static void astlpc_test_bad_version(void)
+{
+	assert(0 ==
+	       mctp_astlpc_negotiate_version(ASTLPC_VER_BAD, ASTLPC_VER_CUR,
+					     ASTLPC_VER_MIN, ASTLPC_VER_CUR));
+	assert(0 ==
+	       mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_BAD,
+					     ASTLPC_VER_MIN, ASTLPC_VER_CUR));
+	assert(0 ==
+	       mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_CUR,
+					     ASTLPC_VER_BAD, ASTLPC_VER_CUR));
+	assert(0 ==
+	       mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_CUR,
+					     ASTLPC_VER_MIN, ASTLPC_VER_BAD));
+	assert(0 == mctp_astlpc_negotiate_version(
+			    ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR, ASTLPC_VER_MIN,
+			    ASTLPC_VER_CUR + 1));
+	assert(0 == mctp_astlpc_negotiate_version(
+			    ASTLPC_VER_MIN, ASTLPC_VER_CUR + 1,
+			    ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR));
+}
+
+static void astlpc_test_incompatible_versions(void)
+{
+	assert(0 == mctp_astlpc_negotiate_version(
+			    ASTLPC_VER_CUR, ASTLPC_VER_CUR, ASTLPC_VER_CUR + 1,
+			    ASTLPC_VER_CUR + 1));
+	assert(0 == mctp_astlpc_negotiate_version(
+			    ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR + 1,
+			    ASTLPC_VER_CUR, ASTLPC_VER_CUR));
+}
+
+static void astlpc_test_choose_bmc_ver_cur(void)
+{
+	assert(2 == mctp_astlpc_negotiate_version(1, 2, 2, 3));
+}
+
+static void astlpc_test_choose_host_ver_cur(void)
+{
+	assert(2 == mctp_astlpc_negotiate_version(2, 3, 1, 2));
+}
+
+static void astlpc_test_version_host_fails_negotiation(void)
+{
+	struct astlpc_endpoint bmc, host;
+	struct mctp_lpcmap_hdr *hdr;
+	uint8_t kcs[2] = { 0 };
+	void *lpc_mem;
+	int rc;
+
+	/* Test harness initialisation */
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(lpc_mem);
+
+	/* BMC initialisation */
+	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem);
+
+	/* Now the BMC is initialised, break its version announcement */
+	hdr = lpc_mem;
+	hdr->bmc_ver_cur = ASTLPC_VER_BAD;
+
+	/* Host initialisation */
+	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs,
+			   lpc_mem);
+	assert(rc < 0);
+
+	endpoint_destroy(&bmc);
+	endpoint_destroy(&host);
+	free(lpc_mem);
+}
+
+static void astlpc_test_version_bmc_fails_negotiation(void)
+{
+	struct astlpc_endpoint bmc, host;
+	struct mctp_lpcmap_hdr *hdr;
+	uint8_t kcs[2] = { 0 };
+	void *lpc_mem;
+	int rc;
+
+	/* Test harness initialisation */
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(lpc_mem);
+
+	/* BMC initialisation */
+	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem);
+
+	/* Host initialisation */
+	endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs, lpc_mem);
+
+	/* Now the host is initialised, break its version announcement */
+	hdr = lpc_mem;
+	hdr->host_ver_cur = ASTLPC_VER_BAD;
+
+	/* Poll the BMC to detect the broken host version */
+	mctp_astlpc_poll(bmc.astlpc);
+	assert(!(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_CHANNEL_ACTIVE));
+
+	/* Poll the host so it detects failed negotiation */
+	rc = mctp_astlpc_poll(host.astlpc);
+	assert(rc < 0);
+
+	endpoint_destroy(&bmc);
+	endpoint_destroy(&host);
+	free(lpc_mem);
 }
 
 static void astlpc_test_simple_init(void)
@@ -594,6 +700,12 @@ static const struct {
 	void (*test)(void);
 } astlpc_tests[] = {
 	TEST_CASE(astlpc_test_simple_init),
+	TEST_CASE(astlpc_test_bad_version),
+	TEST_CASE(astlpc_test_incompatible_versions),
+	TEST_CASE(astlpc_test_choose_bmc_ver_cur),
+	TEST_CASE(astlpc_test_choose_host_ver_cur),
+	TEST_CASE(astlpc_test_version_host_fails_negotiation),
+	TEST_CASE(astlpc_test_version_bmc_fails_negotiation),
 	TEST_CASE(astlpc_test_host_before_bmc),
 	TEST_CASE(astlpc_test_simple_message_bmc_to_host),
 	TEST_CASE(astlpc_test_simple_message_host_to_bmc),
