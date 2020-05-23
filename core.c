@@ -284,7 +284,7 @@ int mctp_register_bus(struct mctp *mctp,
 	mctp->route_policy = ROUTE_ENDPOINT;
 
 	if (binding->start)
-		binding->start(binding);
+		return binding->start(binding);
 
 	return 0;
 }
