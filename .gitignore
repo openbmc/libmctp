@@ -17,11 +17,17 @@ depcomp
 *.gcno
 *.in
 install-sh
+*.la
 libtool
+*.lo
+*.log
 ltmain.sh
 m4
 Makefile
 missing
+*.o
 stamp-h1
 *.swp
 test-driver
+*.trs
+.libs
