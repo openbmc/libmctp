@@ -1,3 +1,4 @@
+*~
 aclocal.m4
 aminclude_static.am
 ar-lib
@@ -15,7 +16,6 @@ depcomp
 *.gcda
 *.gcno
 *.in
-*~
 install-sh
 libtool
 ltmain.sh
