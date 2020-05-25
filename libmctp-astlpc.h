@@ -42,4 +42,4 @@ int mctp_astlpc_get_fd(struct mctp_binding_astlpc *astlpc);
 }
 #endif
 
-#endif /* _LIBMCTP_ASTLPCL_H */
+#endif /* _LIBMCTP_ASTLPC_H */
