@@ -56,9 +56,6 @@ struct mctp_binding_astlpc {
 	uint8_t			kcs_status;
 
 	bool			running;
-
-	/* temporary transmit buffer */
-	uint8_t			txbuf[256];
 };
 
 #define binding_to_astlpc(b) \
