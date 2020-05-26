@@ -37,6 +37,7 @@ mctp_astlpc_init(uint8_t mode, uint32_t mtu, void *lpc_map,
 struct mctp_binding_astlpc *
 mctp_astlpc_init_ops(const struct mctp_binding_astlpc_ops *ops, void *ops_data,
 		     void *lpc_map);
+
 void mctp_astlpc_destroy(struct mctp_binding_astlpc *astlpc);
 
 struct mctp_binding *mctp_binding_astlpc_core(struct mctp_binding_astlpc *b);
