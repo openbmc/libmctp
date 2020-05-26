@@ -91,32 +91,35 @@ struct mctp_binding_astlpc {
 #define ASTLPC_MCTP_MAGIC	0x4d435450
 #define ASTLPC_VER_BAD	0
 #define ASTLPC_VER_MIN	1
-#define ASTLPC_VER_CUR	1
 
+/* Support testing of new binding protocols */
+#ifndef ASTLPC_VER_CUR
+#define ASTLPC_VER_CUR	1
+#endif
+
+#define ASTLPC_PACKET_SIZE(sz)	(4 + (sz))
 #define ASTLPC_BODY_SIZE(sz)	((sz) - 4)
 /* clang-format on */
 
 struct mctp_lpcmap_hdr {
-	uint32_t	magic;
+	uint32_t magic;
 
-	uint16_t	bmc_ver_min;
-	uint16_t	bmc_ver_cur;
-	uint16_t	host_ver_min;
-	uint16_t	host_ver_cur;
-	uint16_t	negotiated_ver;
-	uint16_t	pad0;
+	uint16_t bmc_ver_min;
+	uint16_t bmc_ver_cur;
+	uint16_t host_ver_min;
+	uint16_t host_ver_cur;
+	uint16_t negotiated_ver;
+	uint16_t pad0;
 
-	uint32_t	rx_offset;
-	uint32_t	rx_size;
-	uint32_t	tx_offset;
-	uint32_t	tx_size;
+	struct {
+		uint32_t rx_offset;
+		uint32_t rx_size;
+		uint32_t tx_offset;
+		uint32_t tx_size;
+	} layout;
 } __attribute__((packed));
 
-/* layout of TX/RX areas */
-static const uint32_t	rx_offset = 0x100;
-static const uint32_t	rx_size   = 0x100;
-static const uint32_t	tx_offset = 0x200;
-static const uint32_t	tx_size   = 0x100;
+static const uint32_t control_size = 0x100;
 
 #define LPC_WIN_SIZE                (1 * 1024 * 1024)
 
@@ -124,6 +127,20 @@ static const uint32_t	tx_size   = 0x100;
 #define KCS_STATUS_CHANNEL_ACTIVE	0x40
 #define KCS_STATUS_IBF			0x02
 #define KCS_STATUS_OBF			0x01
+
+#define MIN(a, b)                                                              \
+	({                                                                     \
+		typeof(a) _a = a;                                              \
+		typeof(b) _b = b;                                              \
+		_a < _b ? _a : _b;                                             \
+	})
+
+#define MAX(a, b)                                                              \
+	({                                                                     \
+		typeof(a) _a = a;                                              \
+		typeof(b) _b = b;                                              \
+		_a > _b ? _a : _b;                                             \
+	})
 
 static inline int mctp_astlpc_kcs_write(struct mctp_binding_astlpc *astlpc,
 					enum mctp_binding_astlpc_kcs_reg reg,
@@ -213,16 +230,164 @@ static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 	return 0;
 }
 
+static int mctp_astlpc_layout_read(struct mctp_binding_astlpc *astlpc,
+				   struct mctp_astlpc_layout *layout)
+{
+	struct mctp_lpcmap_hdr hdr;
+	int rc;
+
+	rc = mctp_astlpc_lpc_read(astlpc, &hdr, 0, sizeof(hdr));
+	if (rc < 0)
+		return rc;
+
+	/* Flip the buffers as the names are defined in terms of the host */
+	if (astlpc->mode == MCTP_BINDING_ASTLPC_MODE_BMC) {
+		layout->rx.offset = be32toh(hdr.layout.tx_offset);
+		layout->rx.size = be32toh(hdr.layout.tx_size);
+		layout->tx.offset = be32toh(hdr.layout.rx_offset);
+		layout->tx.size = be32toh(hdr.layout.rx_size);
+	} else {
+		assert(astlpc->mode == MCTP_BINDING_ASTLPC_MODE_HOST);
+
+		layout->rx.offset = be32toh(hdr.layout.rx_offset);
+		layout->rx.size = be32toh(hdr.layout.rx_size);
+		layout->tx.offset = be32toh(hdr.layout.tx_offset);
+		layout->tx.size = be32toh(hdr.layout.tx_size);
+	}
+
+	return 0;
+}
+
+static int mctp_astlpc_layout_write(struct mctp_binding_astlpc *astlpc,
+				    struct mctp_astlpc_layout *layout)
+{
+	uint32_t rx_size_be;
+
+	if (astlpc->mode == MCTP_BINDING_ASTLPC_MODE_BMC) {
+		struct mctp_lpcmap_hdr hdr;
+
+		/*
+		 * Flip the buffers as the names are defined in terms of the
+		 * host
+		 */
+		hdr.layout.rx_offset = htobe32(layout->tx.offset);
+		hdr.layout.rx_size = htobe32(layout->tx.size);
+		hdr.layout.tx_offset = htobe32(layout->rx.offset);
+		hdr.layout.tx_size = htobe32(layout->rx.size);
+
+		return mctp_astlpc_lpc_write(astlpc, &hdr.layout,
+				offsetof(struct mctp_lpcmap_hdr, layout),
+				sizeof(hdr.layout));
+	}
+
+	assert(astlpc->mode == MCTP_BINDING_ASTLPC_MODE_HOST);
+
+	/*
+	 * As of v2 we only need to write rx_size - the offsets are controlled
+	 * by the BMC, as is the BMC's rx_size (host tx_size).
+	 */
+	rx_size_be = htobe32(layout->rx.size);
+	return mctp_astlpc_lpc_write(astlpc, &rx_size_be,
+			offsetof(struct mctp_lpcmap_hdr, layout.rx_size),
+			sizeof(rx_size_be));
+}
+
+static bool mctp_astlpc_buffer_validate(struct mctp_astlpc_buffer *buf,
+					const char *name)
+{
+	/* Check for overflow */
+	if (buf->offset + buf->size < buf->offset) {
+		mctp_prerr(
+			"%s packet buffer parameters overflow: offset: 0x%" PRIx32
+			", size: %" PRIu32,
+			name, buf->offset, buf->size);
+		return false;
+	}
+
+	/* Check that the buffers are contained within the allocated space */
+	if (buf->offset + buf->size > LPC_WIN_SIZE) {
+		mctp_prerr(
+			"%s packet buffer parameters exceed %uM window size: offset: 0x%" PRIx32
+			", size: %" PRIu32,
+			name, (LPC_WIN_SIZE / (1024 * 1024)), buf->offset,
+			buf->size);
+		return false;
+	}
+
+	/* Check that the baseline transmission unit is supported */
+	if (buf->size < ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(MCTP_BTU))) {
+		mctp_prerr(
+			"%s packet buffer too small: Require %zu bytes to support the %u byte baseline transmission unit, found %" PRIu32,
+			name, ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(MCTP_BTU)),
+			MCTP_BTU, buf->size);
+		return false;
+	}
+
+	/* Check for overlap with the control space */
+	if (buf->offset < control_size) {
+		mctp_prerr(
+			"%s packet buffer overlaps control region {0x%" PRIx32
+			", %" PRIu32 "}: Rx {0x%" PRIx32 ", %" PRIu32 "}",
+			name, 0U, control_size, buf->offset, buf->size);
+		return false;
+	}
+
+	return true;
+}
+
+static bool mctp_astlpc_layout_validate(struct mctp_astlpc_layout *layout)
+{
+	struct mctp_astlpc_buffer *rx = &layout->rx;
+	struct mctp_astlpc_buffer *tx = &layout->tx;
+	bool rx_valid, tx_valid;
+
+	rx_valid = mctp_astlpc_buffer_validate(rx, "Rx");
+	tx_valid = mctp_astlpc_buffer_validate(tx, "Tx");
+
+	if (!(rx_valid && tx_valid))
+		return false;
+
+	/* Check that the buffers are disjoint */
+	if ((rx->offset <= tx->offset && rx->offset + rx->size > tx->offset) ||
+	    (tx->offset <= rx->offset && tx->offset + tx->size > rx->offset)) {
+		mctp_prerr("Rx and Tx packet buffers overlap: Rx {0x%" PRIx32
+			   ", %" PRIu32 "}, Tx {0x%" PRIx32 ", %" PRIu32 "}",
+			   rx->offset, rx->size, tx->offset, tx->size);
+		return false;
+	}
+
+	return true;
+}
+
 static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 {
 	struct mctp_lpcmap_hdr hdr = { 0 };
 	uint8_t status;
+	size_t sz;
+
+	/*
+	 * The largest buffer size is half of the allocated MCTP space
+	 * excluding the control space.
+	 */
+	sz = ((LPC_WIN_SIZE - control_size) / 2);
+
+	/*
+	 * Trim the MTU to a multiple of 16 to meet the requirements of 12.17
+	 * Query Hop in DSP0236 v1.3.0.
+	 */
+	sz = MCTP_BODY_SIZE(ASTLPC_BODY_SIZE(sz));
+	sz &= ~0xfUL;
+	sz = ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(sz));
 
 	/* Flip the buffers as the names are defined in terms of the host */
-	astlpc->layout.rx.offset = tx_offset;
-	astlpc->layout.rx.size = tx_size;
-	astlpc->layout.tx.offset = rx_offset;
-	astlpc->layout.tx.size = rx_size;
+	astlpc->layout.tx.offset = control_size;
+	astlpc->layout.tx.size = sz;
+	astlpc->layout.rx.offset =
+		astlpc->layout.tx.offset + astlpc->layout.tx.size;
+	astlpc->layout.rx.size = sz;
+
+	/* Sanity check that can be eliminated if asserts are off */
+	assert(mctp_astlpc_layout_validate(&astlpc->layout));
 
 	hdr = (struct mctp_lpcmap_hdr){
 		.magic = htobe32(ASTLPC_MCTP_MAGIC),
@@ -231,10 +396,10 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 
 		/* Flip the buffers back as we're now describing the host's
 		 * configuration to the host */
-		.rx_offset = htobe32(astlpc->layout.tx.offset),
-		.rx_size = htobe32(astlpc->layout.tx.size),
-		.tx_offset = htobe32(astlpc->layout.rx.offset),
-		.tx_size = htobe32(astlpc->layout.rx.size),
+		.layout.rx_offset = htobe32(astlpc->layout.tx.offset),
+		.layout.rx_size = htobe32(astlpc->layout.tx.size),
+		.layout.tx_offset = htobe32(astlpc->layout.rx.offset),
+		.layout.tx_size = htobe32(astlpc->layout.rx.size),
 	};
 
 	mctp_astlpc_lpc_write(astlpc, &hdr, 0, sizeof(hdr));
@@ -285,6 +450,45 @@ static bool mctp_astlpc_validate_version(uint16_t bmc_ver_min,
 	return true;
 }
 
+static int mctp_astlpc_negotiate_layout_host(struct mctp_binding_astlpc *astlpc)
+{
+	struct mctp_astlpc_layout layout;
+	uint32_t sz;
+	int rc;
+
+	rc = mctp_astlpc_layout_read(astlpc, &layout);
+	if (rc < 0)
+		return rc;
+
+	if (!mctp_astlpc_layout_validate(&layout)) {
+		astlpc_prerr(
+			astlpc,
+			"BMC provided invalid buffer layout: Rx {0x%" PRIx32
+			", %" PRIu32 "}, Tx {0x%" PRIx32 ", %" PRIu32 "}",
+			layout.rx.offset, layout.rx.size, layout.tx.offset,
+			layout.tx.size);
+		return -EINVAL;
+	}
+
+	sz = ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(MCTP_BTU));
+	layout.rx.size = sz;
+
+	if (!mctp_astlpc_layout_validate(&layout)) {
+		astlpc_prerr(
+			astlpc,
+			"Generated invalid buffer layout with size %" PRIu32
+			": Rx {0x%" PRIx32 ", %" PRIu32 "}, Tx {0x%" PRIx32
+			", %" PRIu32 "}",
+			sz, layout.rx.offset, layout.rx.size, layout.tx.offset,
+			layout.tx.size);
+		return -EINVAL;
+	}
+
+	astlpc_prinfo(astlpc, "Requesting MTU of %" PRIu32 " bytes", MCTP_BTU);
+
+	return mctp_astlpc_layout_write(astlpc, &layout);
+}
+
 static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 {
 	const uint16_t ver_min_be = htobe16(ASTLPC_VER_MIN);
@@ -307,11 +511,6 @@ static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 
 	mctp_astlpc_lpc_read(astlpc, &hdr, 0, sizeof(hdr));
 
-	astlpc->layout.rx.offset = be32toh(hdr.rx_offset);
-	astlpc->layout.rx.size = be32toh(hdr.rx_size);
-	astlpc->layout.tx.offset = be32toh(hdr.tx_offset);
-	astlpc->layout.tx.size = be32toh(hdr.tx_size);
-
 	bmc_ver_min = be16toh(hdr.bmc_ver_min);
 	bmc_ver_cur = be16toh(hdr.bmc_ver_cur);
 
@@ -321,6 +520,18 @@ static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 		return -EINVAL;
 	}
 
+	/*
+	 * Negotation always chooses the highest protocol version that
+	 * satisfies the version constraints. So check whether the BMC supports
+	 * v2, and if so, negotiate in v2 style.
+	 */
+	if (ASTLPC_VER_CUR >= 2 && bmc_ver_cur >= 2) {
+		rc = mctp_astlpc_negotiate_layout_host(astlpc);
+		if (rc < 0)
+			return rc;
+	}
+
+	/* Version negotiation */
 	mctp_astlpc_lpc_write(astlpc, &ver_min_be,
 			      offsetof(struct mctp_lpcmap_hdr, host_ver_min),
 			      sizeof(ver_min_be));
@@ -445,11 +656,77 @@ static uint16_t mctp_astlpc_negotiate_version(uint16_t bmc_ver_min,
 	return host_ver_cur;
 }
 
+static uint32_t mctp_astlpc_calculate_mtu(struct mctp_binding_astlpc *astlpc,
+					  struct mctp_astlpc_layout *layout)
+{
+	uint32_t low, high, limit, proposed;
+
+	/* Derive the largest MTU the BMC _can_ support */
+	low = MIN(astlpc->layout.rx.offset, astlpc->layout.tx.offset);
+	high = MAX(astlpc->layout.rx.offset, astlpc->layout.tx.offset);
+	limit = high - low;
+
+	/* Find a mutually acceptable proposed MTU for both directions */
+	proposed = MIN(astlpc->layout.rx.size, layout->tx.size);
+
+	/* Determine the accepted MTU, applied both directions by convention */
+	return MCTP_BODY_SIZE(ASTLPC_BODY_SIZE(MIN(limit, proposed)));
+}
+
+static int mctp_astlpc_negotiate_layout_bmc(struct mctp_binding_astlpc *astlpc)
+{
+	struct mctp_astlpc_layout proposed, pending;
+	uint32_t sz, mtu;
+	int rc;
+
+	/* Extract the host's proposed layout */
+	rc = mctp_astlpc_layout_read(astlpc, &proposed);
+	if (rc < 0)
+		return rc;
+
+	if (!mctp_astlpc_layout_validate(&proposed))
+		return -EINVAL;
+
+	/* Negotiate the MTU */
+	mtu = mctp_astlpc_calculate_mtu(astlpc, &proposed);
+	sz = ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(mtu));
+
+	/*
+	 * Use symmetric MTUs by convention and to pass constraints in rx/tx
+	 * functions
+	 */
+	pending = astlpc->layout;
+	pending.tx.size = sz;
+	pending.rx.size = sz;
+
+	if (mctp_astlpc_layout_validate(&pending)) {
+		/* We found a sensible Rx MTU, so honour it */
+		astlpc->layout = pending;
+
+		/* Enforce the negotiated MTU */
+		rc = mctp_astlpc_layout_write(astlpc, &astlpc->layout);
+		if (rc < 0)
+			return rc;
+
+		astlpc_prinfo(astlpc, "Negotiated an MTU of %" PRIu32 " bytes",
+			      mtu);
+	} else {
+		astlpc_prwarn(astlpc, "MTU negotiation failed");
+		return -EINVAL;
+	}
+
+	if (astlpc->version >= 2)
+		astlpc->binding.pkt_size = MCTP_PACKET_SIZE(mtu);
+
+	return 0;
+}
+
 static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 {
 	uint16_t negotiated, negotiated_be;
 	struct mctp_lpcmap_hdr hdr;
 	uint8_t status;
+	int rc;
 
 	mctp_astlpc_lpc_read(astlpc, &hdr, 0, sizeof(hdr));
 
@@ -458,6 +735,11 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 		mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_CUR,
 					      be16toh(hdr.host_ver_min),
 					      be16toh(hdr.host_ver_cur));
+
+	/* Host Rx MTU negotiation: Failure terminates channel init */
+	rc = mctp_astlpc_negotiate_layout_bmc(astlpc);
+	if (rc < 0)
+		negotiated = ASTLPC_VER_BAD;
 
 	/* Populate the negotiated version */
 	astlpc->version = negotiated;
@@ -523,6 +805,7 @@ static void mctp_astlpc_tx_complete(struct mctp_binding_astlpc *astlpc)
 
 static int mctp_astlpc_finalise_channel(struct mctp_binding_astlpc *astlpc)
 {
+	struct mctp_astlpc_layout layout;
 	uint16_t negotiated;
 	int rc;
 
@@ -543,6 +826,21 @@ static int mctp_astlpc_finalise_channel(struct mctp_binding_astlpc *astlpc)
 	}
 
 	astlpc->version = negotiated;
+
+	rc = mctp_astlpc_layout_read(astlpc, &layout);
+	if (rc < 0)
+		return rc;
+
+	if (!mctp_astlpc_layout_validate(&layout)) {
+		mctp_prerr("BMC proposed invalid buffer parameters");
+		return -EINVAL;
+	}
+
+	astlpc->layout = layout;
+
+	if (negotiated >= 2)
+		astlpc->binding.pkt_size =
+			ASTLPC_BODY_SIZE(astlpc->layout.tx.size);
 
 	return 0;
 }
