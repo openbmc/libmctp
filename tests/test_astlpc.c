@@ -4,6 +4,7 @@
 #include "config.h"
 #endif
 
+#define ASTLPC_VER_CUR 2
 #include "astlpc.c"
 
 #ifdef pr_fmt
@@ -180,6 +181,7 @@ static int endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
 	/* Initialise the binding */
 	ep->astlpc = mctp_astlpc_init(mode, MCTP_BTU, lpc_mem,
 				      &astlpc_direct_mmio_ops, &ep->mmio);
+	assert(ep->astlpc);
 
 	return mctp_register_bus(ep->mctp, &ep->astlpc->binding, eid);
 }
@@ -693,6 +695,236 @@ static void astlpc_test_undefined_command(void)
 	free(lpc_mem);
 }
 
+#define BUFFER_MIN ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(MCTP_BTU))
+
+static void astlpc_test_buffers_rx_offset_overflow(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { UINT32_MAX, BUFFER_MIN },
+		.tx = { control_size, BUFFER_MIN },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_tx_offset_overflow(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { control_size, BUFFER_MIN },
+		.tx = { UINT32_MAX, BUFFER_MIN },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_rx_size_overflow(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { control_size + BUFFER_MIN, UINT32_MAX },
+		.tx = { control_size, BUFFER_MIN },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_tx_size_overflow(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { control_size, BUFFER_MIN },
+		.tx = { control_size + BUFFER_MIN, UINT32_MAX },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_rx_window_violation(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN },
+		.tx = { control_size, BUFFER_MIN },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_tx_window_violation(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { control_size, BUFFER_MIN },
+		.tx = { LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_rx_size_fails_btu(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { control_size, BUFFER_MIN - 1 },
+		.tx = { control_size + BUFFER_MIN, BUFFER_MIN },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_tx_size_fails_btu(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { control_size, BUFFER_MIN },
+		.tx = { control_size + BUFFER_MIN, BUFFER_MIN - 1 },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_overlap_rx_low(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { control_size, 2 * BUFFER_MIN },
+		.tx = { control_size + BUFFER_MIN, 2 * BUFFER_MIN },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_overlap_tx_low(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { control_size + BUFFER_MIN, 2 * BUFFER_MIN },
+		.tx = { control_size, 2 * BUFFER_MIN },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_overlap_exact(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { control_size, 2 * BUFFER_MIN },
+		.tx = { control_size, 2 * BUFFER_MIN },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_overlap_control(void)
+{
+	struct mctp_astlpc_layout l = {
+		.rx = { 0, BUFFER_MIN },
+		.tx = { control_size + BUFFER_MIN, BUFFER_MIN },
+	};
+
+	assert(!mctp_astlpc_layout_validate(&l));
+}
+
+static void astlpc_test_buffers_bad_host_proposal(void)
+{
+	struct astlpc_endpoint bmc, host;
+	struct mctp_lpcmap_hdr *hdr;
+	uint8_t kcs[2] = { 0 };
+	uint32_t rx_size;
+	void *lpc_mem;
+	int rc;
+
+	/* Test harness initialisation */
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(lpc_mem);
+
+	/* BMC initialisation */
+	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem);
+
+	/* Host initialisation */
+	endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs, lpc_mem);
+
+	/*
+	 * Now that the device has initialised the control area, break
+	 * something before polling the BMC
+	 */
+	hdr = lpc_mem;
+	rx_size = be32toh(hdr->layout.rx.size);
+	hdr->layout.rx.size = 0;
+
+	mctp_astlpc_poll(bmc.astlpc);
+
+	/* Make sure the BMC has not set the channel to active */
+	assert(!(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_CHANNEL_ACTIVE));
+
+	endpoint_destroy(&host);
+	endpoint_destroy(&bmc);
+	free(lpc_mem);
+}
+
+static void astlpc_test_buffers_bad_bmc_proposal(void)
+{
+	struct astlpc_endpoint bmc, host;
+	struct mctp_lpcmap_hdr *hdr;
+	uint8_t kcs[2] = { 0 };
+	uint32_t rx_size;
+	void *lpc_mem;
+	int rc;
+
+	/* Test harness initialisation */
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(lpc_mem);
+
+	/* BMC initialisation */
+	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem);
+
+	/*
+	 * Now that the BMC has initialised the control area, break something
+	 * before initialising the host the device
+	 */
+	hdr = lpc_mem;
+	rx_size = be32toh(hdr->layout.rx.size);
+	hdr->layout.rx.size = 0;
+
+	/* Host initialisation: Fails due to bad layout */
+	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs,
+			   lpc_mem);
+	assert(rc < 0);
+
+	endpoint_destroy(&host);
+	endpoint_destroy(&bmc);
+	free(lpc_mem);
+}
+
+static void astlpc_test_buffers_bad_bmc_negotiation(void)
+{
+	struct astlpc_endpoint bmc, host;
+	struct mctp_lpcmap_hdr *hdr;
+	uint8_t kcs[2] = { 0 };
+	uint32_t rx_size;
+	void *lpc_mem;
+	int rc;
+
+	/* Test harness initialisation */
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(lpc_mem);
+
+	/* BMC initialisation */
+	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem);
+
+	/* Host initialisation */
+	endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &kcs, lpc_mem);
+
+	mctp_astlpc_poll(bmc.astlpc);
+
+	/*
+	 * Now that the BMC has initialised the control area, break something
+	 * before polling the device
+	 */
+	hdr = lpc_mem;
+	rx_size = be32toh(hdr->layout.rx.size);
+	hdr->layout.rx.size = 0;
+
+	rc = mctp_astlpc_poll(host.astlpc);
+	assert(rc < 0);
+
+	endpoint_destroy(&host);
+	endpoint_destroy(&bmc);
+	free(lpc_mem);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -714,6 +946,21 @@ static const struct {
 	TEST_CASE(astlpc_test_host_tx_bmc_gone),
 	TEST_CASE(astlpc_test_poll_not_ready),
 	TEST_CASE(astlpc_test_undefined_command),
+	TEST_CASE(astlpc_test_buffers_rx_offset_overflow),
+	TEST_CASE(astlpc_test_buffers_tx_offset_overflow),
+	TEST_CASE(astlpc_test_buffers_rx_size_overflow),
+	TEST_CASE(astlpc_test_buffers_tx_size_overflow),
+	TEST_CASE(astlpc_test_buffers_rx_window_violation),
+	TEST_CASE(astlpc_test_buffers_tx_window_violation),
+	TEST_CASE(astlpc_test_buffers_rx_size_fails_btu),
+	TEST_CASE(astlpc_test_buffers_tx_size_fails_btu),
+	TEST_CASE(astlpc_test_buffers_overlap_rx_low),
+	TEST_CASE(astlpc_test_buffers_overlap_tx_low),
+	TEST_CASE(astlpc_test_buffers_bad_host_proposal),
+	TEST_CASE(astlpc_test_buffers_bad_bmc_proposal),
+	TEST_CASE(astlpc_test_buffers_bad_bmc_negotiation),
+	TEST_CASE(astlpc_test_buffers_overlap_exact),
+	TEST_CASE(astlpc_test_buffers_overlap_control),
 };
 /* clang-format on */
 
