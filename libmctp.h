@@ -38,6 +38,7 @@ struct mctp_hdr {
 /* Baseline Transmission Unit and packet size */
 #define MCTP_BTU		64
 #define MCTP_PACKET_SIZE(unit)	((unit) + sizeof(struct mctp_hdr))
+#define MCTP_BODY_SIZE(unit)	((unit) - sizeof(struct mctp_hdr))
 
 /* packet buffers */
 
