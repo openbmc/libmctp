@@ -56,6 +56,7 @@ struct mctp_binding_astlpc {
 
 	uint8_t mode;
 	uint16_t version;
+	uint32_t requested_mtu;
 
 	/* direct ops data */
 	struct mctp_binding_astlpc_ops ops;
@@ -356,6 +357,13 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 	 */
 	sz = ((LPC_WIN_SIZE - control_size) / 2) & ~0xfUL;
 
+	if (astlpc->requested_mtu) {
+		size_t r;
+
+		r = ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(astlpc->requested_mtu));
+		sz = MIN(sz, r);
+	}
+
 	/* Flip the buffers as the names are defined in terms of the host */
 	astlpc->layout.tx.offset = control_size;
 	astlpc->layout.tx.size = sz;
@@ -363,8 +371,10 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 		astlpc->layout.tx.offset + astlpc->layout.tx.size;
 	astlpc->layout.rx.size = sz;
 
-	/* Sanity check that can be eliminated if asserts are off */
-	assert(mctp_astlpc_layout_validate(&astlpc->layout));
+	if (!mctp_astlpc_layout_validate(&astlpc->layout)) {
+		astlpc_prerr(astlpc, "Cannot support an MTU of %zu", sz);
+		return -EINVAL;
+	}
 
 	hdr = (struct mctp_lpcmap_hdr){
 		.magic = htobe32(ASTLPC_MCTP_MAGIC),
@@ -447,7 +457,10 @@ static int mctp_astlpc_negotiate_layout_host(struct mctp_binding_astlpc *astlpc)
 		return -EINVAL;
 	}
 
-	sz = ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(MCTP_BTU));
+	astlpc_prinfo(astlpc, "Desire an MTU of %" PRIu32 " bytes",
+		      astlpc->requested_mtu);
+
+	sz = ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(astlpc->requested_mtu));
 	layout.rx.size = sz;
 	layout.tx.size = sz;
 
@@ -462,7 +475,8 @@ static int mctp_astlpc_negotiate_layout_host(struct mctp_binding_astlpc *astlpc)
 		return -EINVAL;
 	}
 
-	astlpc_prinfo(astlpc, "Requesting MTU of %" PRIu32 " bytes", MCTP_BTU);
+	astlpc_prinfo(astlpc, "Requesting MTU of %" PRIu32 " bytes",
+		      astlpc->requested_mtu);
 
 	return mctp_astlpc_layout_write(astlpc, &layout);
 }
@@ -919,6 +933,7 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(uint8_t mode,
 	memset(astlpc, 0, sizeof(*astlpc));
 	astlpc->mode = mode;
 	astlpc->lpc_map = NULL;
+	astlpc->requested_mtu = mtu;
 	astlpc->binding.name = "astlpc";
 	astlpc->binding.version = 1;
 	astlpc->binding.pkt_size = MCTP_PACKET_SIZE(mtu);
@@ -952,12 +967,6 @@ mctp_astlpc_init(uint8_t mode, uint32_t mtu, void *lpc_map,
 	      mode == MCTP_BINDING_ASTLPC_MODE_HOST)) {
 		mctp_prerr("Unknown binding mode: %u", mode);
 		return NULL;
-	}
-
-	if (mtu != MCTP_BTU) {
-		mctp_prwarn("Unable to negotiate the MTU, using %u instead",
-			    MCTP_BTU);
-		mtu = MCTP_BTU;
 	}
 
 	astlpc = __mctp_astlpc_init(mode, mtu);
