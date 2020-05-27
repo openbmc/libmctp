@@ -197,7 +197,7 @@ static void network_init(struct astlpc_test *ctx)
 	/* BMC initialisation */
 	endpoint_init(&ctx->bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &ctx->kcs,
 		      ctx->lpc_mem);
-	assert(ctx->kcs[KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
+	assert(ctx->kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
 
 	/* Host initialisation */
 	endpoint_init(&ctx->host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &ctx->kcs,
@@ -205,8 +205,9 @@ static void network_init(struct astlpc_test *ctx)
 
 	/* BMC processes host channel init request, alerts host */
 	mctp_astlpc_poll(ctx->bmc.astlpc);
-	assert(ctx->kcs[KCS_REG_STATUS] & KCS_STATUS_CHANNEL_ACTIVE);
-	assert(ctx->kcs[KCS_REG_DATA] == 0xff);
+	assert(ctx->kcs[MCTP_ASTLPC_KCS_REG_STATUS] &
+	       KCS_STATUS_CHANNEL_ACTIVE);
+	assert(ctx->kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0xff);
 
 	/* Host dequeues channel init result */
 	mctp_astlpc_poll(ctx->host.astlpc);
