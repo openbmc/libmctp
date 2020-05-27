@@ -121,11 +121,6 @@ static const uint32_t	tx_size   = 0x100;
 
 #define LPC_WIN_SIZE                (1 * 1024 * 1024)
 
-enum {
-	KCS_REG_DATA = 0,
-	KCS_REG_STATUS = 1,
-};
-
 #define KCS_STATUS_BMC_READY		0x80
 #define KCS_STATUS_CHANNEL_ACTIVE	0x40
 #define KCS_STATUS_IBF			0x02
