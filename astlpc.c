@@ -175,6 +175,38 @@ static inline int mctp_astlpc_lpc_read(struct mctp_binding_astlpc *astlpc,
 	return 0;
 }
 
+static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
+				      uint8_t status)
+{
+	uint8_t data;
+	int rc;
+
+	/* Since we're setting the status register, we want the other endpoint
+	 * to be interrupted. However, some hardware may only raise a host-side
+	 * interrupt on an ODR event.
+	 * So, write a dummy value of 0xff to ODR, which will ensure that an
+	 * interrupt is triggered, and can be ignored by the host.
+	 */
+	data = 0xff;
+	status |= KCS_STATUS_OBF;
+
+	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
+				   status);
+	if (rc) {
+		astlpc_prwarn(astlpc, "KCS status write failed");
+		return -1;
+	}
+
+	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
+				   data);
+	if (rc) {
+		astlpc_prwarn(astlpc, "KCS dummy data write failed");
+		return -1;
+	}
+
+	return 0;
+}
+
 static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 {
 	struct mctp_lpcmap_hdr hdr = { 0 };
@@ -210,14 +242,7 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 
 	/* set status indicating that the BMC is now active */
 	status = KCS_STATUS_BMC_READY | KCS_STATUS_OBF;
-	/* XXX: Should we be calling mctp_astlpc_kcs_set_status() instead? */
-	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
-				   status);
-	if (rc) {
-		astlpc_prwarn(astlpc, "KCS write failed");
-	}
-
-	return rc;
+	return mctp_astlpc_kcs_set_status(astlpc, status);
 }
 
 static int mctp_binding_astlpc_start_bmc(struct mctp_binding *b)
@@ -305,38 +330,6 @@ static inline bool
 mctp_astlpc_kcs_write_ready(struct mctp_binding_astlpc *astlpc, uint8_t status)
 {
 	return __mctp_astlpc_kcs_ready(astlpc, status, true);
-}
-
-static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
-		uint8_t status)
-{
-	uint8_t data;
-	int rc;
-
-	/* Since we're setting the status register, we want the other endpoint
-	 * to be interrupted. However, some hardware may only raise a host-side
-	 * interrupt on an ODR event.
-	 * So, write a dummy value of 0xff to ODR, which will ensure that an
-	 * interrupt is triggered, and can be ignored by the host.
-	 */
-	data = 0xff;
-	status |= KCS_STATUS_OBF;
-
-	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
-			status);
-	if (rc) {
-		astlpc_prwarn(astlpc, "KCS status write failed");
-		return -1;
-	}
-
-	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
-			data);
-	if (rc) {
-		astlpc_prwarn(astlpc, "KCS dummy data write failed");
-		return -1;
-	}
-
-	return 0;
 }
 
 static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
@@ -460,9 +453,16 @@ static int mctp_astlpc_update_channel(struct mctp_binding_astlpc *astlpc,
 
 	updated = astlpc->kcs_status ^ status;
 
+	astlpc_prdebug(astlpc, "%s: status: 0x%x, update: 0x%x", __func__,
+		       status, updated);
+
 	if (updated & KCS_STATUS_BMC_READY) {
-		if (!(status & KCS_STATUS_BMC_READY))
+		if (status & KCS_STATUS_BMC_READY) {
+			astlpc->kcs_status = status;
+			return astlpc->binding.start(&astlpc->binding);
+		} else {
 			mctp_binding_set_tx_enabled(&astlpc->binding, false);
+		}
 	}
 
 	if (updated & KCS_STATUS_CHANNEL_ACTIVE)
@@ -512,14 +512,23 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 		break;
 	case 0xff:
 		/* No responsibilities for the BMC on 0xff */
-		if (astlpc->mode == MCTP_BINDING_ASTLPC_MODE_BMC)
-			return 0;
-
-		return mctp_astlpc_update_channel(astlpc, status);
+		if (astlpc->mode == MCTP_BINDING_ASTLPC_MODE_HOST) {
+			rc = mctp_astlpc_update_channel(astlpc, status);
+			if (rc < 0)
+				return rc;
+		}
+		break;
 	default:
 		astlpc_prwarn(astlpc, "unknown message 0x%x", data);
 	}
-	return 0;
+
+	/* Handle silent loss of bmc-ready */
+	if (astlpc->mode == MCTP_BINDING_ASTLPC_MODE_HOST) {
+		if (!(status & KCS_STATUS_BMC_READY && data == 0xff))
+			return mctp_astlpc_update_channel(astlpc, status);
+	}
+
+	return rc;
 }
 
 /* allocate and basic initialisation */
@@ -601,6 +610,8 @@ mctp_astlpc_init_ops(const struct mctp_binding_astlpc_ops *ops, void *ops_data,
 
 void mctp_astlpc_destroy(struct mctp_binding_astlpc *astlpc)
 {
+	/* Clear channel-active and bmc-ready */
+	mctp_astlpc_kcs_set_status(astlpc, KCS_STATUS_OBF);
 	__mctp_free(astlpc);
 }
 
