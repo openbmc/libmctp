@@ -201,6 +201,7 @@ static void network_init(struct astlpc_test *ctx)
 	/* BMC initialisation */
 	endpoint_init(&ctx->bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &ctx->kcs,
 		      ctx->lpc_mem);
+	assert(ctx->kcs[KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
 
 	/* Host initialisation */
 	endpoint_init(&ctx->host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, &ctx->kcs,
@@ -485,6 +486,56 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 	network_destroy(&ctx);
 }
 
+static void astlpc_test_host_tx_bmc_gone(void)
+{
+	struct astlpc_test ctx = { 0 };
+	uint8_t unwritten[MCTP_BTU];
+	uint8_t msg[MCTP_BTU];
+	int rc;
+
+	/* Test harness initialisation */
+
+	network_init(&ctx);
+
+	memset(&msg[0], 0x5a, sizeof(msg));
+	memset(&unwritten[0], 0, sizeof(unwritten));
+
+	ctx.msg = &msg[0];
+	ctx.count = 0;
+
+	/* Clear bmc-ready */
+	endpoint_destroy(&ctx.bmc);
+
+	/* Host detects that the BMC is disabled */
+	mctp_astlpc_poll(ctx.host.astlpc);
+
+	/* Host attempts to send the single-packet message, but is prevented */
+	rc = mctp_message_tx(ctx.host.mctp, 8, msg, sizeof(msg));
+	assert(rc == 0);
+	assert(!(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF));
+	astlpc_assert_tx_packet(&ctx.host, &unwritten[0], MCTP_BTU);
+
+	/* BMC comes back */
+	endpoint_init(&ctx.bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &ctx.kcs,
+		      ctx.lpc_mem);
+	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
+
+	/* Host triggers channel init */
+	mctp_astlpc_poll(ctx.host.astlpc);
+
+	/* BMC handles channel init */
+	mctp_astlpc_poll(ctx.bmc.astlpc);
+
+	/* Host completes channel init, flushing the Tx queue */
+	mctp_astlpc_poll(ctx.host.astlpc);
+
+	/* BMC receives the single-packet message */
+	mctp_astlpc_poll(ctx.bmc.astlpc);
+	assert(ctx.count == 1);
+
+	network_destroy(&ctx);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -496,7 +547,8 @@ static const struct {
 	TEST_CASE(astlpc_test_simple_message_bmc_to_host),
 	TEST_CASE(astlpc_test_simple_message_host_to_bmc),
 	TEST_CASE(astlpc_test_packetised_message_bmc_to_host),
-	TEST_CASE(astlpc_test_simple_indirect_message_bmc_to_host)
+	TEST_CASE(astlpc_test_simple_indirect_message_bmc_to_host),
+	TEST_CASE(astlpc_test_host_tx_bmc_gone),
 };
 /* clang-format on */
 
