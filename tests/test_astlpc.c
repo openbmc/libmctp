@@ -558,6 +558,34 @@ static void astlpc_test_poll_not_ready(void)
 	free(lpc_mem);
 }
 
+static void astlpc_test_undefined_command(void)
+{
+	struct astlpc_endpoint bmc;
+	uint8_t kcs[2] = { 0 };
+	void *lpc_mem;
+	int rc;
+
+	/* Test harness initialisation */
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(lpc_mem);
+
+	/* BMC initialisation */
+	endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, &kcs, lpc_mem);
+
+	/* 0x5a isn't legal in v1 or v2 */
+	kcs[MCTP_ASTLPC_KCS_REG_DATA] = 0x5a;
+	kcs[MCTP_ASTLPC_KCS_REG_STATUS] |= KCS_STATUS_IBF;
+
+	/* Check for a command despite none present */
+	rc = mctp_astlpc_poll(bmc.astlpc);
+
+	/* Make sure it doesn't fail, bad command should be discarded */
+	assert(rc == 0);
+
+	endpoint_destroy(&bmc);
+	free(lpc_mem);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -572,6 +600,7 @@ static const struct {
 	TEST_CASE(astlpc_test_simple_indirect_message_bmc_to_host),
 	TEST_CASE(astlpc_test_host_tx_bmc_gone),
 	TEST_CASE(astlpc_test_poll_not_ready),
+	TEST_CASE(astlpc_test_undefined_command),
 };
 /* clang-format on */
 
