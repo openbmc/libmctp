@@ -49,3 +49,5 @@ LDADD = tests/libtest-utils.a libmctp.la
 noinst_LIBRARIES = tests/libtest-utils.a
 
 tests_libtest_utils_a_SOURCES = tests/test-utils.c tests/test-utils.h
+
+@VALGRIND_CHECK_RULES@

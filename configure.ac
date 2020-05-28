@@ -127,6 +127,16 @@ free(malloc(4096));
 AM_CONDITIONAL([LIBMCTP_BINDING_serial], [true])
 AM_CONDITIONAL([LIBMCTP_BINDING_astlpc], [true])
 
+# Check for valgrind
+AS_IF([test "x$enable_tests" = "xno"], [enable_valgrind=no])
+m4_foreach([vgtool], [valgrind_tool_list],
+    [AX_VALGRIND_DFLT(vgtool, [off])])
+AX_VALGRIND_DFLT([memcheck], [on])
+AX_VALGRIND_CHECK
+AM_EXTRA_RECURSIVE_TARGETS([check-valgrind])
+m4_foreach([vgtool], [valgrind_tool_list],
+    [AM_EXTRA_RECURSIVE_TARGETS([check-valgrind-]vgtool)])
+
 AX_CODE_COVERAGE
 m4_ifdef([_AX_CODE_COVERAGE_RULES],
     [AM_CONDITIONAL(AUTOCONF_CODE_COVERAGE_2019_01_06, [true])],
