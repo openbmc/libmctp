@@ -126,6 +126,20 @@ static const uint32_t	tx_size   = 0x100;
 #define KCS_STATUS_IBF			0x02
 #define KCS_STATUS_OBF			0x01
 
+static inline int mctp_astlpc_kcs_write(struct mctp_binding_astlpc *astlpc,
+					enum mctp_binding_astlpc_kcs_reg reg,
+					uint8_t val)
+{
+	return astlpc->ops.kcs_write(astlpc->ops_data, reg, val);
+}
+
+static inline int mctp_astlpc_kcs_read(struct mctp_binding_astlpc *astlpc,
+				       enum mctp_binding_astlpc_kcs_reg reg,
+				       uint8_t *val)
+{
+	return astlpc->ops.kcs_read(astlpc->ops_data, reg, val);
+}
+
 static inline int mctp_astlpc_lpc_write(struct mctp_binding_astlpc *astlpc,
 					const void *buf, long offset,
 					size_t len)
@@ -185,15 +199,13 @@ static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 	data = 0xff;
 	status |= KCS_STATUS_OBF;
 
-	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
-				   status);
+	rc = mctp_astlpc_kcs_write(astlpc, MCTP_ASTLPC_KCS_REG_STATUS, status);
 	if (rc) {
 		astlpc_prwarn(astlpc, "KCS status write failed");
 		return -1;
 	}
 
-	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
-				   data);
+	rc = mctp_astlpc_kcs_write(astlpc, MCTP_ASTLPC_KCS_REG_DATA, data);
 	if (rc) {
 		astlpc_prwarn(astlpc, "KCS dummy data write failed");
 		return -1;
@@ -256,8 +268,7 @@ static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 	uint8_t status;
 	int rc;
 
-	rc = astlpc->ops.kcs_read(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
-				  &status);
+	rc = mctp_astlpc_kcs_read(astlpc, MCTP_ASTLPC_KCS_REG_STATUS, &status);
 	if (rc) {
 		mctp_prwarn("KCS status read failed");
 		return rc;
@@ -284,8 +295,7 @@ static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 			      sizeof(ver_cur_be));
 
 	/* Send channel init command */
-	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
-				   0x0);
+	rc = mctp_astlpc_kcs_write(astlpc, MCTP_ASTLPC_KCS_REG_DATA, 0x0);
 	if (rc) {
 		astlpc_prwarn(astlpc, "KCS write failed");
 	}
@@ -334,8 +344,8 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 	int rc;
 
 	for (;;) {
-		rc = astlpc->ops.kcs_read(astlpc->ops_data,
-				MCTP_ASTLPC_KCS_REG_STATUS, &status);
+		rc = mctp_astlpc_kcs_read(astlpc, MCTP_ASTLPC_KCS_REG_STATUS,
+					  &status);
 		if (rc) {
 			astlpc_prwarn(astlpc, "KCS status read failed");
 			return -1;
@@ -345,8 +355,7 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 		/* todo: timeout */
 	}
 
-	rc = astlpc->ops.kcs_write(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
-			data);
+	rc = mctp_astlpc_kcs_write(astlpc, MCTP_ASTLPC_KCS_REG_DATA, data);
 	if (rc) {
 		astlpc_prwarn(astlpc, "KCS data write failed");
 		return -1;
@@ -474,8 +483,7 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 	uint8_t status, data;
 	int rc;
 
-	rc = astlpc->ops.kcs_read(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_STATUS,
-			&status);
+	rc = mctp_astlpc_kcs_read(astlpc, MCTP_ASTLPC_KCS_REG_STATUS, &status);
 	if (rc) {
 		astlpc_prwarn(astlpc, "KCS read error");
 		return -1;
@@ -486,8 +494,7 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 	if (!mctp_astlpc_kcs_read_ready(astlpc, status))
 		return 0;
 
-	rc = astlpc->ops.kcs_read(astlpc->ops_data, MCTP_ASTLPC_KCS_REG_DATA,
-			&data);
+	rc = mctp_astlpc_kcs_read(astlpc, MCTP_ASTLPC_KCS_REG_DATA, &data);
 	if (rc) {
 		astlpc_prwarn(astlpc, "KCS data read error");
 		return -1;
