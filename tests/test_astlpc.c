@@ -62,7 +62,8 @@ static int mctp_astlpc_mmio_kcs_read(void *data,
 
 	*val = (*mmio->kcs)[reg];
 
-	mctp_prdebug("%s: 0x%hhx from %s", __func__, *val, reg ? "status" : "data");
+	mctp_prdebug("%s: 0x%hhx from %s", __func__, *val,
+		     reg ? "status" : "data");
 
 	if (reg == MCTP_ASTLPC_KCS_REG_DATA) {
 		uint8_t flag = mmio->bmc ? KCS_STATUS_IBF : KCS_STATUS_OBF;
@@ -93,7 +94,8 @@ static int mctp_astlpc_mmio_kcs_write(void *data,
 	else
 		*regp = val;
 
-	mctp_prdebug("%s: 0x%hhx to %s", __func__, val, reg ? "status" : "data");
+	mctp_prdebug("%s: 0x%hhx to %s", __func__, val,
+		     reg ? "status" : "data");
 
 	return 0;
 }
