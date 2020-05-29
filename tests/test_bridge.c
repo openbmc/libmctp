@@ -99,5 +99,9 @@ int main(void)
 	assert(ctx->bindings[0]->tx_count == 1);
 	assert(ctx->bindings[0]->last_pkt_data == 0x55);
 
+	__mctp_free(ctx->bindings[1]);
+	__mctp_free(ctx->bindings[0]);
+	mctp_destroy(ctx->mctp);
+
 	return EXIT_SUCCESS;
 }
