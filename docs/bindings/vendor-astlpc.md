@@ -103,7 +103,8 @@ struct mctp_lpcmap_hdr {
 } __attribute__((packed));
 ```
 
-Where the magic value marking the beginning of the control area is:
+Where the magic value marking the beginning of the control area is the ASCII
+encoding of "MCTP":
 
 ```
 #define LPC_MAGIC 0x4d435450
@@ -138,25 +139,33 @@ be consumed.
 
 #### KCS Status Register Layout
 
-| Bit | Managed By | Description |
-|-----|------------|-------------|
-|  7  |  Software  | (MSB) BMC Active  |
-|  6  |  Software  | Channel active, version negotiated |
-|  5  |  Software  | Unused      |
-|  4  |  Software  | Unused      |
-|  3  |  Hardware  | Command / Data |
-|  2  |  Software  | Unused      |
-|  1  |  Hardware  | Input Buffer Full |
-|  0  |  Hardware  | (LSB) Output Buffer Full |
+The rows containing a ✓ in the protocol version columns indicate use of the bit
+by the column's associated protocol version. Absence of ✓ means the bit is not
+necessary to implement for the given version of the protocol.
+
+| Bit | v1 | Managed By | Description                        |
+|-----|----|------------|------------------------------------|
+|  7  | ✓  |  Software  | (MSB) BMC Active                   |
+|  6  | ✓  |  Software  | Channel active, version negotiated |
+|  5  |    |  Software  | Undefined                          |
+|  4  |    |  Software  | Undefined                          |
+|  3  |    |  Hardware  | Command / Data                     |
+|  2  |    |  Software  | Undefined                          |
+|  1  | ✓  |  Hardware  | Input Buffer Full                  |
+|  0  | ✓  |  Hardware  | (LSB) Output Buffer Full           |
 
 #### KCS Data Register Commands
 
-| Command | Description |
-|---------|-------------|
-|  0x00   | Initialise  |
-|  0x01   | Tx Begin    |
-|  0x02   | Rx Complete |
-|  0xff   | Dummy Value |
+Thw rows containing a ✓ in the protocol version columns indicate use of the
+command by the column's associated protocol version. Absence of the ✓ means the
+command is not necessary to implement for the given version of the protocol.
+
+| Command | v1 | Description |
+|---------|----|-------------|
+|  0x00   | ✓  | Initialise  |
+|  0x01   | ✓  | Tx Begin    |
+|  0x02   | ✓  | Rx Complete |
+|  0xff   | ✓  | Dummy Value |
 
 ### General Protocol Behaviours
 
@@ -209,70 +218,72 @@ below.
 
 #### BMC Initialisation Sequence
 
-1. The BMC populates the LPC mapping with:
-   * The magic value
-   * The BMC minimum and currently supported versions
-   * The Rx and Tx area offsets and sizes
-2. The BMC sets the BMC active bit and triggers the host interrupt
+| Step | v1 | Description                                                      |
+|------|----|------------------------------------------------------------------|
+|  1   | ✓  | The BMC initialises the control area: magic value, BMC versions and buffer parameters |
+|  2   | ✓  | The BMC sets the BMC active bit and triggers the host interrupt  |
 
 #### Host initialisation Sequence
 
-1. Wait for the BMC to indicate it is active via the KCS status register
-2. Populate the host version fields
-3. Send the `Initialise` message via KCS
-4. The hardware sets the IBF flag in the status register
-5. The KCS interrupt is triggered on the BMC
-6. The BMC reads the KCS status and data registers
-7. The hardware clears IBF and de-asserts the KCS IRQ
-8. The BMC calculates the negotiated version
-9. The BMC sets the `Channel Active` bit in the KCS status register
-10. The KCS interrupt is triggered on the host
-11. The host reads the KCS status and data registers
-12. The hardware clears OBF and de-asserts the host KCS IRQ
-13. The host observes that `Channel Active` is set in the KCS status register
-14. The host reads the negotiated version
+| Step | v1 | Description                                                      |
+|------|----|------------------------------------------------------------------|
+|  1   | ✓  | Wait for the BMC to indicate active via the KCS status register  |
+|  2   | ✓  | Populate the host version fields                                 |
+|  3   | ✓  | Send the `Initialise` message via KCS                            |
+|  4   | ✓  | The hardware sets the IBF flag in the status register            |
+|  5   | ✓  | The KCS interrupt is triggered on the BMC                        |
+|  6   | ✓  | The BMC reads the KCS status and data registers                  |
+|  7   | ✓  | The hardware clears IBF and de-asserts the KCS IRQ               |
+|  8   | ✓  | The BMC calculates the negotiated version                        |
+|  9   | ✓  | The BMC sets the `Channel Active` bit in the KCS status register |
+|  10  | ✓  | The KCS interrupt is triggered on the host                       |
+|  11  | ✓  | The host reads the KCS status and data registers                 |
+|  12  | ✓  | The hardware clears OBF and de-asserts the host KCS IRQ          |
+|  13  | ✓  | The host observes that `Channel Active` is set in the KCS status register |
+|  14  | ✓  | The host reads the negotiated version                            |
 
 #### Host Packet Transmission Sequence
 
-1. The host waits on the previous `Rx Complete` message
-2. The host waits on `BMC Active` and `Channel Active` in the KCS status
-   register
-3. The host writes the packet to its Tx area (BMC Rx area)
-4. The host sends the `Tx Begin` command via the KCS interface, transferring
-   ownership of its Tx buffer to the BMC
-5. The hardware sets the IBF flag in the KCS status register
-6. The KCS interrupt is triggered on the BMC
-7. The BMC reads the KCS status and data registers
-8. The hardware clears IBF and de-asserts the KCS IRQ
-9. The BMC observes IBF is set and the command is `Tx Begin`
-10. The BMC reads the packet from the BMC Rx area (host Tx area)
-11. The BMC sends the `Rx Complete` command via the KCS interface
-12. The hardware sets the OBF flag in the KCS status register
-13. The KCS interrupt is triggered on the host
-14. The host reads the KCS status and data registers
-15. The hardware clears OBF and de-asserts the host KCS IRQ
-16. The host observes OBF is set and the command is `Rx Complete`
-17. The host regains ownership of its Tx buffer
+| Step | v1 | Description                                                      |
+|------|----|------------------------------------------------------------------|
+|  1   | ✓  | The host waits on the previous `Rx Complete` message             |
+|  2   | ✓  | The host waits on `BMC Active` and `Channel Active` in the KCS status register |
+|  3   | ✓  | The host writes the packet to its Tx area (BMC Rx area)          |
+|  4   | ✓  | The host sends the `Tx Begin` command via the KCS interface, transferring ownership of its Tx buffer to the BMC |
+|  5   | ✓  | The hardware sets the IBF flag in the KCS status register        |
+|  6   | ✓  | The KCS interrupt is triggered on the BMC                        |
+|  7   | ✓  | The BMC reads the KCS status and data registers                  |
+|  8   | ✓  | The hardware clears IBF and de-asserts the KCS IRQ               |
+|  9   | ✓  | The BMC observes IBF is set and the command is `Tx Begin`        |
+|  10  | ✓  | The BMC reads the packet from the BMC Rx area (host Tx area)     |
+|  11  | ✓  | The BMC sends the `Rx Complete` command via the KCS interface    |
+|  12  | ✓  | The hardware sets the OBF flag in the KCS status register        |
+|  13  | ✓  | The KCS interrupt is triggered on the host                       |
+|  14  | ✓  | The host reads the KCS status and data registers                 |
+|  15  | ✓  | The hardware clears OBF and de-asserts the host KCS IRQ          |
+|  16  | ✓  | The host observes OBF is set and the command is `Rx Complete`    |
+|  17  | ✓  | The host regains ownership of its Tx buffer                      |
 
 #### BMC Packet Transmission Sequence
 
-1. The BMC waits on the previous `Rx Complete` message
-2. The BMC writes the packet to its Tx area (host Rx area)
-3. The BMC sends the `Tx Begin` command via the KCS interface, transferring
-   ownership of its Tx buffer to the host
-4. The hardware sets the OBF flag in the KCS status register
-5. The KCS interrupt is triggered on the host
-6. The host reads the KCS status and data registers
-7. The hardware clears OBF and de-asserts the KCS IRQ
-8. The host observes OBF is set and the command is `Tx Begin`
-9. The host reads the packet from the host Rx area (BMC Tx area)
-10. The host sends the `Rx Complete` command via the KCS interface
-11. The hardware sets the IBF flag in the KCS status register
-12. The KCS interrupt is triggered on the BMC
-13. The BMC reads the KCS status and data registers
-14. The hardware clears IBF and de-asserts the BMC KCS IRQ
-15. The BMC observes IBF is set and the command is `Rx Complete`.
-16. The BMC regains ownership of its Tx buffer
+| Step | v1 | Description                                                      |
+|------|----|------------------------------------------------------------------|
+|  1   | ✓  | The BMC waits on the previous `Rx Complete` message              |
+|  2   | ✓  | The BMC writes the packet to its Tx area (host Rx area)          |
+|  3   | ✓  | The BMC sends the `Tx Begin` command via the KCS interface, transferring ownership of its Tx buffer to the host |
+|  4   | ✓  | The hardware sets the OBF flag in the KCS status register        |
+|  5   | ✓  | The KCS interrupt is triggered on the host                       |
+|  6   | ✓  | The host reads the KCS status and data registers                 |
+|  7   | ✓  | The hardware clears OBF and de-asserts the KCS IRQ               |
+|  8   | ✓  | The host observes OBF is set and the command is `Tx Begin`       |
+|  9   | ✓  | The host reads the packet from the host Rx area (BMC Tx area)    |
+|  10  | ✓  | The host sends the `Rx Complete` command via the KCS interface   |
+|  11  | ✓  | The hardware sets the IBF flag in the KCS status register        |
+|  12  | ✓  | The KCS interrupt is triggered on the BMC                        |
+|  13  | ✓  | The BMC reads the KCS status and data registers                  |
+|  14  | ✓  | The hardware clears IBF and de-asserts the BMC KCS IRQ           |
+|  15  | ✓  | The BMC observes IBF is set and the command is `Rx Complete`.    |
+|  16  | ✓  | The BMC regains ownership of its Tx buffer                       |
 
 ## Implementation Notes
 
