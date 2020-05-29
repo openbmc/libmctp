@@ -1,7 +1,51 @@
-# MCTP LPC Hardware Binding for ASPEED BMC Systems
+# Management Component Transport Protocol (MCTP) LPC Transport Binding Specification for ASPEED BMC Systems
+
+## Scope
 
 This design provides an efficient method to transfer MCTP packets between the
 host and BMC over the LPC bus on ASPEED BMC platforms.
+
+## Normative References
+
+The following referenced documents are indispensable for the application of
+this document.
+
+DMTF DSP0236, Management Component Transport Protocol (MCTP) Base Specification
+1.0,
+http://www.dmtf.org/standards/published_documents/DSP0236_1.0.pdf
+
+Intel (R) Low Pin Count (LPC) Interface Specification 1.1,
+https://www.intel.com/content/dam/www/program/design/us/en/documents/low-pin-count-interface-specification.pdf
+
+IPMI Consortium, Intelligent Platform Management Interface Specification, v1.5
+Revision 1.1 February 20, 2002,
+http://download.intel.com/design/servers/ipmi/IPMIv1_5rev1_1.pdf
+
+## Terms and Definitions
+
+### Keyboard Controller Style Interface (KCS)
+
+A set of bit definitions, and operation of the registers typically used in
+keyboard microcontrollers and embedded controllers. The term "Keyboard
+Controller Style" reflects that the register definition was originally used as
+the legacy "8742" keyboard controller interface in PC architecture computer
+systems.  This interface is available built-in to several commercially
+available microcontrollers. Data is transferred across the KCS interface using
+a per-byte handshake.
+
+### Low Pin Count (LPC)
+
+A bus specification that implements ISA bus in a reduced physical form while
+extending ISA's capabilities.
+
+### LPC Firmware Cycles (LPC FW)
+
+LPC firmware cycles allow separate boot BIOS firmware memory cycles and
+application memory cycles with respect to the LPC bus. The ASPEED BMCs allow
+remapping of the LPC firmware cycles onto arbitrary regions of the BMC's
+physical address space, including RAM.
+
+## MCTP over LPC Transport
 
 The basic components used for the transfer are:
 
@@ -25,7 +69,15 @@ On this indication, the remote side will:
 2. Read the MCTP packet from the LPC FW window
 3. Read from the KCS buffer, to clear the 'buffer full' state.
 
-## LPC FW Window Layout
+### Scope
+
+The document limits itself to describing the operation of the binding protocol.
+The following issues of protocol ABI are considered out of scope:
+
+1. The LPC IO address and Serial IRQ parameters of the KCS device
+2. The concrete location of the control region in the LPC FW address space
+
+### LPC FW Window Layout
 
 The window of BMC-memory-backed LPC FW address space has a predefined format,
 consisting of:
@@ -74,7 +126,7 @@ protocol.
 All control data is in big-endian format. MCTP packet data is transferred
 exactly as is presented, and no data escaping is performed.
 
-## KCS Control
+### KCS Control
 
 The KCS hardware on the ASPEED BMCs is used as a method of indicating, to the
 remote side, that a packet is ready to be transferred through the LPC FW
@@ -93,7 +145,7 @@ cleared when data has been read).
 We use these flags to determine whether data in the LPC window is available to
 be consumed.
 
-### KCS Status Register Layout
+#### KCS Status Register Layout
 
 | Bit | Managed By | Description |
 |-----|------------|-------------|
@@ -106,7 +158,7 @@ be consumed.
 |  1  |  Hardware  | Input Buffer Full |
 |  0  |  Hardware  | (LSB) Output Buffer Full |
 
-### KCS Data Register Commands
+#### KCS Data Register Commands
 
 | Command | Description |
 |---------|-------------|
@@ -115,7 +167,7 @@ be consumed.
 |  0x02   | Rx Complete |
 |  0xff   | Dummy Value |
 
-## General Protocol Behaviours
+### General Protocol Behaviours
 
 * The BMC writes to the status register
   * The hardware triggers a host interrupt
@@ -136,7 +188,7 @@ be consumed.
   the KCS interface to trigger a data-register interrupt by performing a dummy
   write
 
-### LPC Window Ownership and Synchronisation
+#### LPC Window Ownership and Synchronisation
 
 Because the LPC FW window is shared between the host and the BMC we need
 strict rules on which entity is allowed to access it at specific times.
@@ -158,20 +210,20 @@ During packet transmission, the follow sequence occurs:
 * The Rx side sends a `Rx Complete` once done, indicating that the buffer
   ownership is transferred back to the Tx side.
 
-## LPC Binding Operation
+### LPC Binding Operation
 
 The binding operation is not symmetric as the BMC is the only side that can
 drive the status register. Each side's initialisation sequence is outlined
 below.
 
-### BMC Initialisation Sequence
+#### BMC Initialisation Sequence
 
 | Step | Description                                                      |
 |------|------------------------------------------------------------------|
 |  1   | The BMC initialises the control area: magic value, BMC versions and buffer parameters |
 |  2   | The BMC sets the BMC active bit and triggers the host interrupt  |
 
-### Host initialisation Sequence
+#### Host initialisation Sequence
 
 | Step | Description                                                      |
 |------|------------------------------------------------------------------|
@@ -190,7 +242,7 @@ below.
 |  13  | The host observes that `Channel Active` is set in the KCS status register |
 |  14  | The host reads the negotiated version                            |
 
-### Host Packet Transmission Sequence
+#### Host Packet Transmission Sequence
 
 | Step | Description                                                      |
 |------|------------------------------------------------------------------|
@@ -212,7 +264,7 @@ below.
 |  16  | The host observes OBF is set and the command is `Rx Complete`    |
 |  17  | The host regains ownership of its Tx buffer                      |
 
-### BMC Packet Transmission Sequence
+#### BMC Packet Transmission Sequence
 
 | Step | Description                                                      |
 |------|------------------------------------------------------------------|
@@ -241,7 +293,7 @@ The KCS hardware (used as the full transfer channel) can be used to transfer
 arbitrarily-sized MCTP messages. However, there are much larger overheads in
 synchronisation between host and BMC for every byte transferred.
 
-### Using the MCTP Serial Binding (DSP0253)
+### The MCTP Serial Binding (DSP0253)
 
 We could use the VUART hardware to transfer the MCTP packets according to the
 existing MCTP Serial Binding. However, the VUART device is already used for
