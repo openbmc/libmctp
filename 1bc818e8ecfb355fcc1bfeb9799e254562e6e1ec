@@ -1,0 +1,9 @@
+Ok-To-Test+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Verified+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Code-Review+1: Iwona Winiarska <iwona.winiarska@intel.com>
+Code-Review+2: Andrew Jeffery <andrew@aj.id.au>
+Submitted-by: Andrew Jeffery <andrew@aj.id.au>
+Submitted-at: Wed, 03 Jun 2020 00:57:14 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/libmctp/+/32888
+Project: openbmc/libmctp
+Branch: refs/heads/master
