@@ -6,6 +6,7 @@
 #include <err.h>
 #include <errno.h>
 #include <getopt.h>
+#include <limits.h>
 #include <poll.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -334,7 +335,7 @@ static int client_process_recv(struct ctx *ctx, int idx)
 		goto out_close;
 	}
 
-	if (len > ctx->buf_size) {
+	if ((size_t)len > ctx->buf_size) {
 		void *tmp;
 
 		tmp = realloc(ctx->buf, len);

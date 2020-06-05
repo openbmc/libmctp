@@ -30,8 +30,11 @@ struct callback_data {
 	};
 };
 
-static void control_message_transport_callback(mctp_eid_t src, void *data,
-					       void *buf, size_t len)
+#define __unused __attribute__((unused))
+
+static void control_message_transport_callback(mctp_eid_t src __unused,
+					       void *data, void *buf,
+					       size_t len __unused)
 {
 	struct callback_data *ctx = data;
 	struct mctp_ctrl_msg_hdr *msg_hdr = buf;
@@ -98,7 +101,7 @@ static void send_transport_control_message(void)
 	mctp_destroy(endpoint);
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	send_transport_control_message();
 

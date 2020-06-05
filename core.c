@@ -67,8 +67,8 @@ struct mctp {
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif
 
-static int mctp_message_tx_on_bus(struct mctp *mctp, struct mctp_bus *bus,
-		mctp_eid_t src, mctp_eid_t dest, void *msg, size_t msg_len);
+static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
+				  mctp_eid_t dest, void *msg, size_t msg_len);
 
 struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *binding, size_t len)
 {
@@ -240,9 +240,10 @@ struct mctp *mctp_init(void)
 
 void mctp_destroy(struct mctp *mctp)
 {
-	int i;
+	size_t i;
 
 	/* Cleanup message assembly contexts */
+	BUILD_ASSERT(ARRAY_SIZE(mctp->msg_ctxs) < SIZE_MAX);
 	for (i = 0; i < ARRAY_SIZE(mctp->msg_ctxs); i++) {
 		struct mctp_msg_ctx *tmp = &mctp->msg_ctxs[i];
 		if (tmp->buf)
@@ -320,9 +321,8 @@ static inline bool mctp_ctrl_cmd_is_transport(struct mctp_ctrl_msg_hdr *hdr)
 		(hdr->command_code <= MCTP_CTRL_CMD_LAST_TRANSPORT));
 }
 
-static bool mctp_ctrl_handle_msg(struct mctp *mctp, struct mctp_bus *bus,
-				 mctp_eid_t src, mctp_eid_t dest, void *buffer,
-				 size_t length)
+static bool mctp_ctrl_handle_msg(struct mctp_bus *bus, mctp_eid_t src,
+				 void *buffer, size_t length)
 {
 	struct mctp_ctrl_msg_hdr *msg_hdr = buffer;
 
@@ -384,8 +384,8 @@ static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus, mctp_eid_t src,
 			 */
 			if (mctp_ctrl_cmd_is_request(msg_hdr)) {
 				bool handled;
-				handled = mctp_ctrl_handle_msg(mctp, bus, src,
-							       dest, buf, len);
+				handled = mctp_ctrl_handle_msg(bus, src, buf,
+							       len);
 				if (handled)
 					return;
 			}
@@ -402,8 +402,7 @@ static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus, mctp_eid_t src,
 			if (dest_bus == bus)
 				continue;
 
-			mctp_message_tx_on_bus(mctp, dest_bus,
-					src, dest, buf, len);
+			mctp_message_tx_on_bus(dest_bus, src, dest, buf, len);
 		}
 
 	}
@@ -551,8 +550,8 @@ void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
 		mctp_send_tx_queue(bus);
 }
 
-static int mctp_message_tx_on_bus(struct mctp *mctp, struct mctp_bus *bus,
-		mctp_eid_t src, mctp_eid_t dest, void *msg, size_t msg_len)
+static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
+				  mctp_eid_t dest, void *msg, size_t msg_len)
 {
 	size_t max_payload_len, payload_len, p;
 	struct mctp_pktbuf *pkt;
@@ -613,5 +612,5 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 	struct mctp_bus *bus;
 
 	bus = find_bus_for_eid(mctp, eid);
-	return mctp_message_tx_on_bus(mctp, bus, bus->eid, eid, msg, msg_len);
+	return mctp_message_tx_on_bus(bus, bus->eid, eid, msg, msg_len);
 }

@@ -14,9 +14,11 @@ fi
 
 case "${BOOTSTRAP_MODE}" in
     dev)
-        FLAGS="-Wformat -Werror=format-security"
-        FLAGS="${FLAGS} -Werror=array-bounds"
-        FLAGS="${FLAGS} -Werror=implicit-function-declaration"
+        FLAGS="-O2 -Wall -Wextra -Wformat-security"
+        FLAGS="${FLAGS} -Wparentheses"
+        FLAGS="${FLAGS} -Wno-type-limits"
+        FLAGS="${FLAGS} -Werror"
+        # FLAGS="${FLAGS} -Wpedantic"
         FLAGS="${FLAGS} -fsanitize=address,leak,undefined"
         FLAGS="${FLAGS} -ggdb"
         ./configure \

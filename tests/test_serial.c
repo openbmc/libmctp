@@ -33,7 +33,8 @@ static int mctp_binding_serial_pipe_tx(void *data, void *buf, size_t len)
 	ssize_t rc;
 
 	rc = write(ctx->egress, buf, len);
-	assert(rc == len);
+	assert(rc >= 0);
+	assert((size_t)rc == len);
 
 	return rc;
 }
@@ -42,7 +43,10 @@ uint8_t mctp_msg_src[2 * MCTP_BTU];
 
 static bool seen;
 
-static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
+#define __unused __attribute__((unused))
+
+static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
+		       size_t len)
 {
 	uint8_t type;
 

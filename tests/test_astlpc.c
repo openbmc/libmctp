@@ -122,7 +122,10 @@ int mctp_astlpc_mmio_lpc_write(void *data, void *buf, long offset, size_t len)
 	return 0;
 }
 
-static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
+#define __unused __attribute__((unused))
+
+static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
+		       size_t len)
 {
 	uint8_t type;
 

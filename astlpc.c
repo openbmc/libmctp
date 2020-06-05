@@ -237,7 +237,8 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 		return;
 	}
 
-	if (len > astlpc->binding.pkt_size) {
+	assert(astlpc->binding.pkt_size >= 0);
+	if (len > (uint32_t)astlpc->binding.pkt_size) {
 		mctp_prwarn("invalid RX len 0x%x", len);
 		return;
 	}
