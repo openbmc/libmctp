@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
 #include <assert.h>
+#include <errno.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -273,10 +274,16 @@ int mctp_register_bus(struct mctp *mctp,
 		struct mctp_binding *binding,
 		mctp_eid_t eid)
 {
+	int rc = 0;
+
 	/* todo: multiple busses */
 	assert(mctp->n_busses == 0);
 	mctp->n_busses = 1;
+
 	mctp->busses = __mctp_alloc(sizeof(struct mctp_bus));
+	if (!mctp->busses)
+		return -ENOMEM;
+
 	memset(mctp->busses, 0, sizeof(struct mctp_bus));
 	mctp->busses[0].binding = binding;
 	mctp->busses[0].eid = eid;
@@ -284,10 +291,16 @@ int mctp_register_bus(struct mctp *mctp,
 	binding->mctp = mctp;
 	mctp->route_policy = ROUTE_ENDPOINT;
 
-	if (binding->start)
-		return binding->start(binding);
+	if (binding->start) {
+		rc = binding->start(binding);
+		if (rc < 0) {
+			mctp_prerr("Failed to start binding: %d", rc);
+			__mctp_free(mctp->busses);
+			mctp->busses = NULL;
+		}
+	}
 
-	return 0;
+	return rc;
 }
 
 int mctp_bridge_busses(struct mctp *mctp,
