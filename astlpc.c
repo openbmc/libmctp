@@ -95,7 +95,7 @@ struct mctp_binding_astlpc {
 
 /* Support testing of new binding protocols */
 #ifndef ASTLPC_VER_CUR
-#define ASTLPC_VER_CUR	1
+#define ASTLPC_VER_CUR	2
 #endif
 
 #define ASTLPC_PACKET_SIZE(sz)	(4 + (sz))
