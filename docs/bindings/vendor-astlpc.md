@@ -285,6 +285,24 @@ below.
 |  15  | The BMC observes IBF is set and the command is `Rx Complete`.    |
 |  16  | The BMC regains ownership of its Tx buffer                       |
 
+## Implementation Notes
+
+On the BMC the initial prototype implementation makes use of the following
+components:
+
+* An LPC KCS device exposed by a [binding-specific kernel driver][mctp-driver]
+* The reserved memory mapped by the LPC2AHB bridge via the [aspeed-lpc-ctrl
+  driver][aspeed-lpc-ctrl]
+* The astlpc binding found in [libmctp][libmctp]
+
+[mctp-driver]: https://github.com/openbmc/linux/commit/9a3b539a175cf4fe1f8fc2997e8a91abec25c37f
+[aspeed-lpc-ctrl]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/soc/aspeed/aspeed-lpc-ctrl.c?h=v5.7
+[libmctp]: https://github.com/openbmc/libmctp
+
+From the host side, the LPC Firmware and KCS IO cycles are driven by
+free-standing firmware. Some firmwares exploit [libmctp][libmctp] by
+implementing the driver hooks for direct access to the LPC devices.
+
 ## Alternatives Considered
 
 ### The KCS MCTP Binding (DSP0254)
