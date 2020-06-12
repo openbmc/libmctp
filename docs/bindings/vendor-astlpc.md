@@ -142,8 +142,18 @@ designated Input/Output Buffer Full (IBF/OBF), and are automatically set by
 hardware when data has been written to the corresponding ODR/IDR buffer (and
 cleared when data has been read).
 
-We use these flags to determine whether data in the LPC window is available to
-be consumed.
+While the IBF and OBF flags are managed in hardware, the remaining
+software-defined bits in the status register are used to carry other required
+protocol state. A problematic feature of the KCS status register is described
+in the IPMI specification, which states that an interrupt may be triggered on
+writes to the KCS status register but hardware implementations are not required
+to do so. Comparatively, writes to the data registers must set the
+corresponding buffer-full flag and invoke an interrupt.
+
+To ensure interrupts are generated for status updates, we exploit the OBF
+interrupt to signal a status update by writing a dummy command to ODR after
+updating the status register, as outlined below.
+
 
 #### KCS Status Register Layout
 
@@ -167,26 +177,51 @@ be consumed.
 |  0x02   | Rx Complete |
 |  0xff   | Dummy Value |
 
-### General Protocol Behaviours
+### KCS Status and Control Sequences
 
-* The BMC writes to the status register
-  * The hardware triggers a host interrupt
-  * The host reads the status register for BMC operating state transitions
-* The host writes to the data register
-  * The hardware triggers a BMC interrupt
-  * The BMC reads the status register for IBF (this is the only bit that may
-    change)
-  * If IBF is set, the BMC reads the data register for buffer state transitions
-* The BMC writes to the data register
-  * The hardware triggers a Host interrupt
-  * The host reads the status register for OBF (this is the only bit that may
-    change)
-  * If OBF is set, the host reads the data register for buffer state
-    transitions
-* Some KCS hardware implementations may only trigger an interrupt from ODR
-  events (and not status update). The `0xff` dummy value allows either side of
-  the KCS interface to trigger a data-register interrupt by performing a dummy
-  write
+The KCS status flags and command set govern the state of the protocol, defining
+the ability to send and receive packets on the LPC bus.
+
+#### Host Command to BMC Sequence
+
+The host sends commands to the BMC to signal channel initialisation, begin
+transmission of a packet, or to complete reception of a packet.
+
+| Step | Description                                             |
+|------|---------------------------------------------------------|
+|  1   | The host writes a command value to IDR                  |
+|  2   | The hardware sets IBF, which triggers a BMC interrupt   |
+|  3   | The BMC reads the status register for IBF               |
+|  4   | If IBF is set, the BMC reads the host command from IDR  |
+|  5   | The interrupt is acknowledged by the data register read |
+
+#### BMC Command to Host Sequence
+
+The BMC sends commands to the host to begin transmission of a packet or to
+complete reception of a packet.
+
+| Step | Description                                             |
+|------|---------------------------------------------------------|
+|  1   | The BMC writes a command value to ODR                   |
+|  2   | The hardware sets OBF, which triggers a host interrupt  |
+|  3   | The host reads the status register for OBF              |
+|  4   | If OBF is set, the host reads the BMC command from ODR  |
+|  5   | The interrupt is acknowledged by the data register read |
+
+#### BMC Status Update Sequence
+
+The BMC sends status updates to the host to signal loss of function, loss of
+channel state, or the presence of a command in the KCS data register.
+
+| Step | Description                                                    |
+|------|----------------------------------------------------------------|
+|  1   | The BMC writes the status value to the status register         |
+|  2   | The BMC writes the dummy command to ODR                        |
+|  3   | The hardware sets OBF, which triggers a host interrupt         |
+|  4   | If OBF is set, the host reads the BMC command from ODR         |
+|  5   | The interrupt is acknowledged by the data register read        |
+|  6   | The host observes the command is the dummy command             |
+|  7   | The host reads the status register to capture the state change |
 
 #### LPC Window Ownership and Synchronisation
 
@@ -216,74 +251,57 @@ The binding operation is not symmetric as the BMC is the only side that can
 drive the status register. Each side's initialisation sequence is outlined
 below.
 
+The sequences below contain steps where the BMC updates the channel status and
+where commands are sent between the BMC and the host. The act of updating
+status or sending a command invokes the behaviour outlined in [KCS
+Control](#kcs-control).
+
+The packet transmission sequences assume that `BMC Active` and `Channel Active`
+are set.
+
 #### BMC Initialisation Sequence
 
-| Step | Description                                                      |
-|------|------------------------------------------------------------------|
+| Step | Description                              |
+|------|------------------------------------------|
 |  1   | The BMC initialises the control area: magic value, BMC versions and buffer parameters |
-|  2   | The BMC sets the BMC active bit and triggers the host interrupt  |
+|  2   | The BMC sets the status to `BMC Active`  |
 
 #### Host initialisation Sequence
 
-| Step | Description                                                      |
-|------|------------------------------------------------------------------|
-|  1   | Wait for the BMC to indicate active via the KCS status register  |
-|  2   | Populate the host version fields                                 |
-|  3   | Send the `Initialise` message via KCS                            |
-|  4   | The hardware sets the IBF flag in the status register            |
-|  5   | The KCS interrupt is triggered on the BMC                        |
-|  6   | The BMC reads the KCS status and data registers                  |
-|  7   | The hardware clears IBF and de-asserts the KCS IRQ               |
-|  8   | The BMC calculates the negotiated version                        |
-|  9   | The BMC sets the `Channel Active` bit in the KCS status register |
-|  10  | The KCS interrupt is triggered on the host                       |
-|  11  | The host reads the KCS status and data registers                 |
-|  12  | The hardware clears OBF and de-asserts the host KCS IRQ          |
-|  13  | The host observes that `Channel Active` is set in the KCS status register |
-|  14  | The host reads the negotiated version                            |
+| Step | Description                                    |
+|------|------------------------------------------------|
+|  1   | The host waits for the `BMC Active` state      |
+|  2   | The host populates the its version fields      |
+|  3   | The host sends the `Initialise` command        |
+|  4   | The BMC observes the `Initialise` command      |
+|  5   | The BMC calculates the negotiated version      |
+|  6   | The BMC sets the status to `Channel Active`    |
+|  7   | The host observes that `Channel Active` is set |
+|  8   | The host reads the negotiated version          |
 
 #### Host Packet Transmission Sequence
 
-| Step | Description                                                      |
-|------|------------------------------------------------------------------|
-|  1   | The host waits on the previous `Rx Complete` message             |
-|  2   | The host waits on `BMC Active` and `Channel Active` in the KCS status register |
-|  3   | The host writes the packet to its Tx area (BMC Rx area)          |
-|  4   | The host sends the `Tx Begin` command via the KCS interface, transferring ownership of its Tx buffer to the BMC |
-|  5   | The hardware sets the IBF flag in the KCS status register        |
-|  6   | The KCS interrupt is triggered on the BMC                        |
-|  7   | The BMC reads the KCS status and data registers                  |
-|  8   | The hardware clears IBF and de-asserts the KCS IRQ               |
-|  9   | The BMC observes IBF is set and the command is `Tx Begin`        |
-|  10  | The BMC reads the packet from the BMC Rx area (host Tx area)     |
-|  11  | The BMC sends the `Rx Complete` command via the KCS interface    |
-|  12  | The hardware sets the OBF flag in the KCS status register        |
-|  13  | The KCS interrupt is triggered on the host                       |
-|  14  | The host reads the KCS status and data registers                 |
-|  15  | The hardware clears OBF and de-asserts the host KCS IRQ          |
-|  16  | The host observes OBF is set and the command is `Rx Complete`    |
-|  17  | The host regains ownership of its Tx buffer                      |
+| Step | Description                                                  |
+|------|--------------------------------------------------------------|
+|  1   | The host waits on any previous `Rx Complete` message         |
+|  3   | The host writes the packet to its Tx area (BMC Rx area)      |
+|  4   | The host sends the `Tx Begin` command, transferring ownership of its Tx buffer to the BMC |
+|  5   | The BMC observes the `Tx Begin` command                      |
+|  6   | The BMC reads the packet from the its Rx area (host Tx area) |
+|  7   | The BMC sends the `Rx Complete` command, transferring ownership of its Rx buffer to the host |
+|  8   | The host observes the `Rx Complete` command                  |
 
 #### BMC Packet Transmission Sequence
 
-| Step | Description                                                      |
-|------|------------------------------------------------------------------|
-|  1   | The BMC waits on the previous `Rx Complete` message              |
-|  2   | The BMC writes the packet to its Tx area (host Rx area)          |
-|  3   | The BMC sends the `Tx Begin` command via the KCS interface, transferring ownership of its Tx buffer to the host |
-|  4   | The hardware sets the OBF flag in the KCS status register        |
-|  5   | The KCS interrupt is triggered on the host                       |
-|  6   | The host reads the KCS status and data registers                 |
-|  7   | The hardware clears OBF and de-asserts the KCS IRQ               |
-|  8   | The host observes OBF is set and the command is `Tx Begin`       |
-|  9   | The host reads the packet from the host Rx area (BMC Tx area)    |
-|  10  | The host sends the `Rx Complete` command via the KCS interface   |
-|  11  | The hardware sets the IBF flag in the KCS status register        |
-|  12  | The KCS interrupt is triggered on the BMC                        |
-|  13  | The BMC reads the KCS status and data registers                  |
-|  14  | The hardware clears IBF and de-asserts the BMC KCS IRQ           |
-|  15  | The BMC observes IBF is set and the command is `Rx Complete`.    |
-|  16  | The BMC regains ownership of its Tx buffer                       |
+| Step | Description                                                   |
+|------|---------------------------------------------------------------|
+|  1   | The BMC waits on any previous `Rx Complete` message           |
+|  2   | The BMC writes the packet to its Tx area (host Rx area)       |
+|  3   | The BMC sends the `Tx Begin` command, transferring ownership of its Tx buffer to the host |
+|  8   | The host observes the `Tx Begin` command                      |
+|  9   | The host reads the packet from the host Rx area (BMC Tx area) |
+|  10  | The host sends the `Rx Complete` command, transferring ownership of its Rx buffer to the BMC |
+|  15  | The BMC observes the `Rx Complete` command                    |
 
 ## Implementation Notes
 
