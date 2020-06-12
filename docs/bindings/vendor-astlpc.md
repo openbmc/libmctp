@@ -23,6 +23,11 @@ http://download.intel.com/design/servers/ipmi/IPMIv1_5rev1_1.pdf
 
 ## Terms and Definitions
 
+### Baseline Transmission Unit (BTU)
+
+Defined by the MCTP base specification as the smallest maximum packet size all
+MCTP-compliant endpoints must accept.
+
 ### Keyboard Controller Style Interface (KCS)
 
 A set of bit definitions, and operation of the registers typically used in
@@ -45,7 +50,32 @@ application memory cycles with respect to the LPC bus. The ASPEED BMCs allow
 remapping of the LPC firmware cycles onto arbitrary regions of the BMC's
 physical address space, including RAM.
 
+### Maximum Transmission Unit (MTU)
+
+The largest payload the link will accept for a packet. The Maximum Transmission
+Unit represents a value that is at least as large as the BTU. Negotiation of
+MTU values larger than the BTU may improve throughput for data-intensive
+transfers.
+
+## Conventions
+
+Where unspecified, state, command and sequence descriptions apply to all
+versions of the protocol unless marked otherwise.
+
 ## MCTP over LPC Transport
+
+### Binding Background and Evolution
+
+Version 1 of the binding provides a simple specification for duplex exchange of
+a single packet. The motivation for the design was to demonstrate the potential
+of the binding concept while keeping the design simple.
+
+Version 2 of the binding builds on v1, increasing throughput by providing a
+negotiation strategy for the BMC and the host to agree on a maximum
+transmission unit larger than the baseline transmission unit defined by the
+MCTP base specification.
+
+### Concepts
 
 The basic components used for the transfer are:
 
@@ -125,6 +155,41 @@ protocol.
 
 All control data is in big-endian format. MCTP packet data is transferred
 exactly as is presented, and no data escaping is performed.
+
+#### Negotiation of the Maximum Transmission Unit
+
+Version 1 of the protocol offers no mechanism for negotiation of the maximum
+transmission unit. The Rx and Tx buffers must be sized to accommodate packets
+up to the Baseline Transmission Unit, and the implementation assumes that the
+MTU is set to the BTU regardless of the values of `rx_size` and `tx_size`.
+
+Version 2 of the protocol exploits the `rx_size` and `tx_size` fields in the
+control region to negotiate the link MTU. Note that at the time that the MTU is
+under negotiation the protocol version has not been finalised, so the process
+is necessarily backwards-compatible.
+
+The relevant property that each endpoint must control is the MTU of packets it
+will receive, as this governs how the remote endpoint's packetisation impacts
+memory pressure at the local endpoint. As such while the BMC MUST populate
+`rx_size` for backwards compatibility with version 1, the host MAY write
+`rx_size` without regard for its current value if the host supports version 2.
+The BMC controls the value of `tx_size`, and MAY choose to adjust it in
+response to the host's proposed `rx_size` value. As such, when `Channel Active`
+is set by the BMC, the host MUST read both `rx_size` and `tx_size` in response
+to ensure both the BMC and the host have a consistent understanding of the MTU
+in each direction. It is convention for `rx_size` and `tx_size` to be set to
+the same value by the BMC as part of finalising the channel, though it is not
+invalid to have asymmetric MTUs.
+
+For all protocol versions, the following properties must be upheld for the Rx
+and Tx buffers to be considered valid:
+
+* Intersect neither eachother nor the control region
+* Not extend beyond the window allocated to MCTP in the LPC FW address space
+* Must accommodate at least BTU-sized payloads
+
+The BMC MAY choose to fail channel initialisation if these properties are
+violated in the negotiation process.
 
 ### KCS Control
 
@@ -230,8 +295,7 @@ strict rules on which entity is allowed to access it at specific times.
 
 Firstly, we have rules for modification:
 
-* The control data is only written during initialisation. Only the BMC may
-  write to the control area, except the host-version fields. The control area
+* The control data is only written during initialisation. The control area
   is never modified once the channel is active.
 * Only the BMC may write to the Rx buffer described in the control area
 * Only the host may write to the Tx buffer described in the control area
@@ -266,18 +330,21 @@ are set.
 |  1   | The BMC initialises the control area: magic value, BMC versions and buffer parameters |
 |  2   | The BMC sets the status to `BMC Active`  |
 
-#### Host initialisation Sequence
+#### Host Initialisation Sequence
 
-| Step | Description                                    |
-|------|------------------------------------------------|
-|  1   | The host waits for the `BMC Active` state      |
-|  2   | The host populates the its version fields      |
-|  3   | The host sends the `Initialise` command        |
-|  4   | The BMC observes the `Initialise` command      |
-|  5   | The BMC calculates the negotiated version      |
-|  6   | The BMC sets the status to `Channel Active`    |
-|  7   | The host observes that `Channel Active` is set |
-|  8   | The host reads the negotiated version          |
+| Step | v1 | v2 | Description                                    |
+|------|----|----|------------------------------------------------|
+|  1   | ✓  | ✓  | The host waits for the `BMC Active` state      |
+|  2   | ✓  | ✓  | The host populates the its version fields      |
+|  3   |    | ✓  | The host derives and writes to `rx_size` the packet size associated with its desired MTU |
+|  4   | ✓  | ✓  | The host sends the `Initialise` command        |
+|  5   | ✓  | ✓  | The BMC observes the `Initialise` command      |
+|  6   | ✓  | ✓  | The BMC calculates and writes `negotiated_ver` |
+|  7   |    | ✓  | The BMC calculates the MTUs and updates neither, one or both of `rx_size` and `tx_size` |
+|  8   | ✓  | ✓  | The BMC sets the status to `Channel Active`    |
+|  9   | ✓  | ✓  | The host observes that `Channel Active` is set |
+|  10  | ✓  | ✓  | The host reads the negotiated version          |
+|  11  |    | ✓  | The host reads both `rx_size` and `tx_size` to derive the negotiated MTUs |
 
 #### Host Packet Transmission Sequence
 
