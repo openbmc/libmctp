@@ -58,7 +58,7 @@ int main(void)
 	mctp = mctp_init();
 	assert(mctp);
 
-	astlpc = mctp_astlpc_init();
+	astlpc = mctp_astlpc_init_fileio();
 	assert(astlpc);
 
 	mctp_astlpc_register_bus(astlpc, mctp, local_eid);
