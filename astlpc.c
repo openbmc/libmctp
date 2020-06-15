@@ -1121,9 +1121,12 @@ struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 
 	/*
 	 * If we're doing file IO then we're very likely not running
-	 * freestanding, so lets assume that we're on the BMC side
+	 * freestanding, so lets assume that we're on the BMC side.
+	 *
+	 * Requesting an MTU of 0 requests the largest possible MTU, whatever
+	 * value that might take.
 	 */
-	astlpc = __mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU);
+	astlpc = __mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_BMC, 0);
 	if (!astlpc)
 		return NULL;
 
