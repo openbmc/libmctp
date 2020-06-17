@@ -94,6 +94,9 @@ void mctp_destroy(struct mctp *mctp);
  * If this function is called, the MCTP stack is initialised as an 'endpoint',
  * and will deliver local packets to a RX callback - see `mctp_set_rx_all()`
  * below.
+ *
+ * Returns the bus ID of the registered binding (zero-or-greater), or a
+ * negative error code on failure.
  */
 int mctp_register_bus(struct mctp *mctp,
 		struct mctp_binding *binding,
@@ -102,11 +105,85 @@ int mctp_register_bus(struct mctp *mctp,
 /* Create a simple bidirectional bridge between busses.
  *
  * In this mode, the MCTP stack is initialised as a bridge. There is no EID
- * defined, so no packets are considered local. Instead, all messages from one
+ * defined for the bridge itself, so no packets are considered local. The
+ * supplied endpoint IDs should map to the device context associated with each
+ * binding. The route table is configured such that all messages from one
  * binding are forwarded to the other.
  */
-int mctp_bridge_busses(struct mctp *mctp,
-		struct mctp_binding *b1, struct mctp_binding *b2);
+int mctp_bridge_busses(struct mctp *mctp, struct mctp_binding *b1,
+		       mctp_eid_t eid1, struct mctp_binding *b2,
+		       mctp_eid_t eid2);
+
+/* Routing */
+
+/*
+ * Represent a device by its physical address parameters to assist route
+ * table representation and route resolution.
+ */
+struct mctp_device {
+	uint8_t bus; /* If you have more busses than endpoints... */
+	uint64_t address; /* Surely enough for everyone... */
+};
+
+bool mctp_device_equal(const struct mctp_device *a,
+		       const struct mctp_device *b);
+
+struct mctp_route {
+	struct mctp_eid_range range;
+	struct mctp_device device;
+
+/*
+ * Route types.
+ *
+ * MCTP_ROUTE_TYPE_UPSTREAM, MCTP_ROUTE_TYPE_DOWNSTREAM and
+ * MCTP_ROUTE_TYPE_LOCAL are the "upstream", "downstream and "local" route
+ * types as defined by DSP0236 v1.3.1 section 9.1.6.
+ *
+ * MCTP_ROUTE_TYPE_SELF is libmctp-specific. It represents a route for an
+ * endpoint attached to the libmctp context instance, i.e. EIDs that will cause
+ * a packet to be delivered us rather than routed to another device in the
+ * network. Resolving EIDs attached to the context via the route table is
+ * necessary because a bridge context may have a number of EIDs assigned that
+ * is not equal to the number of attached ports.
+ *
+ * See DSP0236 v1.3.1 section 9.1.2 for the various bridge EID configurations.
+ *
+ * Note that MCTP_ROUTE_TYPE_LOCAL _does not_ refer to routes for ports that
+ * are attached to the libmctp context; rather, it refers to routes for devices
+ * that are _attached to the buses associated with the ports of the context_.
+ *
+ * See DSP0236 v1.3.1 sections 9.1.6, 9.1.7.1 and 12.9 for further explanation
+ * of the local route type.
+ */
+#define MCTP_ROUTE_TYPE_SELF	   0
+#define MCTP_ROUTE_TYPE_UPSTREAM   1
+#define MCTP_ROUTE_TYPE_DOWNSTREAM 2
+#define MCTP_ROUTE_TYPE_LOCAL	   3
+	uint8_t type;
+};
+
+#define MCTP_ROUTE_MATCH_ROUTE	(1 << 0)
+#define MCTP_ROUTE_MATCH_RANGE	(1 << 1)
+#define MCTP_ROUTE_MATCH_DEVICE (1 << 2)
+#define MCTP_ROUTE_MATCH_EID	(1 << 3)
+#define MCTP_ROUTE_MATCH_TYPE	(1 << 4)
+const struct mctp_route *mctp_route_match(struct mctp *mctp,
+					  const struct mctp_route *route,
+					  uint32_t flags);
+void mctp_route_put(const struct mctp_route *route);
+const struct mctp_route *mctp_route_get_by_eid(struct mctp *mctp,
+					       mctp_eid_t eid);
+const struct mctp_route *mctp_route_get_by_type(struct mctp *mctp,
+						uint8_t type);
+const struct mctp_route *
+mctp_route_get_by_device(struct mctp *mctp, const struct mctp_device *dev);
+bool mctp_route_is_local(const struct mctp_route *route);
+mctp_eid_t mctp_route_as_eid(const struct mctp_route *route);
+
+int mctp_route_add(struct mctp *mctp, const struct mctp_route *route);
+int mctp_route_remove(struct mctp *mctp, const struct mctp_route *route);
+int mctp_route_insert(struct mctp *mctp, const struct mctp_route *route);
+int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route);
 
 typedef void (*mctp_rx_fn)(uint8_t src_eid, void *data,
 		void *msg, size_t len);
@@ -156,7 +233,6 @@ void mctp_set_log_custom(void (*fn)(int, const char *, va_list));
 #define MCTP_LOG_NOTICE		5
 #define MCTP_LOG_INFO		6
 #define MCTP_LOG_DEBUG		7
-
 
 #ifdef __cplusplus
 }

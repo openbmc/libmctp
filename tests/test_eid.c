@@ -43,6 +43,8 @@ static void create_packet(struct mctp_hdr *pkt,
 	pkt->flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM;
 }
 
+#include "libmctp-log.h"
+
 void test_eid_rx(void)
 {
 	struct test_ctx _ctx, *ctx = &_ctx;
@@ -139,6 +141,8 @@ static void test_mctp_eid_range_is_invalid(void)
 
 int main(void)
 {
+	mctp_set_log_stdio(MCTP_LOG_DEBUG);
+
 	test_eid_rx();
 	test_mctp_eid_is_valid();
 	test_mctp_eid_range_is_routable();
