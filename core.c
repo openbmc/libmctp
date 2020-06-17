@@ -40,6 +40,16 @@ struct mctp_msg_ctx {
 	size_t		buf_alloc_size;
 };
 
+struct mctp_route_entry {
+	struct mctp_route_entry *prev;
+	struct mctp_route_entry *next;
+	struct mctp_route route;
+};
+
+struct mctp_route_table {
+	struct mctp_route_entry *head;
+};
+
 struct mctp {
 	int			n_busses;
 	struct mctp_bus		*busses;
@@ -57,6 +67,8 @@ struct mctp {
 		ROUTE_ENDPOINT,
 		ROUTE_BRIDGE,
 	}			route_policy;
+
+	struct mctp_route_table routes;
 };
 
 #ifndef BUILD_ASSERT
@@ -67,6 +79,57 @@ struct mctp {
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif
+
+bool mctp_eid_is_valid(const struct mctp *mctp __attribute__((unused)),
+			      mctp_eid_t eid)
+{
+	return eid == MCTP_EID_NULL || eid >= 8;
+}
+
+bool mctp_eid_is_special(const struct mctp *mctp __attribute__((unused)),
+				mctp_eid_t eid)
+{
+	return eid == MCTP_EID_NULL || eid == MCTP_EID_BROADCAST;
+}
+
+bool mctp_eid_range_is_valid(const struct mctp *mctp,
+			     const struct mctp_eid_range *range)
+{
+	bool valid, special;
+
+	assert(range);
+
+	valid = mctp_eid_is_valid(mctp, range->first);
+	special = mctp_eid_is_special(mctp, range->first) ||
+		mctp_eid_is_special(mctp, range->last);
+
+	return range->first <= range->last && valid && !special;
+}
+
+int mctp_eid_range_equal(const struct mctp *mctp __attribute__((unused)),
+			 const struct mctp_eid_range *a,
+			 const struct mctp_eid_range *b)
+{
+	return a->first == b->first && a->last == b->last;
+}
+
+int mctp_eid_range_contains(const struct mctp *mctp __attribute__((unused)),
+			    const struct mctp_eid_range *range, mctp_eid_t eid)
+{
+	assert(mctp_eid_range_is_valid(mctp, range));
+
+	return eid >= range->first && eid <= range->last;
+}
+
+int mctp_eid_range_intersects(const struct mctp *mctp,
+			      const struct mctp_eid_range *a,
+			      const struct mctp_eid_range *b)
+{
+	return mctp_eid_range_contains(mctp, a, b->first) ||
+		mctp_eid_range_contains(mctp, a, b->last) ||
+		mctp_eid_range_contains(mctp, b, a->first) ||
+		mctp_eid_range_contains(mctp, b, a->last);
+}
 
 static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 				  mctp_eid_t dest, void *msg, size_t msg_len);
@@ -229,12 +292,31 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 }
 
 /* Core API functions */
+static void mctp_route_table_init(struct mctp *mctp)
+{
+	mctp->routes.head = NULL;
+}
+
+static void mctp_route_table_destroy(struct mctp *mctp)
+{
+	struct mctp_route_entry *cur, *next;
+
+	cur = mctp->routes.head;
+	while (cur) {
+		next = cur->next;
+		__mctp_free(cur);
+		cur = next;
+	}
+}
+
 struct mctp *mctp_init(void)
 {
 	struct mctp *mctp;
 
 	mctp = __mctp_alloc(sizeof(*mctp));
 	memset(mctp, 0, sizeof(*mctp));
+
+	mctp_route_table_init(mctp);
 
 	return mctp;
 }
@@ -251,6 +333,7 @@ void mctp_destroy(struct mctp *mctp)
 			__mctp_free(tmp->buf);
 	}
 
+	mctp_route_table_destroy(mctp);
 	__mctp_free(mctp->busses);
 	__mctp_free(mctp);
 }
@@ -626,4 +709,256 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 
 	bus = find_bus_for_eid(mctp, eid);
 	return mctp_message_tx_on_bus(bus, bus->eid, eid, msg, msg_len);
+}
+
+bool mctp_route_bus_addr_equal(const struct mctp_route *a,
+			       const struct mctp_route *b)
+{
+	return a->bus == b->bus && a->address == b->address;
+}
+
+static struct mctp_route_entry *
+mctp_route_list_add(struct mctp_route_entry *head,
+		    struct mctp_route_entry *entry)
+{
+	assert(entry);
+
+	if (head)
+		head->prev = entry;
+	entry->next = head;
+	entry->prev = NULL;
+
+	return entry;
+}
+
+static struct mctp_route_entry *
+mctp_route_list_remove(struct mctp_route_entry *head,
+		       struct mctp_route_entry *entry)
+{
+	assert(head);
+	assert(entry);
+
+	if (entry->next)
+		entry->next->prev = entry->prev;
+
+	if (entry->prev)
+		entry->prev->next = entry->next;
+
+	return (head == entry) ? head->next : head;
+}
+
+static struct mctp_route_entry *
+mctp_route_list_match(const struct mctp *mctp,
+		      struct mctp_route_entry *head,
+		      const struct mctp_route *route, uint32_t flags)
+{
+	struct mctp_route_entry *cur;
+	uint32_t mask;
+
+	assert(mctp);
+	assert(route);
+
+	if (!flags)
+		return NULL;
+
+	/* Mutually exclusive */
+	mask = (MCTP_ROUTE_MATCH_EID | MCTP_ROUTE_MATCH_RANGE);
+	if ((flags & mask) == mask)
+		return NULL;
+
+	cur = head;
+	while (cur) {
+		if (flags & MCTP_ROUTE_MATCH_ROUTE) {
+			bool range, phys;
+
+			range = mctp_eid_range_equal(mctp, &cur->route.range,
+						     &route->range);
+			phys = mctp_route_bus_addr_equal(&cur->route, route);
+			if (range && phys)
+				break;
+		}
+
+		if (flags & MCTP_ROUTE_MATCH_RANGE) {
+			bool range;
+
+			range = mctp_eid_range_equal(mctp, &cur->route.range,
+						     &route->range);
+			if (range)
+				break;
+		}
+
+		if (flags & MCTP_ROUTE_MATCH_BUS_ADDR) {
+			if (mctp_route_bus_addr_equal(&cur->route, route))
+				break;
+		}
+
+		if (flags & MCTP_ROUTE_MATCH_EID) {
+			if (mctp_eid_range_intersects(mctp, &cur->route.range,
+						      &route->range))
+				break;
+		}
+
+		cur = cur->next;
+	}
+
+	return cur;
+}
+
+/* Ownership weirdness if we pass the result to mctp_route_remove() */
+const struct mctp_route *mctp_route_match(const struct mctp *mctp,
+					  const struct mctp_route *route,
+					  uint32_t flags)
+{
+	const struct mctp_route_entry *entry;
+
+	entry = mctp_route_list_match(mctp, mctp->routes.head, route, flags);
+
+	return entry ? &entry->route : NULL;
+}
+
+static struct mctp_route_entry *
+__mctp_route_add(struct mctp *mctp, const struct mctp_route *route)
+{
+	struct mctp_route_entry *entry;
+
+	assert(mctp);
+	assert(route);
+
+	entry = __mctp_alloc(sizeof(*entry));
+	if (!entry)
+		return NULL;
+
+	entry->route = *route;
+	mctp->routes.head = mctp_route_list_add(mctp->routes.head, entry);
+
+	return entry;
+}
+
+/*
+ * Pre-condition: The route is not present in the route table
+ * Post-condition: The rout is present in the route table
+ */
+int mctp_route_add(struct mctp *mctp, const struct mctp_route *route)
+{
+
+	uint32_t flags;
+
+	assert(mctp);
+
+	if (!mctp_eid_range_is_valid(mctp, &route->range))
+		return -EINVAL;
+
+	flags = MCTP_ROUTE_MATCH_EID | MCTP_ROUTE_MATCH_BUS_ADDR;
+	if (mctp_route_match(mctp, route, flags))
+		return -EEXIST;
+
+	return __mctp_route_add(mctp, route) ? 0 : -ENOMEM;
+}
+
+static void __mctp_route_remove(struct mctp *mctp,
+			        struct mctp_route_entry *route)
+{
+	assert(mctp);
+	assert(route);
+
+	mctp->routes.head = mctp_route_list_remove(mctp->routes.head, route);
+
+	__mctp_free(route);
+}
+
+/*
+ * Pre-condition: The route may be present in the route table.
+ * Post-condition: The route is not present in the route table.
+ */
+int mctp_route_remove(struct mctp *mctp, const struct mctp_route *route)
+{
+	struct mctp_route_entry *match;
+	uint32_t flags;
+
+	if (!mctp_eid_range_is_valid(mctp, &route->range))
+		return -EINVAL;
+
+	flags = MCTP_ROUTE_MATCH_ROUTE;
+	match = mctp_route_list_match(mctp, mctp->routes.head, route, flags);
+	if (!match)
+		return 0;
+
+	__mctp_route_remove(mctp, match);
+
+	return 0;
+}
+
+/*
+ * Pre-condition: Entries covering the provided route may exist in the route
+ * 		  table
+ * Post-condition: The provided route is present in the route table
+ */
+int mctp_route_insert(struct mctp *mctp, const struct mctp_route *route)
+{
+	int rc;
+
+	/* Punch a route-shaped hole in the table */
+	rc = mctp_route_delete(mctp, route);
+	if (rc < 0)
+		return rc;
+
+	/* Fill the hole with route */
+	return __mctp_route_add(mctp, route) ? 0 : -ENOMEM;
+}
+
+/*
+ * Pre-condition: Entries covering the route may exist in the route table
+ * Post-condition: The provided route is not present in the route table
+ */
+int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route)
+{
+	struct mctp_route_entry **table, *match;
+	uint32_t flags;
+
+	if (!mctp_eid_range_is_valid(mctp, &route->range))
+		return -EINVAL;
+
+	table = &mctp->routes.head;
+	flags = MCTP_ROUTE_MATCH_EID;
+
+	while ((match = mctp_route_list_match(mctp, *table, route, flags))) {
+		struct mctp_route entry;
+
+		assert(mctp_eid_range_is_valid(mctp, &match->route.range));
+
+		entry = match->route;
+
+		/* This invalidates match */
+		__mctp_route_remove(mctp, match);
+		match = NULL;
+
+		if (entry.range.first >= route->range.first &&
+				entry.range.last <= route->range.last) {
+			/* Entry is a strict subset, remove it completely */
+			continue;
+		}
+
+		/* Ensure entry's last EID is less than route's first */
+		if (entry.range.last <= route->range.last) {
+			assert(entry.range.first < route->range.first);
+
+			entry.range.last = route->range.first - 1;
+		}
+
+		/* Ensure entry's first EID is greater than route's last */
+		if (entry.range.first >= route->range.first) {
+			assert(entry.range.last > route->range.last);
+
+			entry.range.first = route->range.last + 1;
+		}
+
+		/* If the resulting entry is no-longer valid then drop it */
+		if (!mctp_eid_range_is_valid(mctp, &entry.range))
+			continue;
+
+		if (!__mctp_route_add(mctp, &entry))
+			return -ENOMEM;
+	}
+
+	return 0;
 }
