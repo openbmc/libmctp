@@ -89,9 +89,11 @@ void mctp_destroy(struct mctp *mctp);
 /* Register a binding to the MCTP core, and creates a bus (populating
  * binding->bus).
  *
- * If this function is called, the MCTP stack is initialised as an 'endpoint',
- * and will deliver local packets to a RX callback - see `mctp_set_rx_all()`
- * below.
+ * If this function is called with a valid endpoint ID any packets destined for
+ * the provided endpoint will be delivered locally - see `mctp_set_rx_all()`
+ * below. Pass eid as MCTP_EID_NULL to disable local delivery for the bus.
+ *
+ * Returns the bus ID of the registered binding for the mctp instance.
  */
 int mctp_register_bus(struct mctp *mctp,
 		struct mctp_binding *binding,
@@ -100,11 +102,56 @@ int mctp_register_bus(struct mctp *mctp,
 /* Create a simple bidirectional bridge between busses.
  *
  * In this mode, the MCTP stack is initialised as a bridge. There is no EID
- * defined, so no packets are considered local. Instead, all messages from one
+ * defined for the bridge itself, so no packets are considered local. The
+ * supplied endpoint IDs should map to the device context associated with each
+ * binding. The route table is configured such that all messages from one
  * binding are forwarded to the other.
  */
-int mctp_bridge_busses(struct mctp *mctp,
-		struct mctp_binding *b1, struct mctp_binding *b2);
+int mctp_bridge_busses(struct mctp *mctp, struct mctp_binding *b1,
+		       mctp_eid_t eid1, struct mctp_binding *b2,
+		       mctp_eid_t eid2);
+
+/* Routing */
+struct mctp_device {
+	uint8_t bus; /* If you have more busses than endpoints... */
+	uint64_t address; /* Surely enough for everyone... */
+};
+
+bool mctp_device_equal(const struct mctp_device *a,
+		       const struct mctp_device *b);
+
+struct mctp_route {
+	struct mctp_eid_range range;
+	struct mctp_device device;
+
+#define MCTP_ROUTE_TYPE_ENDPOINT   0
+#define MCTP_ROUTE_TYPE_UPSTREAM   1
+#define MCTP_ROUTE_TYPE_DOWNSTREAM 2
+#define MCTP_ROUTE_TYPE_LOCAL	   3
+	uint8_t type;
+};
+
+#define MCTP_ROUTE_MATCH_ROUTE	(1 << 0)
+#define MCTP_ROUTE_MATCH_RANGE	(1 << 1)
+#define MCTP_ROUTE_MATCH_DEVICE (1 << 2)
+#define MCTP_ROUTE_MATCH_EID	(1 << 3)
+#define MCTP_ROUTE_MATCH_TYPE	(1 << 4)
+const struct mctp_route *mctp_route_match(struct mctp *mctp,
+					  const struct mctp_route *route,
+					  uint32_t flags);
+void mctp_route_put(const struct mctp_route *route);
+const struct mctp_route *mctp_route_get_by_eid(struct mctp *mctp,
+					       mctp_eid_t eid);
+const struct mctp_route *mctp_route_get_by_type(struct mctp *mctp,
+						uint8_t type);
+const struct mctp_route *
+mctp_route_get_by_device(struct mctp *mctp, const struct mctp_device *dev);
+mctp_eid_t mctp_route_as_eid(const struct mctp_route *route);
+
+int mctp_route_add(struct mctp *mctp, const struct mctp_route *route);
+int mctp_route_remove(struct mctp *mctp, const struct mctp_route *route);
+int mctp_route_insert(struct mctp *mctp, const struct mctp_route *route);
+int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route);
 
 typedef void (*mctp_rx_fn)(uint8_t src_eid, void *data,
 		void *msg, size_t len);
