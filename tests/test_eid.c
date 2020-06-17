@@ -1,7 +1,13 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 
 #include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -37,7 +43,7 @@ static void create_packet(struct mctp_hdr *pkt,
 	pkt->flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM;
 }
 
-int main(void)
+void test_eid_rx(void)
 {
 	struct test_ctx _ctx, *ctx = &_ctx;
 	const mctp_eid_t local_eid = 8;
@@ -73,6 +79,55 @@ int main(void)
 
 	mctp_binding_test_destroy(ctx->binding);
 	mctp_destroy(ctx->mctp);
+}
+
+static void test_mctp_eid_is_valid(void)
+{
+	struct mctp *mctp = NULL;
+
+	assert(mctp_eid_is_valid(mctp, 0));
+	assert(!mctp_eid_is_valid(mctp, 1));
+	assert(!mctp_eid_is_valid(mctp, 2));
+	assert(!mctp_eid_is_valid(mctp, 3));
+	assert(!mctp_eid_is_valid(mctp, 4));
+	assert(!mctp_eid_is_valid(mctp, 5));
+	assert(!mctp_eid_is_valid(mctp, 6));
+	assert(!mctp_eid_is_valid(mctp, 7));
+	assert(mctp_eid_is_valid(mctp, 8));
+	assert(mctp_eid_is_valid(mctp, 254));
+	assert(mctp_eid_is_valid(mctp, 255));
+}
+
+static void test_mctp_eid_range_is_valid(void)
+{
+	struct mctp *mctp = NULL;
+
+	assert(mctp_eid_range_is_valid(
+		mctp, &(struct mctp_eid_range){ .first = 8, .last = 8 }));
+	assert(mctp_eid_range_is_valid(
+		mctp, &(struct mctp_eid_range){ .first = 8, .last = 9 }));
+	assert(mctp_eid_range_is_valid(
+		mctp, &(struct mctp_eid_range){ .first = 8, .last = 254 }));
+}
+
+static void test_mctp_eid_range_is_invalid(void)
+{
+	struct mctp *mctp = NULL;
+
+	assert(!mctp_eid_range_is_valid(
+		mctp, &(struct mctp_eid_range){ .first = 0, .last = 0 }));
+	assert(!mctp_eid_range_is_valid(
+		mctp, &(struct mctp_eid_range){ .first = 255, .last = 255 }));
+	assert(!mctp_eid_range_is_valid(
+		mctp, &(struct mctp_eid_range){ .first = 9, .last = 8 }));
+}
+
+int main(void)
+{
+	test_eid_rx();
+	test_mctp_eid_is_valid();
+	test_mctp_eid_range_is_valid();
+	test_mctp_eid_range_is_invalid();
 
 	return EXIT_SUCCESS;
 }

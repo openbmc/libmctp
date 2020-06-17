@@ -12,11 +12,33 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
+/* MCTP core */
+struct mctp;
+struct mctp_bus;
 typedef uint8_t mctp_eid_t;
 
 /* Special Endpoint ID values */
 #define MCTP_EID_NULL 0
 #define MCTP_EID_BROADCAST 0xff
+
+/* Inclusive range */
+struct mctp_eid_range {
+	mctp_eid_t first;
+	mctp_eid_t last;
+};
+
+bool mctp_eid_is_valid(const struct mctp *mctp, mctp_eid_t eid);
+bool mctp_eid_is_special(const struct mctp *mctp, mctp_eid_t eid);
+bool mctp_eid_range_is_valid(const struct mctp *mctp,
+			     const struct mctp_eid_range *range);
+int mctp_eid_range_contains(const struct mctp *mctp,
+			    const struct mctp_eid_range *range, mctp_eid_t eid);
+int mctp_eid_range_equal(const struct mctp *mctp,
+			 const struct mctp_eid_range *a,
+			 const struct mctp_eid_range *b);
+int mctp_eid_range_intersects(const struct mctp *mctp,
+			      const struct mctp_eid_range *a,
+			      const struct mctp_eid_range *b);
 
 /* MCTP packet definitions */
 struct mctp_hdr {
@@ -60,10 +82,6 @@ void *mctp_pktbuf_alloc_start(struct mctp_pktbuf *pkt, size_t size);
 void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, size_t size);
 int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, size_t len);
 
-/* MCTP core */
-struct mctp;
-struct mctp_bus;
-
 struct mctp *mctp_init(void);
 void mctp_destroy(struct mctp *mctp);
 
@@ -87,8 +105,36 @@ int mctp_register_bus(struct mctp *mctp,
 int mctp_bridge_busses(struct mctp *mctp,
 		struct mctp_binding *b1, struct mctp_binding *b2);
 
-typedef void (*mctp_rx_fn)(uint8_t src_eid, void *data,
-		void *msg, size_t len);
+/* Routing */
+struct mctp_route {
+	struct mctp_eid_range range;
+
+#define MCTP_ROUTE_TYPE_ENDPOINT   0
+#define MCTP_ROUTE_TYPE_UPSTREAM   1
+#define MCTP_ROUTE_TYPE_DOWNSTREAM 2
+#define MCTP_ROUTE_TYPE_LOCAL	   3
+	uint8_t type;
+
+	uint8_t bus; /* If you have more busses than endpoints... */
+	uint64_t address; /* Surely enough for everyone... */
+};
+
+bool mctp_route_bus_addr_equal(const struct mctp_route *a,
+			       const struct mctp_route *b);
+
+#define MCTP_ROUTE_MATCH_ROUTE	  (1 << 0)
+#define MCTP_ROUTE_MATCH_RANGE	  (1 << 1)
+#define MCTP_ROUTE_MATCH_BUS_ADDR (1 << 2)
+#define MCTP_ROUTE_MATCH_EID	  (1 << 3)
+const struct mctp_route *mctp_route_match(const struct mctp *mctp,
+					  const struct mctp_route *route,
+					  uint32_t flags);
+int mctp_route_add(struct mctp *mctp, const struct mctp_route *route);
+int mctp_route_remove(struct mctp *mctp, const struct mctp_route *route);
+int mctp_route_insert(struct mctp *mctp, const struct mctp_route *route);
+int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route);
+
+typedef void (*mctp_rx_fn)(uint8_t src_eid, void *data, void *msg, size_t len);
 
 int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data);
 
