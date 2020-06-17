@@ -82,9 +82,8 @@ int main(void)
 	ctx->bindings[0] = mctp_binding_bridge_init();
 	ctx->bindings[1] = mctp_binding_bridge_init();
 
-	mctp_bridge_busses(ctx->mctp,
-			&ctx->bindings[0]->binding,
-			&ctx->bindings[1]->binding);
+	mctp_bridge_busses(ctx->mctp, &ctx->bindings[0]->binding, 8,
+			   &ctx->bindings[1]->binding, 9);
 
 	mctp_binding_set_tx_enabled(&ctx->bindings[0]->binding, true);
 	mctp_binding_set_tx_enabled(&ctx->bindings[1]->binding, true);

@@ -37,6 +37,10 @@ add_executable (test_cmds tests/test_cmds.c tests/test-utils.c)
 target_link_libraries (test_cmds mctp)
 add_test (NAME control_commands COMMAND test_cmds)
 
+add_executable (test_route tests/test_route.c)
+target_link_libraries (test_route mctp)
+add_test (NAME route COMMAND test_route)
+
 install (TARGETS mctp DESTINATION lib)
 install (FILES libmctp.h DESTINATION include)
 
