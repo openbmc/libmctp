@@ -71,6 +71,7 @@ int main(void)
 
 	struct mctp_binding_serial_pipe *a;
 	struct mctp_binding_serial_pipe *b;
+	struct mctp_route route;
 	int p[2][2];
 	int rc;
 
@@ -95,7 +96,15 @@ int main(void)
 	a->egress = p[1][1];
 	mctp_serial_open_fd(a->serial, a->ingress);
 	mctp_serial_set_tx_fn(a->serial, mctp_binding_serial_pipe_tx, a);
-	mctp_register_bus(scenario[0].mctp, mctp_binding_serial_core(a->serial), 8);
+	mctp_register_bus(scenario[0].mctp, mctp_binding_serial_core(a->serial),
+			  MCTP_EID(8));
+	route = (struct mctp_route){
+		.range = { .first = 9, .last = 9 },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.device = { .bus = 0, .address = 0, },
+	};
+	rc = mctp_route_insert(scenario[0].mctp, &route);
+	assert(!rc);
 
 	/* Instantiate the B side of the serial pipe */
 	scenario[1].mctp = mctp_init();
@@ -108,7 +117,15 @@ int main(void)
 	b->egress = p[0][1];
 	mctp_serial_open_fd(b->serial, b->ingress);
 	mctp_serial_set_tx_fn(b->serial, mctp_binding_serial_pipe_tx, a);
-	mctp_register_bus(scenario[1].mctp, mctp_binding_serial_core(b->serial), 9);
+	mctp_register_bus(scenario[1].mctp, mctp_binding_serial_core(b->serial),
+			  MCTP_EID(9));
+	route = (struct mctp_route){
+		.range = { .first = 8, .last = 8 },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.device = { .bus = 0, .address = 0, },
+	};
+	rc = mctp_route_insert(scenario[1].mctp, &route);
+	assert(!rc);
 
 	/* Transmit a message from A to B */
 	rc = mctp_message_tx(scenario[0].mctp, MCTP_EID(9), mctp_msg_src,
