@@ -196,6 +196,7 @@ static void endpoint_destroy(struct astlpc_endpoint *ep)
 
 static void network_init(struct astlpc_test *ctx)
 {
+	struct mctp_route route;
 	int rc;
 
 	ctx->lpc_mem = calloc(1, 1 * 1024 * 1024);
@@ -206,10 +207,26 @@ static void network_init(struct astlpc_test *ctx)
 			   &ctx->kcs, ctx->lpc_mem);
 	assert(!rc);
 	assert(ctx->kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
+	route = (struct mctp_route){
+		.range = { .first = 9, .last = 9 },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.bus = 0,
+		.address = 0,
+	};
+	rc = mctp_route_insert(ctx->bmc.mctp, &route);
+	assert(!rc);
 
 	/* Host initialisation */
 	rc = endpoint_init(&ctx->host, 9, MCTP_BINDING_ASTLPC_MODE_HOST,
 			   MCTP_BTU, &ctx->kcs, ctx->lpc_mem);
+	assert(!rc);
+	route = (struct mctp_route){
+		.range = { .first = 8, .last = 8 },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.bus = 0,
+		.address = 0,
+	};
+	rc = mctp_route_insert(ctx->host.mctp, &route);
 	assert(!rc);
 
 	/* BMC processes host channel init request, alerts host */
@@ -545,6 +562,7 @@ static void astlpc_test_simple_init(void)
 static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 {
 	struct astlpc_test ctx = { 0 };
+	struct mctp_route route;
 	uint8_t kcs[2] = { 0 };
 	uint8_t msg[MCTP_BTU];
 	int rc;
@@ -568,6 +586,14 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 		mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU, NULL,
 				 &astlpc_indirect_mmio_ops, &ctx.bmc.mmio);
 	mctp_register_bus(ctx.bmc.mctp, &ctx.bmc.astlpc->binding, 8);
+	route = (struct mctp_route){
+		.range = { .first = 9, .last = 9 },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.bus = 0,
+		.address = 0,
+	};
+	rc = mctp_route_insert(ctx.bmc.mctp, &route);
+	assert(!rc);
 
 	/* Host initialisation */
 	ctx.host.mmio.bmc = false;
@@ -580,6 +606,14 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 		mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU, NULL,
 				 &astlpc_indirect_mmio_ops, &ctx.host.mmio);
 	mctp_register_bus(ctx.host.mctp, &ctx.host.astlpc->binding, 9);
+	route = (struct mctp_route){
+		.range = { .first = 8, .last = 8 },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.bus = 0,
+		.address = 0,
+	};
+	rc = mctp_route_insert(ctx.host.mctp, &route);
+	assert(!rc);
 
 	/* BMC processes host channel init request, alerts host */
 	mctp_astlpc_poll(ctx.bmc.astlpc);
