@@ -99,11 +99,14 @@ int mctp_register_bus(struct mctp *mctp,
 /* Create a simple bidirectional bridge between busses.
  *
  * In this mode, the MCTP stack is initialised as a bridge. There is no EID
- * defined, so no packets are considered local. Instead, all messages from one
+ * defined for the bridge itself, so no packets are considered local. The
+ * supplied endpoint IDs should map to the device context associated with each
+ * binding. The route table is configured such that all messages from one
  * binding are forwarded to the other.
  */
-int mctp_bridge_busses(struct mctp *mctp,
-		struct mctp_binding *b1, struct mctp_binding *b2);
+int mctp_bridge_busses(struct mctp *mctp, struct mctp_binding *b1,
+		       mctp_eid_t eid1, struct mctp_binding *b2,
+		       mctp_eid_t eid2);
 
 /* Routing */
 struct mctp_route {
@@ -126,9 +129,16 @@ bool mctp_route_bus_addr_equal(const struct mctp_route *a,
 #define MCTP_ROUTE_MATCH_RANGE	  (1 << 1)
 #define MCTP_ROUTE_MATCH_BUS_ADDR (1 << 2)
 #define MCTP_ROUTE_MATCH_EID	  (1 << 3)
-const struct mctp_route *mctp_route_match(const struct mctp *mctp,
+#define MCTP_ROUTE_MATCH_TYPE	  (1 << 4)
+const struct mctp_route *mctp_route_match(struct mctp *mctp,
 					  const struct mctp_route *route,
 					  uint32_t flags);
+const struct mctp_route *mctp_route_get_by_eid(struct mctp *mctp,
+					       mctp_eid_t eid);
+const struct mctp_route *mctp_route_get_by_type(struct mctp *mctp,
+						uint8_t type);
+void mctp_route_put(struct mctp *mctp, const struct mctp_route *route);
+
 int mctp_route_add(struct mctp *mctp, const struct mctp_route *route);
 int mctp_route_remove(struct mctp *mctp, const struct mctp_route *route);
 int mctp_route_insert(struct mctp *mctp, const struct mctp_route *route);
