@@ -161,7 +161,7 @@ static int binding_serial_init(struct mctp *mctp, struct binding *binding,
 	if (rc)
 		return -1;
 
-	mctp_register_bus(mctp, mctp_binding_serial_core(serial), eid);
+	mctp_register_endpoint(mctp, mctp_binding_serial_core(serial), eid);
 
 	binding->data = serial;
 
@@ -195,7 +195,7 @@ static int binding_astlpc_init(struct mctp *mctp, struct binding *binding,
 		return -1;
 	}
 
-	mctp_register_bus(mctp, mctp_binding_astlpc_core(astlpc), eid);
+	mctp_register_endpoint(mctp, mctp_binding_astlpc_core(astlpc), eid);
 
 	binding->data = astlpc;
 	return 0;
