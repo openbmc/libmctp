@@ -53,7 +53,7 @@ void mctp_binding_test_rx_raw(struct mctp_binding_test *test,
 void mctp_binding_test_register_bus(struct mctp_binding_test *binding,
 		struct mctp *mctp, mctp_eid_t eid)
 {
-	mctp_register_bus(mctp, &binding->binding, eid);
+	mctp_register_endpoint(mctp, &binding->binding, eid);
 }
 
 void mctp_test_stack_init(struct mctp **mctp,
