@@ -1238,21 +1238,17 @@ static bool mctp_ctrl_handle_msg(struct mctp_bus *bus, mctp_eid_t src,
 	 * message handler. The transport control message handler will be
 	 * provided with messages in the command range 0xF0 - 0xFF.
 	 */
-	if (mctp_ctrl_cmd_is_transport(msg_hdr)) {
-		if (bus->binding->control_rx != NULL) {
-			/* MCTP bus binding handler */
-			bus->binding->control_rx(src,
-						 bus->binding->control_rx_data,
-						 buffer, length);
-			return true;
-		}
-	}
+	if (!mctp_ctrl_cmd_is_transport(msg_hdr))
+		return false;
 
-	/*
-	 * Command was not handled, due to lack of specific callback.
-	 * It will be passed to regular message_rx handler.
-	 */
-	return false;
+	if (bus->binding->control_rx == NULL)
+		return false;
+
+	/* MCTP bus binding handler */
+	bus->binding->control_rx(src, bus->binding->control_rx_data, buffer,
+				 length);
+
+	return true;
 }
 
 static inline bool mctp_ctrl_cmd_is_request(struct mctp_ctrl_msg_hdr *hdr)
@@ -1279,10 +1275,9 @@ static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus, mctp_eid_t src,
 		 * Identify if this is a control request message.
 		 * See DSP0236 v1.3.0 sec. 11.5.
 		 */
-		if (mctp_ctrl_cmd_is_request(msg_hdr)) {
-			if (mctp_ctrl_handle_msg(bus, src, buf, len))
-				return;
-		}
+		if (mctp_ctrl_cmd_is_request(msg_hdr) &&
+		    mctp_ctrl_handle_msg(bus, src, buf, len))
+			return;
 	}
 
 	if (mctp->message_rx)
