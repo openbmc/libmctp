@@ -88,19 +88,20 @@ struct mctp *mctp_init(void);
 void mctp_set_max_message_size(struct mctp *mctp, size_t message_size);
 void mctp_destroy(struct mctp *mctp);
 
-/* Register a binding to the MCTP core, and creates a bus (populating
- * binding->bus).
+/* Register a binding to the MCTP core.
  *
- * If this function is called, the MCTP stack is initialised as an 'endpoint',
- * and will deliver local packets to a RX callback - see `mctp_set_rx_all()`
- * below.
+ * Returns the bus ID of the registered binding.
+ */
+int mctp_register_binding(struct mctp *mctp, struct mctp_binding *binding);
+
+/* Register a binding to the MCTP core, and associate an EID with the binding's
+ * bus port. The provided EID must be a routable EID.
  *
  * Returns the bus ID of the registered binding (zero-or-greater), or a
  * negative error code on failure.
  */
-int mctp_register_bus(struct mctp *mctp,
-		struct mctp_binding *binding,
-		mctp_eid_t eid);
+int mctp_register_endpoint(struct mctp *mctp, struct mctp_binding *binding,
+			   mctp_eid_t eid);
 
 /* Create a simple bidirectional bridge between busses.
  *

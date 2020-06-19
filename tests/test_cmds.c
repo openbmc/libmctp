@@ -67,7 +67,7 @@ static void setup_test_binding(struct mctp_binding *test_binding,
 	test_binding->control_rx = control_message_transport_callback;
 	test_binding->control_rx_data = callback_ctx;
 
-	mctp_register_bus(test_endpoint, test_binding, eid_1);
+	mctp_register_endpoint(test_endpoint, test_binding, eid_1);
 	mctp_binding_set_tx_enabled(test_binding, true);
 }
 

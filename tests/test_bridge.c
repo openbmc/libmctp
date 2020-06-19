@@ -36,7 +36,7 @@ static int mctp_binding_bridge_tx(struct mctp_binding *b,
 }
 
 static void mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
-		uint8_t key)
+				   mctp_eid_t src, mctp_eid_t dest, uint8_t key)
 {
 	struct mctp_pktbuf *pkt;
 	struct mctp_hdr *hdr;
@@ -49,9 +49,8 @@ static void mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 	hdr = mctp_pktbuf_hdr(pkt);
 	hdr->flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM;
 
-	/* arbitrary src/dest, as we're bridging */
-	hdr->src = 1;
-	hdr->dest = 2;
+	hdr->src = src;
+	hdr->dest = dest;
 
 	buf = mctp_pktbuf_data(pkt);
 	*buf = key;
@@ -88,12 +87,12 @@ int main(void)
 	mctp_binding_set_tx_enabled(&ctx->bindings[0]->binding, true);
 	mctp_binding_set_tx_enabled(&ctx->bindings[1]->binding, true);
 
-	mctp_binding_bridge_rx(ctx->bindings[0], 0xaa);
+	mctp_binding_bridge_rx(ctx->bindings[0], 8, 9, 0xaa);
 	assert(ctx->bindings[0]->tx_count == 0);
 	assert(ctx->bindings[1]->tx_count == 1);
 	assert(ctx->bindings[1]->last_pkt_data == 0xaa);
 
-	mctp_binding_bridge_rx(ctx->bindings[1], 0x55);
+	mctp_binding_bridge_rx(ctx->bindings[1], 9, 8, 0x55);
 	assert(ctx->bindings[1]->tx_count == 1);
 	assert(ctx->bindings[0]->tx_count == 1);
 	assert(ctx->bindings[0]->last_pkt_data == 0x55);
