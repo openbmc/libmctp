@@ -437,6 +437,101 @@ static void test_mctp_route_table_insert_delete_intersect(void)
 	mctp_destroy(mctp);
 }
 
+struct test_mctp_notify {
+	struct mctp *mctp;
+	struct mctp_route_entry *entry;
+	uint8_t count;
+};
+
+static void mctp_route_notify_cb(void *data,
+				 const struct mctp_route_entry *event)
+{
+	const struct mctp_route_entry *match;
+	struct test_mctp_notify *test;
+
+	test = data;
+
+	match = mctp_route_list_match(test->mctp, event, &test->entry->route,
+				      MCTP_ROUTE_MATCH_ROUTE);
+	if (match) {
+		if (test->entry->flags == match->flags)
+			test->count++;
+	}
+}
+
+static void test_mctp_route_table_add_notify(void)
+{
+	struct mctp_route_entry entry;
+	struct test_mctp_notify test;
+	struct mctp *mctp;
+	int rc;
+
+	mctp = mctp_init();
+	assert(mctp);
+
+	entry = (struct mctp_route_entry){
+		.flags = MCTP_ROUTE_ENTRY_NOTIFY_ADD,
+		.route = {
+			.range = { .first = 8, .last = 8 },
+			.device = { .bus = 0, .address = 0, },
+			.type = MCTP_ROUTE_TYPE_ENDPOINT,
+		},
+	};
+
+	test.mctp = mctp;
+	test.entry = &entry;
+	test.count = 0;
+
+	rc = mctp_route_set_notify(mctp, mctp_route_notify_cb, &test);
+	assert(!rc);
+
+	rc = mctp_route_add(mctp, &entry.route);
+	assert(!rc);
+
+	assert(test.count == 1);
+
+	mctp_destroy(mctp);
+}
+
+static void test_mctp_route_table_remove_notify(void)
+{
+	struct mctp_route_entry entry;
+	struct test_mctp_notify test;
+	struct mctp *mctp;
+	int rc;
+
+	mctp = mctp_init();
+	assert(mctp);
+
+	entry = (struct mctp_route_entry){
+		.flags = MCTP_ROUTE_ENTRY_NOTIFY_REMOVE,
+		.route = {
+			.range = { .first = 8, .last = 8 },
+			.type = MCTP_ROUTE_TYPE_ENDPOINT,
+			.device = { .bus = 0, .address = 0, },
+		},
+	};
+
+	test.mctp = mctp;
+	test.entry = &entry;
+	test.count = 0;
+
+	rc = mctp_route_set_notify(mctp, mctp_route_notify_cb, &test);
+	assert(!rc);
+
+	rc = mctp_route_add(mctp, &entry.route);
+	assert(!rc);
+
+	assert(test.count == 0);
+
+	rc = mctp_route_remove(mctp, &entry.route);
+	assert(!rc);
+
+	assert(test.count == 1);
+
+	mctp_destroy(mctp);
+}
+
 int main(void)
 {
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
@@ -451,6 +546,8 @@ int main(void)
 	test_mctp_route_table_remove_middle();
 	test_mctp_route_table_insert_two_disjoint();
 	test_mctp_route_table_insert_delete_intersect();
+	test_mctp_route_table_add_notify();
+	test_mctp_route_table_remove_notify();
 
 	return 0;
 }
