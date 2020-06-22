@@ -122,6 +122,16 @@ struct mctp_route {
 	uint64_t address; /* Surely enough for everyone... */
 };
 
+struct mctp_route_entry {
+	struct mctp_route_entry *prev;
+	struct mctp_route_entry *next;
+
+#define MCTP_ROUTE_ENTRY_NOTIFY_ADD	(1UL << 0)
+#define MCTP_ROUTE_ENTRY_NOTIFY_REMOVE	(1UL << 1)
+	uint32_t flags;
+	struct mctp_route route;
+};
+
 bool mctp_route_bus_addr_equal(const struct mctp_route *a,
 			       const struct mctp_route *b);
 
@@ -130,6 +140,11 @@ bool mctp_route_bus_addr_equal(const struct mctp_route *a,
 #define MCTP_ROUTE_MATCH_BUS_ADDR (1 << 2)
 #define MCTP_ROUTE_MATCH_EID	  (1 << 3)
 #define MCTP_ROUTE_MATCH_TYPE	  (1 << 4)
+const struct mctp_route_entry *
+mctp_route_list_match(const struct mctp *mctp,
+		      const struct mctp_route_entry *head,
+		      const struct mctp_route *route, uint32_t flags);
+
 const struct mctp_route *mctp_route_match(struct mctp *mctp,
 					  const struct mctp_route *route,
 					  uint32_t flags);
@@ -143,6 +158,12 @@ int mctp_route_add(struct mctp *mctp, const struct mctp_route *route);
 int mctp_route_remove(struct mctp *mctp, const struct mctp_route *route);
 int mctp_route_insert(struct mctp *mctp, const struct mctp_route *route);
 int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route);
+
+typedef void (*mctp_route_notify_fn)(void *data,
+				     const struct mctp_route_entry *event);
+
+int mctp_route_set_notify(struct mctp *mctp, mctp_route_notify_fn fn,
+			  void *data);
 
 typedef void (*mctp_rx_fn)(uint8_t src_eid, void *data, void *msg, size_t len);
 

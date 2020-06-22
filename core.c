@@ -38,16 +38,6 @@ struct mctp_msg_ctx {
 	size_t		buf_alloc_size;
 };
 
-struct mctp_route_entry {
-	struct mctp_route_entry *prev;
-	struct mctp_route_entry *next;
-	struct mctp_route route;
-};
-
-struct mctp_route_table {
-	struct mctp_route_entry *head;
-};
-
 struct mctp {
 	int n_busses;
 	struct mctp_bus	*busses;
@@ -55,6 +45,10 @@ struct mctp {
 	/* Message RX callback */
 	mctp_rx_fn message_rx;
 	void *message_rx_data;
+
+	/* Route notify callback */
+	void (*route_notify)(void *data, const struct mctp_route_entry *event);
+	void *route_notify_data;
 
 	/* Message reassembly.
 	 * @todo: flexible context count
@@ -285,23 +279,6 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 }
 
 /* Core API functions */
-static void mctp_route_table_init(struct mctp *mctp)
-{
-	mctp->routes = NULL;
-}
-
-static void mctp_route_table_destroy(struct mctp *mctp)
-{
-	struct mctp_route_entry *cur, *next;
-
-	cur = mctp->routes;
-	while (cur) {
-		next = cur->next;
-		__mctp_free(cur);
-		cur = next;
-	}
-}
-
 struct mctp *mctp_init(void)
 {
 	struct mctp *mctp;
@@ -309,11 +286,11 @@ struct mctp *mctp_init(void)
 	mctp = __mctp_alloc(sizeof(*mctp));
 	memset(mctp, 0, sizeof(*mctp));
 
-	mctp_route_table_init(mctp);
-
 	return mctp;
 }
 
+/* FIXME: ordering */
+static void mctp_route_list_destroy(struct mctp_route_entry *head);
 void mctp_destroy(struct mctp *mctp)
 {
 	size_t i;
@@ -326,7 +303,7 @@ void mctp_destroy(struct mctp *mctp)
 			__mctp_free(tmp->buf);
 	}
 
-	mctp_route_table_destroy(mctp);
+	mctp_route_list_destroy(mctp->routes);
 	__mctp_free(mctp->busses);
 	__mctp_free(mctp);
 }
@@ -818,8 +795,9 @@ mctp_route_list_remove(struct mctp_route_entry *head,
 }
 
 static struct mctp_route_entry *
-mctp_route_list_match(const struct mctp *mctp, struct mctp_route_entry *head,
-		      const struct mctp_route *route, uint32_t flags)
+__mctp_route_list_match(const struct mctp *mctp,
+			struct mctp_route_entry *head,
+			const struct mctp_route *route, uint32_t flags)
 {
 	struct mctp_route_entry *cur;
 	uint32_t mask;
@@ -879,6 +857,26 @@ mctp_route_list_match(const struct mctp *mctp, struct mctp_route_entry *head,
 	return cur;
 }
 
+const struct mctp_route_entry *
+mctp_route_list_match(const struct mctp *mctp,
+		      const struct mctp_route_entry *head,
+		      const struct mctp_route *route, uint32_t flags)
+{
+	return __mctp_route_list_match(mctp, (struct mctp_route_entry *)head,
+				       route, flags);
+}
+
+static void mctp_route_list_destroy(struct mctp_route_entry *head)
+{
+	struct mctp_route_entry *next;
+
+	while (head) {
+		next = head->next;
+		__mctp_free(head);
+		head = next;
+	}
+}
+
 /* Ownership weirdness if we pass the result to mctp_route_remove() */
 const struct mctp_route *mctp_route_match(struct mctp *mctp,
 					  const struct mctp_route *route,
@@ -926,23 +924,88 @@ void mctp_route_put(struct mctp *mctp __attribute__((unused)),
 	/* FIXME */
 }
 
-static struct mctp_route_entry *__mctp_route_add(struct mctp *mctp,
-						 const struct mctp_route *route)
+static struct mctp_route_entry *
+__mctp_route_add(struct mctp_route_entry **head, const struct mctp_route *route)
 {
 	struct mctp_route_entry *entry;
 
-	assert(mctp);
 	assert(route);
 
 	entry = __mctp_alloc(sizeof(*entry));
 	if (!entry)
 		return NULL;
+	memset(entry, 0, sizeof(*entry));
 
 	entry->route = *route;
-	mctp->routes = mctp_route_list_add(mctp->routes, entry);
+	*head = mctp_route_list_add(*head, entry);
 
 	return entry;
 }
+
+static void __mctp_route_remove(struct mctp_route_entry **head,
+				struct mctp_route_entry *entry)
+{
+	assert(entry);
+
+	*head = mctp_route_list_remove(*head, entry);
+
+	__mctp_free(entry);
+}
+
+static struct mctp_route_entry *
+mctp_route_event_add(struct mctp_route_entry **eventp,
+		       struct mctp_route_entry **tablep,
+		       const struct mctp_route *route)
+{
+	struct mctp_route_entry *ee, *te;
+
+	if (eventp) {
+		ee = __mctp_route_add(eventp, route);
+		if (!ee)
+			return NULL;
+
+		ee->flags |= MCTP_ROUTE_ENTRY_NOTIFY_ADD;
+	}
+
+	te = __mctp_route_add(tablep, route);
+	if (eventp && !te) {
+		__mctp_route_remove(eventp, te);
+		return NULL;
+	}
+
+	return te;
+}
+
+static void mctp_route_event_remove(struct mctp_route_entry **eventp,
+				      struct mctp_route_entry **tablep,
+				      struct mctp_route_entry *entry)
+{
+	if (!eventp) {
+		__mctp_route_remove(tablep, entry);
+		return;
+	}
+
+	/* Reuse the entry being removed */
+	*tablep = mctp_route_list_remove(*tablep, entry);
+
+	assert(!(entry->flags & MCTP_ROUTE_ENTRY_NOTIFY_ADD));
+	assert(!(entry->flags & MCTP_ROUTE_ENTRY_NOTIFY_REMOVE));
+
+	entry->flags |= MCTP_ROUTE_ENTRY_NOTIFY_REMOVE;
+	*eventp = mctp_route_list_add(*eventp, entry);
+}
+
+static void mctp_route_notify(struct mctp *mctp, struct mctp_route_entry *event)
+{
+	if (!event)
+		return;
+
+	assert(mctp->route_notify);
+	mctp->route_notify(mctp->route_notify_data, event);
+	mctp_route_list_destroy(event);
+}
+
+#define MCTP_ROUTE_EVENT(mctp, event)	((mctp)->route_notify ? &event : NULL)
 
 /*
  * Pre-condition: The route is not present in the route table
@@ -950,6 +1013,8 @@ static struct mctp_route_entry *__mctp_route_add(struct mctp *mctp,
  */
 int mctp_route_add(struct mctp *mctp, const struct mctp_route *route)
 {
+	struct mctp_route_entry *event = NULL;
+	struct mctp_route_entry *entry;
 	uint32_t flags;
 
 	assert(mctp);
@@ -961,18 +1026,14 @@ int mctp_route_add(struct mctp *mctp, const struct mctp_route *route)
 	if (mctp_route_match(mctp, route, flags))
 		return -EEXIST;
 
-	return __mctp_route_add(mctp, route) ? 0 : -ENOMEM;
-}
+	entry = mctp_route_event_add(MCTP_ROUTE_EVENT(mctp, event),
+				       &mctp->routes, route);
+	if (!entry)
+		return -ENOMEM;
 
-static void __mctp_route_remove(struct mctp *mctp,
-				struct mctp_route_entry *route)
-{
-	assert(mctp);
-	assert(route);
+	mctp_route_notify(mctp, event);
 
-	mctp->routes = mctp_route_list_remove(mctp->routes, route);
-
-	__mctp_free(route);
+	return 0;
 }
 
 /*
@@ -981,6 +1042,7 @@ static void __mctp_route_remove(struct mctp *mctp,
  */
 int mctp_route_remove(struct mctp *mctp, const struct mctp_route *route)
 {
+	struct mctp_route_entry *event = NULL;
 	struct mctp_route_entry *match;
 	uint32_t flags;
 
@@ -988,57 +1050,36 @@ int mctp_route_remove(struct mctp *mctp, const struct mctp_route *route)
 		return -EINVAL;
 
 	flags = MCTP_ROUTE_MATCH_ROUTE;
-	match = mctp_route_list_match(mctp, mctp->routes, route, flags);
+	match = __mctp_route_list_match(mctp, mctp->routes, route, flags);
 	if (!match)
 		return 0;
 
-	__mctp_route_remove(mctp, match);
+	mctp_route_event_remove(MCTP_ROUTE_EVENT(mctp, event), &mctp->routes,
+				  match);
+
+	mctp_route_notify(mctp, event);
 
 	return 0;
 }
 
-/*
- * Pre-condition: Entries covering the provided route may exist in the route
- * 		  table
- * Post-condition: The provided route is present in the route table
- */
-int mctp_route_insert(struct mctp *mctp, const struct mctp_route *route)
+static int mctp_route_event_delete(struct mctp *mctp,
+				   struct mctp_route_entry **eventp,
+				   struct mctp_route_entry **tablep,
+				   const struct mctp_route *route)
 {
-	int rc;
-
-	/* Punch a route-shaped hole in the table */
-	rc = mctp_route_delete(mctp, route);
-	if (rc < 0)
-		return rc;
-
-	/* Fill the hole with route */
-	return __mctp_route_add(mctp, route) ? 0 : -ENOMEM;
-}
-
-/*
- * Pre-condition: Entries covering the route may exist in the route table
- * Post-condition: The provided route is not present in the route table
- */
-int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route)
-{
-	struct mctp_route_entry **table, *match;
+	struct mctp_route_entry *match;
 	uint32_t flags;
 
-	if (!mctp_eid_range_is_valid(mctp, &route->range))
-		return -EINVAL;
-
-	table = &mctp->routes;
 	flags = MCTP_ROUTE_MATCH_EID;
 
-	while ((match = mctp_route_list_match(mctp, *table, route, flags))) {
+	while ((match = __mctp_route_list_match(mctp, *tablep, route, flags))) {
 		struct mctp_route entry;
 
 		assert(mctp_eid_range_is_valid(mctp, &match->route.range));
 
 		entry = match->route;
 
-		/* This invalidates match */
-		__mctp_route_remove(mctp, match);
+		mctp_route_event_remove(eventp, &mctp->routes, match);
 		match = NULL;
 
 		if (entry.range.first < route->range.first &&
@@ -1049,13 +1090,16 @@ int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route)
 			left = entry;
 			left.range.last = route->range.first - 1;
 			assert(mctp_eid_range_is_valid(mctp, &left.range));
-			if (!__mctp_route_add(mctp, &left))
+			if (!mctp_route_event_add(eventp, &mctp->routes,
+						    &left)) {
 				return -ENOMEM;
+			}
 
 			right = entry;
 			right.range.first = route->range.last + 1;
 			assert(mctp_eid_range_is_valid(mctp, &right.range));
-			if (!__mctp_route_add(mctp, &right))
+			if (!mctp_route_event_add(eventp, &mctp->routes,
+						    &right))
 				return -ENOMEM;
 
 			return 0;
@@ -1085,9 +1129,66 @@ int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route)
 		if (!mctp_eid_range_is_valid(mctp, &entry.range))
 			continue;
 
-		if (!__mctp_route_add(mctp, &entry))
+		if (!mctp_route_event_add(eventp, &mctp->routes, &entry))
 			return -ENOMEM;
 	}
+
+	return 0;
+}
+
+/*
+ * Pre-condition: Entries covering the provided route may exist in the route
+ * 		  table
+ * Post-condition: The provided route is present in the route table
+ */
+int mctp_route_insert(struct mctp *mctp, const struct mctp_route *route)
+{
+	struct mctp_route_entry **eventp, *event = NULL;
+	int rc;
+
+	if (!mctp_eid_range_is_valid(mctp, &route->range))
+		return -EINVAL;
+
+	eventp = MCTP_ROUTE_EVENT(mctp, event);
+
+	/* Punch a route-shaped hole in the table */
+	rc = mctp_route_event_delete(mctp, eventp, &mctp->routes, route);
+	if (rc < 0)
+		return rc;
+
+	/* Fill the hole with route */
+	rc = mctp_route_event_add(eventp, &mctp->routes, route) ? 0 : -ENOMEM;
+
+	mctp_route_notify(mctp, event);
+
+	return rc;
+}
+
+/*
+ * Pre-condition: Entries covering the route may exist in the route table
+ * Post-condition: The provided route is not present in the route table
+ */
+int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route)
+{
+	struct mctp_route_entry *event = NULL;
+	int rc;
+
+	if (!mctp_eid_range_is_valid(mctp, &route->range))
+		return -EINVAL;
+
+	rc = mctp_route_event_delete(mctp, MCTP_ROUTE_EVENT(mctp, event),
+				     &mctp->routes, route);
+
+	mctp_route_notify(mctp, event);
+
+	return rc;
+}
+
+int mctp_route_set_notify(struct mctp *mctp, mctp_route_notify_fn fn,
+			  void *data)
+{
+	mctp->route_notify = fn;
+	mctp->route_notify_data = data;
 
 	return 0;
 }
