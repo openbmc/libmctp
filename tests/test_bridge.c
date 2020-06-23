@@ -35,6 +35,15 @@ static int mctp_binding_bridge_tx(struct mctp_binding *b,
 	return 0;
 }
 
+struct mctp_pktbuf *mctp_binding_bridge_frame(struct mctp_binding *binding
+					      __attribute__((unused)),
+					      struct mctp_pktbuf *pkt,
+					      const struct mctp_device *dest
+					      __attribute__((unused)))
+{
+	return pkt;
+}
+
 static void mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 				   mctp_eid_t src, mctp_eid_t dest, uint8_t key)
 {
@@ -68,6 +77,7 @@ static struct mctp_binding_bridge *mctp_binding_bridge_init(void)
 	binding->binding.name = "test";
 	binding->binding.version = 1;
 	binding->binding.tx = mctp_binding_bridge_tx;
+	binding->binding.frame = mctp_binding_bridge_frame;
 	binding->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
 	binding->binding.pkt_pad = 0;
 	return binding;
@@ -76,6 +86,9 @@ static struct mctp_binding_bridge *mctp_binding_bridge_init(void)
 int main(void)
 {
 	struct test_ctx _ctx, *ctx = &_ctx;
+
+	mctp_set_log_stdio(MCTP_LOG_DEBUG);
+
 	mctp_eid_t eid_1 = MCTP_EID(8);
 	mctp_eid_t eid_2 = MCTP_EID(9);
 
