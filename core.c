@@ -105,7 +105,7 @@ void *mctp_pktbuf_data(struct mctp_pktbuf *pkt)
 	return (void *)pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr);
 }
 
-uint8_t mctp_pktbuf_size(struct mctp_pktbuf *pkt)
+size_t mctp_pktbuf_size(struct mctp_pktbuf *pkt)
 {
 	return pkt->end - pkt->start;
 }
