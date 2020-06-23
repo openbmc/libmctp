@@ -614,34 +614,55 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 	return 0;
 }
 
+static struct mctp_pktbuf *
+mctp_binding_astlpc_frame(struct mctp_binding *b, struct mctp_pktbuf *pkt,
+			  const struct mctp_device *dest
+			  __attribute__((unused)))
+{
+	struct mctp_binding_astlpc *astlpc = binding_to_astlpc(b);
+	unsigned char *hdr;
+	uint32_t elen;
+	size_t plen;
+
+	plen = mctp_pktbuf_size(pkt);
+	if (plen > UINT32_MAX) {
+		astlpc_prerr(astlpc, "Packet too large: %zu", plen);
+		return NULL;
+	}
+
+	elen = plen;
+	elen = htobe32(elen);
+	hdr = mctp_pktbuf_alloc_start(pkt, sizeof(uint32_t));
+	memcpy(hdr, &elen, sizeof(elen));
+
+	return pkt;
+}
+
 static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 		struct mctp_pktbuf *pkt)
 {
 	struct mctp_binding_astlpc *astlpc = binding_to_astlpc(b);
-	uint32_t len, len_be;
 	struct mctp_hdr *hdr;
+	size_t len;
 
 	hdr = mctp_pktbuf_hdr(pkt);
 	len = mctp_pktbuf_size(pkt);
 
 	astlpc_prdebug(astlpc,
-		       "%s: Transmitting %" PRIu32
-		       "-byte packet (%hhu, %hhu, 0x%hhx)",
+		       "%s: Transmitting %zu-byte packet (%hhu, %hhu, 0x%hhx)",
 		       __func__, len, hdr->src, hdr->dest, hdr->flags_seq_tag);
 
-	if (len > ASTLPC_BODY_SIZE(astlpc->layout.tx.size)) {
-		astlpc_prwarn(astlpc, "invalid TX len 0x%x", len);
+	if (len > astlpc->layout.tx.size) {
+		astlpc_prwarn(astlpc, "invalid TX len 0x%zx", len);
 		return -1;
 	}
 
-	len_be = htobe32(len);
-	mctp_astlpc_lpc_write(astlpc, &len_be, astlpc->layout.tx.offset,
-			      sizeof(len_be));
-	mctp_astlpc_lpc_write(astlpc, hdr, astlpc->layout.tx.offset + 4, len);
+	mctp_astlpc_lpc_write(astlpc, pkt->data, astlpc->layout.tx.offset, len);
 
 	mctp_binding_set_tx_enabled(b, false);
 
 	mctp_astlpc_kcs_send(astlpc, 0x1);
+
 	return 0;
 }
 
@@ -964,8 +985,9 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(uint8_t mode,
 	astlpc->binding.name = "astlpc";
 	astlpc->binding.version = 1;
 	astlpc->binding.pkt_size = MCTP_PACKET_SIZE(mtu);
-	astlpc->binding.pkt_pad = 0;
-	astlpc->binding.pkt_start = 0;
+	astlpc->binding.pkt_pad = sizeof(uint32_t);
+	astlpc->binding.pkt_start = astlpc->binding.pkt_pad;
+	astlpc->binding.frame = mctp_binding_astlpc_frame;
 	astlpc->binding.tx = mctp_binding_astlpc_tx;
 	if (mode == MCTP_BINDING_ASTLPC_MODE_BMC)
 		astlpc->binding.start = mctp_binding_astlpc_start_bmc;
