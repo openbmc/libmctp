@@ -235,6 +235,9 @@ struct mctp_binding {
 	int pkt_size;
 	int pkt_pad;
 	int (*start)(struct mctp_binding *binding);
+	struct mctp_pktbuf *(*frame)(struct mctp_binding *binding,
+				     struct mctp_pktbuf *pkt,
+				     const struct mctp_device *dest);
 	int (*tx)(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
 	mctp_rx_fn control_rx;
 	void *control_rx_data;
