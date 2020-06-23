@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5040a3c3_24e03ee4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-06-23T13:18:23Z",
+      "side": 1,
+      "message": "Agree here, as this is way to maintain the neighbor information which has proper Endpoint ID (I don\u0027t disagree here for the same maintenance), but we don\u0027t want to use this entries till the EID\u0027s are properly assigned. i.e. Provisional EID stuff is not explained here.",
+      "range": {
+        "startLine": 10,
+        "startChar": 45,
+        "endLine": 11,
+        "endChar": 26
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c310660b_3c5183f7",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-06-23T13:18:23Z",
+      "side": 1,
+      "message": "Clarification: Usage of this one here?\n\nAlso, how the type is mapped to the Entry type of the Get routing table\nTable 27 of routing table format.\n\nThe way i see it, if we are the bridge, then we will just push all the downstream entries. Will skip LOCAL, and maintain it for own purpose right?",
+      "range": {
+        "startLine": 112,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 34
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb1fec65_0cab3b54",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-06-23T13:18:23Z",
+      "side": 1,
+      "message": "yes, but wouldn\u0027t be better to make this as uint8_t address[MAX_PHYSICAL_ADDRESS_SIZE]\nReason: Still the code will support vendor defined with a flag.",
+      "range": {
+        "startLine": 119,
+        "startChar": 22,
+        "endLine": 119,
+        "endChar": 51
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f37ef9bb_11f01154",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-06-23T13:18:23Z",
+      "side": 1,
+      "message": "routing table is common for all buses right?, so plan is to find the binding type based on the binding_struct ? or shall we maintain a struct variable here?",
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
