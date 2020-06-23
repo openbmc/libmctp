@@ -77,9 +77,6 @@ int main(void)
 
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
 
-	memset(&mctp_msg_src[0], 0x5a, MCTP_BTU);
-	memset(&mctp_msg_src[MCTP_BTU], 0xa5, MCTP_BTU);
-
 	rc = pipe(p[0]);
 	assert(!rc);
 
@@ -128,6 +125,47 @@ int main(void)
 	};
 	rc = mctp_route_insert(scenario[1].mctp, &route);
 	assert(!rc);
+
+	memset(&mctp_msg_src[0], 0x5a, MCTP_BTU);
+	memset(&mctp_msg_src[MCTP_BTU], 0xa5, MCTP_BTU);
+
+	/* Transmit a message from A to B */
+	rc = mctp_message_tx(scenario[0].mctp, MCTP_EID(9), mctp_msg_src,
+			     sizeof(mctp_msg_src));
+	assert(rc == 0);
+
+	/* Read the message at B from A */
+	seen = false;
+	mctp_serial_read(b->serial);
+	assert(seen);
+
+	/* Send a message containing a frame token escape */
+	mctp_msg_src[0] = 0x7e;
+	/* Transmit a message from A to B */
+	rc = mctp_message_tx(scenario[0].mctp, MCTP_EID(9), mctp_msg_src,
+			     sizeof(mctp_msg_src));
+	assert(rc == 0);
+
+	/* Read the message at B from A */
+	seen = false;
+	mctp_serial_read(b->serial);
+	assert(seen);
+
+	/* Send a message containing an escape token escape */
+	mctp_msg_src[0] = 0x7d;
+	/* Transmit a message from A to B */
+	rc = mctp_message_tx(scenario[0].mctp, MCTP_EID(9), mctp_msg_src,
+			     sizeof(mctp_msg_src));
+	assert(rc == 0);
+
+	/* Read the message at B from A */
+	seen = false;
+	mctp_serial_read(b->serial);
+	assert(seen);
+
+	/* Send a multi-packet message full of escapes */
+	memset(&mctp_msg_src[0], 0x7e, MCTP_BTU);
+	memset(&mctp_msg_src[MCTP_BTU], 0x7d, MCTP_BTU);
 
 	/* Transmit a message from A to B */
 	rc = mctp_message_tx(scenario[0].mctp, MCTP_EID(9), mctp_msg_src,
