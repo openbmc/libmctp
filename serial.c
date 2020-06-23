@@ -112,47 +112,97 @@ static size_t mctp_serial_pkt_escape(struct mctp_pktbuf *pkt, uint8_t *buf)
 	return j;
 }
 
-static int mctp_binding_serial_tx(struct mctp_binding *b,
-		struct mctp_pktbuf *pkt)
+static struct mctp_pktbuf *
+mctp_binding_serial_frame(struct mctp_binding *b, struct mctp_pktbuf *pkt,
+			  const struct mctp_device *dest
+			  __attribute__((unused)))
 {
 	struct mctp_binding_serial *serial = binding_to_serial(b);
 	struct mctp_serial_header *hdr;
 	struct mctp_serial_trailer *tlr;
 	uint8_t *buf;
-	size_t len;
+	size_t provided, required;
 
 	/* the length field in the header excludes serial framing
 	 * and escape sequences */
-	len = mctp_pktbuf_size(pkt);
+	provided = mctp_pktbuf_size(pkt);
 
-	hdr = (void *)serial->txbuf;
+	required = mctp_serial_pkt_escape(pkt, NULL);
+	if (required + sizeof(*hdr) + sizeof(*tlr) > sizeof(serial->txbuf)) {
+		mctp_prerr(
+			"Escaped packet size exceeded allocated bounce buffer");
+		return NULL;
+	}
+
+	if (required != provided) {
+		/* Use the bounce buffer to inject escaping */
+		hdr = (void *)serial->txbuf;
+	} else {
+		/* Otherwise inject the metadata straight into the packet */
+		hdr = mctp_pktbuf_alloc_start(pkt, sizeof(*hdr));
+	}
+
 	hdr->flag = MCTP_SERIAL_FRAMING_FLAG;
 	hdr->revision = MCTP_SERIAL_REVISION;
-	hdr->len = len;
+	hdr->len = provided;
 
 	buf = (void *)(hdr + 1);
 
-	len = mctp_serial_pkt_escape(pkt, NULL);
-	if (len + sizeof(*hdr) + sizeof(*tlr) > sizeof(serial->txbuf))
-		return -1;
+	if (required != provided) {
+		mctp_serial_pkt_escape(pkt, buf);
+		buf += required;
+		tlr = (void *)buf;
+	} else {
+		tlr = mctp_pktbuf_alloc_end(pkt, sizeof(*tlr));
+	}
 
-	mctp_serial_pkt_escape(pkt, buf);
-
-	buf += len;
-
-	tlr = (void *)buf;
 	tlr->flag = MCTP_SERIAL_FRAMING_FLAG;
 	/* todo: trailer FCS */
 	tlr->fcs_msb = 0;
 	tlr->fcs_lsb = 0;
 
-	len += sizeof(*hdr) + sizeof(*tlr);
+	if (required != provided) {
+		required += sizeof(*hdr) + sizeof(*tlr);
+
+		if (required > pkt->size) {
+			struct mctp_pktbuf *escaped;
+
+			escaped = __mctp_alloc(sizeof(*escaped) + required);
+			if (!escaped) {
+				mctp_prerr("Failed to allocate packet");
+				return NULL;
+			}
+
+			mctp_pktbuf_free(pkt);
+			pkt = escaped;
+			pkt->size = required;
+			pkt->start = b->pkt_start;
+			pkt->end = required;
+			pkt->mctp_hdr_off = pkt->start;
+			pkt->next = NULL;
+		}
+
+		buf = mctp_pktbuf_alloc_start(pkt, sizeof(*hdr));
+		memcpy(buf, serial->txbuf, required);
+	}
+
+	return pkt;
+}
+
+static int mctp_binding_serial_tx(struct mctp_binding *b,
+				  struct mctp_pktbuf *pkt)
+{
+	struct mctp_binding_serial *serial = binding_to_serial(b);
+	size_t len;
+	int rc;
+
+	len = mctp_pktbuf_size(pkt);
 
 	if (!serial->tx_fn)
-		return mctp_write_all(write, serial->fd, serial->txbuf, len);
+		return mctp_write_all(write, serial->fd, pkt->data, len);
 
-	return mctp_write_all(serial->tx_fn, serial->tx_fn_data, serial->txbuf,
-			      len);
+	rc = mctp_write_all(serial->tx_fn, serial->tx_fn_data, pkt->data, len);
+	return rc;
 }
 
 static void mctp_serial_finish_packet(struct mctp_binding_serial *serial,
@@ -344,9 +394,11 @@ struct mctp_binding_serial *mctp_serial_init(void)
 	serial->binding.name = "serial";
 	serial->binding.version = 1;
 	serial->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
-	serial->binding.pkt_pad = 0;
-	serial->binding.pkt_start = 0;
+	serial->binding.pkt_pad = sizeof(struct mctp_serial_header) +
+				  sizeof(struct mctp_serial_trailer);
+	serial->binding.pkt_start = sizeof(struct mctp_serial_header);
 	serial->binding.start = mctp_serial_core_start;
+	serial->binding.frame = mctp_binding_serial_frame;
 	serial->binding.tx = mctp_binding_serial_tx;
 
 	return serial;
