@@ -234,6 +234,7 @@ struct mctp_binding {
 	struct mctp *mctp;
 	int pkt_size;
 	int pkt_pad;
+	int pkt_start;
 	int (*start)(struct mctp_binding *binding);
 	struct mctp_pktbuf *(*frame)(struct mctp_binding *binding,
 				     struct mctp_pktbuf *pkt,
