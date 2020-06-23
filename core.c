@@ -1211,24 +1211,65 @@ static void mctp_send_tx_queue(struct mctp_bus *bus)
 
 static void mctp_bus_route(struct mctp_binding *binding,
 			   const struct mctp_route *route,
-			   struct mctp_pktbuf *pkt)
+			   struct mctp_pktbuf *rx_pkt)
 {
+	struct mctp_pktbuf *tx_pkt, *framed;
 	struct mctp *mctp = binding->mctp;
+	struct mctp_hdr *rx_hdr, *tx_hdr;
 	struct mctp_bus *bus;
+	size_t len;
 
 	if (route->device.bus >= mctp->n_busses) {
 		mctp_prerr("Dropping packet, invalid bus ID in route: %" PRIu8
 			   " (%" PRIu8 ")",
 			   route->device.bus, mctp->n_busses);
-		mctp_pktbuf_free(pkt);
-		return;
+		goto out;
 	}
 	bus = &mctp->busses[route->device.bus];
 
-	mctp_packet_tx_enqueue(bus, pkt);
+	if (!bus->binding->frame) {
+		/* Binding frames the packet on tx */
+		mctp_packet_tx_enqueue(bus, rx_pkt);
+
+		/* pkt is freed once it has been sent */
+		mctp_send_tx_queue(bus);
+
+		return;
+	}
+
+	rx_hdr = mctp_pktbuf_hdr(rx_pkt);
+
+	/* rx_pkt size includes MCTP header */
+	tx_pkt = mctp_pktbuf_alloc(bus->binding, mctp_pktbuf_size(rx_pkt));
+	if (!tx_pkt) {
+		mctp_prerr("Failed to allocate packet for transmission");
+		goto out;
+	}
+
+	tx_hdr = mctp_pktbuf_hdr(tx_pkt);
+	tx_hdr->ver = bus->binding->version & 0xf;
+	tx_hdr->dest = rx_hdr->dest;
+	tx_hdr->src = rx_hdr->src;
+	tx_hdr->flags_seq_tag = rx_hdr->flags_seq_tag;
+
+	/* Payload length */
+	len = mctp_pktbuf_size(rx_pkt) - sizeof(*tx_hdr);
+	memcpy(mctp_pktbuf_data(tx_pkt), mctp_pktbuf_data(rx_pkt), len);
+
+	framed = bus->binding->frame(bus->binding, tx_pkt, &route->device);
+	if (!framed) {
+		mctp_prerr("Failed to frame packet for transmission");
+		goto out;
+	}
+
+	mctp_packet_tx_enqueue(bus, framed);
 
 	/* pkt is freed once it has been sent */
 	mctp_send_tx_queue(bus);
+
+out:
+	mctp_pktbuf_free(rx_pkt);
+	return;
 }
 
 static void mctp_bus_assemble(struct mctp_binding *binding,
@@ -1254,7 +1295,7 @@ static void mctp_bus_assemble(struct mctp_binding *binding,
 		/* single-packet message - send straight up to rx function,
 		 * no need to create a message context */
 		len = pkt->end - pkt->mctp_hdr_off - sizeof(struct mctp_hdr);
-		p = pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr),
+		p = pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr);
 		mctp_rx(mctp, bus, MCTP_EID(hdr->src), p, len);
 		break;
 
@@ -1373,6 +1414,7 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 				  mctp_eid_t dest, void *msg, size_t msg_len)
 {
 	size_t max_payload_len, payload_len, p;
+	const struct mctp_route *route;
 	struct mctp_pktbuf *pkt;
 	struct mctp_hdr *hdr;
 	int i;
@@ -1381,6 +1423,12 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 
 	mctp_prdebug("%s: Generating packets for transmission of %zu byte message from %hhu to %hhu",
 		     __func__, msg_len, src, dest);
+
+	route = mctp_route_get_by_eid(bus->binding->mctp, dest);
+	if (!route) {
+		mctp_prerr("Failed to find route for endpoint %" PRIu8, dest);
+		return -ENXIO;
+	}
 
 	/* queue up packets, each of max MCTP_MTU size */
 	for (p = 0, i = 0; p < msg_len; i++) {
@@ -1408,12 +1456,29 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 
 		memcpy(mctp_pktbuf_data(pkt), msg + p, payload_len);
 
+		if (bus->binding->frame) {
+			struct mctp_pktbuf *framed;
+
+			framed = bus->binding->frame(bus->binding, pkt,
+						     &route->device);
+			if (!framed) {
+				mctp_prerr(
+					"Failed to frame packet for transmission");
+				mctp_pktbuf_free(pkt);
+				return -EBADMSG;
+			}
+
+			pkt = framed;
+		}
+
 		mctp_packet_tx_enqueue(bus, pkt);
 
 		p += payload_len;
 	}
 
 	mctp_prdebug("%s: Enqueued %d packets", __func__, i);
+
+	mctp_route_put(route);
 
 	mctp_send_tx_queue(bus);
 
