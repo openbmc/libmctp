@@ -975,6 +975,7 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(uint8_t mode,
 	astlpc->binding.version = 1;
 	astlpc->binding.pkt_size = MCTP_PACKET_SIZE(mtu);
 	astlpc->binding.pkt_pad = 0;
+	astlpc->binding.pkt_start = 0;
 	astlpc->binding.tx = mctp_binding_astlpc_tx;
 	if (mode == MCTP_BINDING_ASTLPC_MODE_BMC)
 		astlpc->binding.start = mctp_binding_astlpc_start_bmc;

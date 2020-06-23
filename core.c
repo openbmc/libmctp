@@ -87,7 +87,7 @@ struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *binding, size_t len)
 	buf = __mctp_alloc(sizeof(*buf) + size);
 
 	buf->size = size;
-	buf->start = binding->pkt_pad;
+	buf->start = binding->pkt_start;
 	buf->end = buf->start + len;
 	buf->mctp_hdr_off = buf->start;
 	buf->next = NULL;
