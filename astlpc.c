@@ -681,7 +681,8 @@ static uint32_t mctp_astlpc_calculate_mtu(struct mctp_binding_astlpc *astlpc,
 	return MCTP_BODY_SIZE(ASTLPC_BODY_SIZE(MIN(limit, layout->tx.size)));
 }
 
-static int mctp_astlpc_negotiate_layout_bmc(struct mctp_binding_astlpc *astlpc)
+static int mctp_astlpc_negotiate_layout_bmc(struct mctp_binding_astlpc *astlpc,
+					    uint16_t version)
 {
 	struct mctp_astlpc_layout proposed, pending;
 	uint32_t sz, mtu;
@@ -723,7 +724,7 @@ static int mctp_astlpc_negotiate_layout_bmc(struct mctp_binding_astlpc *astlpc)
 		return -EINVAL;
 	}
 
-	if (astlpc->version >= 2)
+	if (version >= 2)
 		astlpc->binding.pkt_size = MCTP_PACKET_SIZE(mtu);
 
 	return 0;
@@ -745,7 +746,7 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 					      be16toh(hdr.host_ver_cur));
 
 	/* Host Rx MTU negotiation: Failure terminates channel init */
-	rc = mctp_astlpc_negotiate_layout_bmc(astlpc);
+	rc = mctp_astlpc_negotiate_layout_bmc(astlpc, negotiated);
 	if (rc < 0)
 		negotiated = ASTLPC_VER_BAD;
 
