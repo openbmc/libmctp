@@ -543,11 +543,11 @@ static void mctp_send_tx_queue(struct mctp_bus *bus)
 		int rc;
 
 		rc = mctp_packet_tx(bus, pkt);
-		if (rc)
-			break;
-
 		bus->tx_queue_head = pkt->next;
 		mctp_pktbuf_free(pkt);
+
+		if (rc)
+			break;
 	}
 
 	if (!bus->tx_queue_head)
