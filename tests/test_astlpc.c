@@ -202,14 +202,15 @@ static void network_init(struct astlpc_test *ctx)
 	assert(ctx->lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&ctx->bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
-			   &ctx->kcs, ctx->lpc_mem);
+	rc = endpoint_init(&ctx->bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   MCTP_BTU, &ctx->kcs, ctx->lpc_mem);
 	assert(!rc);
 	assert(ctx->kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
 
 	/* Host initialisation */
-	rc = endpoint_init(&ctx->host, 9, MCTP_BINDING_ASTLPC_MODE_HOST,
-			   MCTP_BTU, &ctx->kcs, ctx->lpc_mem);
+	rc = endpoint_init(&ctx->host, MCTP_EID(9),
+			   MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU, &ctx->kcs,
+			   ctx->lpc_mem);
 	assert(!rc);
 
 	/* BMC processes host channel init request, alerts host */
@@ -255,7 +256,7 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
 
 	/* BMC sends a message */
-	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.bmc.mctp, MCTP_EID(9), msg, sizeof(msg));
 	assert(rc == 0);
 
 	/* Host receives the first packet */
@@ -295,7 +296,7 @@ static void astlpc_test_simple_message_host_to_bmc(void)
 	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
 
 	/* Host sends the single-packet message */
-	rc = mctp_message_tx(ctx.host.mctp, 8, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.host.mctp, MCTP_EID(8), msg, sizeof(msg));
 	assert(rc == 0);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
@@ -335,7 +336,7 @@ static void astlpc_test_simple_message_bmc_to_host(void)
 	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
 
 	/* BMC sends the single-packet message */
-	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.bmc.mctp, MCTP_EID(9), msg, sizeof(msg));
 	assert(rc == 0);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
@@ -377,7 +378,7 @@ static void astlpc_test_host_before_bmc(void)
 				  &astlpc_direct_mmio_ops, &mmio);
 
 	/* Register the binding to trigger the start-up sequence */
-	rc = mctp_register_bus(mctp, &astlpc->binding, 8);
+	rc = mctp_register_bus(mctp, &astlpc->binding, MCTP_EID(8));
 
 	/* Start-up should fail as we haven't initialised the BMC */
 	assert(rc < 0);
@@ -441,8 +442,8 @@ static void astlpc_test_version_host_fails_negotiation(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* Now the BMC is initialised, break its version announcement */
@@ -450,8 +451,8 @@ static void astlpc_test_version_host_fails_negotiation(void)
 	hdr->bmc_ver_cur = ASTLPC_VER_BAD;
 
 	/* Host initialisation */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&host, MCTP_EID(9), MCTP_BINDING_ASTLPC_MODE_HOST,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(rc < 0);
 
 	endpoint_destroy(&bmc);
@@ -472,13 +473,13 @@ static void astlpc_test_version_bmc_fails_negotiation(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* Host initialisation */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&host, MCTP_EID(9), MCTP_BINDING_ASTLPC_MODE_HOST,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* Now the host is initialised, break its version announcement */
@@ -510,16 +511,16 @@ static void astlpc_test_simple_init(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* Verify the BMC binding was initialised */
 	assert(kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_BMC_READY);
 
 	/* Host initialisation */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&host, MCTP_EID(9), MCTP_BINDING_ASTLPC_MODE_HOST,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* Host sends channel init command */
@@ -592,7 +593,7 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
 
 	/* BMC sends the single-packet message */
-	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.bmc.mctp, MCTP_EID(9), msg, sizeof(msg));
 	assert(rc == 0);
 
 	/* Host receives the single-packet message */
@@ -632,14 +633,14 @@ static void astlpc_test_host_tx_bmc_gone(void)
 	mctp_astlpc_poll(ctx.host.astlpc);
 
 	/* Host attempts to send the single-packet message, but is prevented */
-	rc = mctp_message_tx(ctx.host.mctp, 8, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.host.mctp, MCTP_EID(8), msg, sizeof(msg));
 	assert(rc == 0);
 	assert(!(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF));
 	astlpc_assert_tx_packet(&ctx.host, &unwritten[0], MCTP_BTU);
 
 	/* BMC comes back */
-	rc = endpoint_init(&ctx.bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
-			   &ctx.kcs, ctx.lpc_mem);
+	rc = endpoint_init(&ctx.bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   MCTP_BTU, &ctx.kcs, ctx.lpc_mem);
 	assert(!rc);
 	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
 
@@ -671,8 +672,8 @@ static void astlpc_test_poll_not_ready(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* Check for a command despite none present */
@@ -697,8 +698,8 @@ static void astlpc_test_undefined_command(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* 0x5a isn't legal in v1 or v2 */
@@ -850,13 +851,13 @@ static void astlpc_test_buffers_bad_host_proposal(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* Host initialisation */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&host, MCTP_EID(9), MCTP_BINDING_ASTLPC_MODE_HOST,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/*
@@ -889,8 +890,8 @@ static void astlpc_test_buffers_bad_bmc_proposal(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/*
@@ -901,8 +902,8 @@ static void astlpc_test_buffers_bad_bmc_proposal(void)
 	hdr->layout.rx_size = 0;
 
 	/* Host initialisation: Fails due to bad layout */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&host, MCTP_EID(9), MCTP_BINDING_ASTLPC_MODE_HOST,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(rc < 0);
 
 	endpoint_destroy(&host);
@@ -923,13 +924,13 @@ static void astlpc_test_buffers_bad_bmc_negotiation(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* Host initialisation */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&host, MCTP_EID(9), MCTP_BINDING_ASTLPC_MODE_HOST,
+			   MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	mctp_astlpc_poll(bmc.astlpc);
@@ -970,7 +971,7 @@ static void astlpc_test_buffers_bad_host_init(void)
 		mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_HOST, 0, lpc_mem,
 				 &astlpc_direct_mmio_ops, &host.mmio);
 
-	rc = mctp_register_bus(host.mctp, &host.astlpc->binding, 8);
+	rc = mctp_register_bus(host.mctp, &host.astlpc->binding, MCTP_EID(8));
 	assert(rc < 0);
 
 	mctp_astlpc_destroy(host.astlpc);
@@ -990,12 +991,12 @@ static void astlpc_test_negotiate_increased_mtu(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, 3 * MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   3 * MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* Host initialisation */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST,
+	rc = endpoint_init(&host, MCTP_EID(9), MCTP_BINDING_ASTLPC_MODE_HOST,
 			   2 * MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
@@ -1022,12 +1023,12 @@ static void astlpc_test_negotiate_mtu_low_high(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, 3 * MCTP_BTU,
-			   &kcs, lpc_mem);
+	rc = endpoint_init(&bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC,
+			   3 * MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
 	/* Host initialisation with low MTU */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST,
+	rc = endpoint_init(&host, MCTP_EID(9), MCTP_BINDING_ASTLPC_MODE_HOST,
 			   2 * MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 
@@ -1049,7 +1050,7 @@ static void astlpc_test_negotiate_mtu_low_high(void)
 	 * Bring up a new host endpoint with a higher MTU than we previously
 	 * negotiated
 	 */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST,
+	rc = endpoint_init(&host, MCTP_EID(9), MCTP_BINDING_ASTLPC_MODE_HOST,
 			   3 * MCTP_BTU, &kcs, lpc_mem);
 	assert(!rc);
 

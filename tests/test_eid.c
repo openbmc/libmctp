@@ -48,9 +48,9 @@ static void create_packet(struct mctp_hdr *pkt,
 void test_eid_rx(void)
 {
 	struct test_ctx _ctx, *ctx = &_ctx;
-	const mctp_eid_t local_eid = 8;
-	const mctp_eid_t remote_eid = 9;
-	const mctp_eid_t other_eid = 10;
+	const mctp_eid_t local_eid = MCTP_EID(8);
+	const mctp_eid_t remote_eid = MCTP_EID(9);
+	const mctp_eid_t other_eid = MCTP_EID(10);
 	struct {
 		struct mctp_hdr	hdr;
 		uint8_t		payload[1];
@@ -68,7 +68,7 @@ void test_eid_rx(void)
 	mctp_binding_test_rx_raw(ctx->binding, &pktbuf, sizeof(pktbuf));
 
 	assert(ctx->rx_count == 1);
-	assert(ctx->src_eid == remote_eid);
+	assert(mctp_eid_equal(ctx->src_eid, remote_eid));
 
 	/* check a message not addressed to us is not received */
 	ctx->rx_count = 0;
@@ -87,17 +87,17 @@ static void test_mctp_eid_is_valid(void)
 {
 	struct mctp *mctp = NULL;
 
-	assert(mctp_eid_is_valid(mctp, 0));
-	assert(!mctp_eid_is_valid(mctp, 1));
-	assert(!mctp_eid_is_valid(mctp, 2));
-	assert(!mctp_eid_is_valid(mctp, 3));
-	assert(!mctp_eid_is_valid(mctp, 4));
-	assert(!mctp_eid_is_valid(mctp, 5));
-	assert(!mctp_eid_is_valid(mctp, 6));
-	assert(!mctp_eid_is_valid(mctp, 7));
-	assert(mctp_eid_is_valid(mctp, 8));
-	assert(mctp_eid_is_valid(mctp, 254));
-	assert(mctp_eid_is_valid(mctp, 255));
+	assert(mctp_eid_is_valid(mctp, MCTP_EID(0)));
+	assert(!mctp_eid_is_valid(mctp, MCTP_EID(1)));
+	assert(!mctp_eid_is_valid(mctp, MCTP_EID(2)));
+	assert(!mctp_eid_is_valid(mctp, MCTP_EID(3)));
+	assert(!mctp_eid_is_valid(mctp, MCTP_EID(4)));
+	assert(!mctp_eid_is_valid(mctp, MCTP_EID(5)));
+	assert(!mctp_eid_is_valid(mctp, MCTP_EID(6)));
+	assert(!mctp_eid_is_valid(mctp, MCTP_EID(7)));
+	assert(mctp_eid_is_valid(mctp, MCTP_EID(8)));
+	assert(mctp_eid_is_valid(mctp, MCTP_EID(254)));
+	assert(mctp_eid_is_valid(mctp, MCTP_EID(255)));
 }
 
 static void test_mctp_eid_range_is_valid(void)

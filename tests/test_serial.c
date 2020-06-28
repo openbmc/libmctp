@@ -111,7 +111,8 @@ int main(void)
 	mctp_register_bus(scenario[1].mctp, mctp_binding_serial_core(b->serial), 9);
 
 	/* Transmit a message from A to B */
-	rc = mctp_message_tx(scenario[0].mctp, 9, mctp_msg_src, sizeof(mctp_msg_src));
+	rc = mctp_message_tx(scenario[0].mctp, MCTP_EID(9), mctp_msg_src,
+			     sizeof(mctp_msg_src));
 	assert(rc == 0);
 
 	/* Read the message at B from A */

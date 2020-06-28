@@ -77,13 +77,15 @@ static struct mctp_binding_bridge *mctp_binding_bridge_init(void)
 int main(void)
 {
 	struct test_ctx _ctx, *ctx = &_ctx;
+	mctp_eid_t eid_1 = MCTP_EID(8);
+	mctp_eid_t eid_2 = MCTP_EID(9);
 
 	ctx->mctp = mctp_init();
 	ctx->bindings[0] = mctp_binding_bridge_init();
 	ctx->bindings[1] = mctp_binding_bridge_init();
 
-	mctp_bridge_busses(ctx->mctp, &ctx->bindings[0]->binding, 8,
-			   &ctx->bindings[1]->binding, 9);
+	mctp_bridge_busses(ctx->mctp, &ctx->bindings[0]->binding, eid_1,
+			   &ctx->bindings[1]->binding, eid_2);
 
 	mctp_binding_set_tx_enabled(&ctx->bindings[0]->binding, true);
 	mctp_binding_set_tx_enabled(&ctx->bindings[1]->binding, true);

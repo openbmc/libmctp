@@ -97,8 +97,8 @@ struct test {
 
 static void run_one_test(struct test_ctx *ctx, struct test *test)
 {
-	const mctp_eid_t local_eid = 8;
-	const mctp_eid_t remote_eid = 9;
+	const mctp_eid_t local_eid = MCTP_EID(8);
+	const mctp_eid_t remote_eid = MCTP_EID(9);
 	struct {
 		struct mctp_hdr	hdr;
 		uint8_t		payload[1];

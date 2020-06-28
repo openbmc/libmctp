@@ -242,16 +242,22 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 }
 
 /* Endpoint ID and Routing APIs */
+bool mctp_eid_equal(mctp_eid_t a, mctp_eid_t b)
+{
+	return a == b;
+}
+
 bool mctp_eid_is_valid(const struct mctp *mctp __attribute__((unused)),
 		       mctp_eid_t eid)
 {
-	return eid == MCTP_EID_NULL || eid >= 8;
+	return mctp_eid_equal(eid, MCTP_EID_NULL) || eid >= 8;
 }
 
 bool mctp_eid_is_special(const struct mctp *mctp __attribute__((unused)),
 			 mctp_eid_t eid)
 {
-	return eid == MCTP_EID_NULL || eid == MCTP_EID_BROADCAST;
+	return mctp_eid_equal(eid, MCTP_EID_NULL) ||
+	       mctp_eid_equal(eid, MCTP_EID_BROADCAST);
 }
 
 bool mctp_eid_range_is_valid(const struct mctp *mctp,
@@ -261,9 +267,9 @@ bool mctp_eid_range_is_valid(const struct mctp *mctp,
 
 	assert(range);
 
-	valid = mctp_eid_is_valid(mctp, range->first);
-	special = mctp_eid_is_special(mctp, range->first) ||
-		  mctp_eid_is_special(mctp, range->last);
+	valid = mctp_eid_is_valid(mctp, MCTP_EID(range->first));
+	special = mctp_eid_is_special(mctp, MCTP_EID(range->first)) ||
+		  mctp_eid_is_special(mctp, MCTP_EID(range->last));
 
 	return range->first <= range->last && valid && !special;
 }
@@ -287,10 +293,10 @@ int mctp_eid_range_intersects(const struct mctp *mctp,
 			      const struct mctp_eid_range *a,
 			      const struct mctp_eid_range *b)
 {
-	return mctp_eid_range_contains(mctp, a, b->first) ||
-	       mctp_eid_range_contains(mctp, a, b->last) ||
-	       mctp_eid_range_contains(mctp, b, a->first) ||
-	       mctp_eid_range_contains(mctp, b, a->last);
+	return mctp_eid_range_contains(mctp, a, MCTP_EID(b->first)) ||
+	       mctp_eid_range_contains(mctp, a, MCTP_EID(b->last)) ||
+	       mctp_eid_range_contains(mctp, b, MCTP_EID(a->first)) ||
+	       mctp_eid_range_contains(mctp, b, MCTP_EID(a->last));
 }
 
 bool mctp_device_equal(const struct mctp_device *a, const struct mctp_device *b)
@@ -542,7 +548,7 @@ mctp_eid_t mctp_route_as_eid(const struct mctp_route *route)
 	assert(route);
 	assert(route->range.first == route->range.last);
 
-	return route->range.first;
+	return MCTP_EID(route->range.first);
 }
 
 static struct mctp_route_entry *__mctp_route_add(struct mctp_route_entry **head,
