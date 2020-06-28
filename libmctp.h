@@ -216,7 +216,7 @@ typedef void (*mctp_route_notify_fn)(void *data,
 int mctp_route_set_notify(struct mctp *mctp, mctp_route_notify_fn fn,
 			  void *data);
 
-typedef void (*mctp_rx_fn)(uint8_t src_eid, void *data, void *msg, size_t len);
+typedef void (*mctp_rx_fn)(mctp_eid_t src, void *data, void *msg, size_t len);
 
 int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data);
 
