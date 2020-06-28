@@ -136,7 +136,7 @@ int mctp_astlpc_mmio_lpc_write(void *data, const void *buf, long offset,
 
 #define __unused __attribute__((unused))
 
-static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
+static void rx_message(mctp_eid_t eid __unused, void *data __unused, void *msg,
 		       size_t len)
 {
 	struct astlpc_test *test = data;

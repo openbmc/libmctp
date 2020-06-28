@@ -44,18 +44,18 @@ struct client {
 };
 
 struct ctx {
-	struct mctp	*mctp;
-	struct binding	*binding;
-	bool		verbose;
-	int		local_eid;
-	void		*buf;
-	size_t		buf_size;
+	struct mctp *mctp;
+	struct binding *binding;
+	bool verbose;
+	mctp_eid_t local_eid;
+	void *buf;
+	size_t buf_size;
 
-	int		sock;
-	struct pollfd	*pollfds;
+	int sock;
+	struct pollfd *pollfds;
 
-	struct client	*clients;
-	int		n_clients;
+	struct client *clients;
+	int n_clients;
 };
 
 static void tx_message(struct ctx *ctx, mctp_eid_t eid, void *msg, size_t len)
@@ -81,7 +81,7 @@ static void client_remove_inactive(struct ctx *ctx)
 	}
 }
 
-static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
+static void rx_message(mctp_eid_t eid, void *data, void *msg, size_t len)
 {
 	struct ctx *ctx = data;
 	struct iovec iov[2];
@@ -304,7 +304,7 @@ static int socket_process(struct ctx *ctx)
 static int client_process_recv(struct ctx *ctx, int idx)
 {
 	struct client *client = &ctx->clients[idx];
-	uint8_t eid;
+	mctp_eid_t eid;
 	ssize_t len;
 	int rc;
 
