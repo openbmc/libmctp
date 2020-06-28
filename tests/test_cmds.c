@@ -14,8 +14,8 @@
 #undef NDEBUG
 #endif
 
-static const mctp_eid_t eid_1 = 9;
-static const mctp_eid_t eid_2 = 10;
+static const mctp_eid_t eid_1 = MCTP_EID(9);
+static const mctp_eid_t eid_2 = MCTP_EID(10);
 
 struct msg_payload {
 	struct mctp_hdr hdr;

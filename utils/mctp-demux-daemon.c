@@ -24,7 +24,7 @@
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define __unused __attribute__((unused))
 
-static const mctp_eid_t local_eid_default = 8;
+static const mctp_eid_t local_eid_default = MCTP_EID(8);
 static char sockname[] = "\0mctp-mux";
 
 struct binding {
@@ -361,15 +361,14 @@ static int client_process_recv(struct ctx *ctx, int idx)
 		goto out_close;
 	}
 
-	eid = *(uint8_t *)ctx->buf;
+	eid = MCTP_EID(*(uint8_t *)ctx->buf);
 
 	if (ctx->verbose)
 		fprintf(stderr,
 			"client[%d] sent message: dest 0x%02x len %d\n",
 			idx, eid, rc - 1);
 
-
-	if (eid == ctx->local_eid)
+	if (mctp_eid_equal(eid, ctx->local_eid))
 		rx_message(eid, ctx, ctx->buf + 1, rc - 1);
 	else
 		tx_message(ctx, eid, ctx->buf + 1, rc - 1);
@@ -520,7 +519,7 @@ int main(int argc, char * const *argv)
 			ctx->verbose = true;
 			break;
 		case 'e':
-			ctx->local_eid = atoi(optarg);
+			ctx->local_eid = MCTP_EID(atoi(optarg));
 			break;
 		default:
 			fprintf(stderr, "Invalid argument\n");

@@ -12,14 +12,16 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
-typedef uint8_t mctp_eid_t;
-
 struct mctp;
 struct mctp_bus;
+typedef uint8_t mctp_eid_t;
+#define MCTP_EID(id) (id)
 
 /* Special Endpoint ID values */
-#define MCTP_EID_NULL 0
-#define MCTP_EID_BROADCAST 0xff
+#define MCTP_EID_NULL	   MCTP_EID(0)
+#define MCTP_EID_BROADCAST MCTP_EID(255)
+
+bool mctp_eid_equal(mctp_eid_t a, mctp_eid_t b);
 
 /* Inclusive range */
 struct mctp_eid_range {
