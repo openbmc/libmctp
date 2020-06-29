@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "2c5b6960_f0d3038f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-06-29T02:10:07Z",
+      "side": 1,
+      "message": "One more point to add. I think handling provisional EID, through routing table, will bring unnecessary complexity, as maintenance of the same needs to be done. Instead maintaining an extra Address variable (binding private) in the pkt will be easier to maintain \u0026 directly linked to the packet. This can also serve the purpose of implementing any security related to the packet. \nThoughts?",
+      "parentUuid": "4491617f_ecd68cdf",
+      "range": {
+        "startLine": 10,
+        "startChar": 45,
+        "endLine": 11,
+        "endChar": 26
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2b9da04f_7eb42e4f",
         "filename": "core.c",
         "patchSetId": 5
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "Right, I\u0027m defining valid as \"not reserved\". EIDs 1-7 are reserved, but others have a defined behaviour even if they may not be assignable to a specific endpoint.\n\nSee mctp_eid_is_special() below.",
       "parentUuid": "2b9da04f_7eb42e4f",
+      "range": {
+        "startLine": 85,
+        "startChar": 8,
+        "endLine": 85,
+        "endChar": 28
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "94c2f205_edf041e0",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-06-29T02:10:07Z",
+      "side": 1,
+      "message": "Agree with Andrew here, is_special is there to handle the same.",
+      "parentUuid": "d7c7c151_083992ef",
       "range": {
         "startLine": 85,
         "startChar": 8,
@@ -213,6 +261,48 @@
       "side": 1,
       "message": "Yes this might be a better idea if we can determine MAX_PHYSICAL_ADDRESS_SIZE.",
       "parentUuid": "bb1fec65_0cab3b54",
+      "range": {
+        "startLine": 119,
+        "startChar": 22,
+        "endLine": 119,
+        "endChar": 51
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "17b784f4_8ca97d82",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-06-29T02:10:07Z",
+      "side": 1,
+      "message": "Agree, As binding information based on bus number is not dynamic field, and there is no need to maintain a 1:1 match.\n\nAdd a todo - to define a helper to get binding information based on bus number must be more than enough.",
+      "parentUuid": "f010f030_2a30960b",
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5abecc16_7592bc03",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-06-29T02:10:07Z",
+      "side": 1,
+      "message": "No need to change in this patchset, to keep this patchset simple",
+      "parentUuid": "62d8e5f2_928b95c7",
       "range": {
         "startLine": 119,
         "startChar": 22,
