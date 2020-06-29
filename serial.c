@@ -1,13 +1,10 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
-#include <assert.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include "binding.h"
 
 #ifdef MCTP_HAVE_FILEIO
 #include <unistd.h>
@@ -18,6 +15,11 @@ static const size_t write(int fd, void *buf, size_t len)
 	return -1;
 }
 #endif
+
+#include <assert.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define pr_fmt(x) "serial: " x
 

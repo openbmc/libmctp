@@ -196,22 +196,6 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 		void *msg, size_t msg_len);
 
 /* hardware bindings */
-struct mctp_binding {
-	const char *name;
-	uint8_t version;
-	struct mctp_bus *bus;
-	struct mctp *mctp;
-	int pkt_size;
-	int pkt_pad;
-	int pkt_start;
-	int (*start)(struct mctp_binding *binding);
-	struct mctp_pktbuf *(*frame)(struct mctp_binding *binding,
-				     struct mctp_pktbuf *pkt,
-				     const struct mctp_device *dest);
-	int (*tx)(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
-	mctp_rx_fn control_rx;
-	void *control_rx_data;
-};
 
 void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable);
 
