@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3db7cc11_9184394c",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2020-06-29T23:50:31Z",
+      "side": 1,
+      "message": "I guess it should be:\n if (match-\u003ebus \u003e\u003d mctp-\u003en_busses)",
+      "range": {
+        "startLine": 349,
+        "startChar": 15,
+        "endLine": 349,
+        "endChar": 17
+      },
+      "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "af3d9a47_dae3c272",
         "filename": "core.c",
         "patchSetId": 3
@@ -45,6 +68,30 @@
       "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "21ed82c6_6383b7b2",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 904,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2020-06-29T23:50:31Z",
+      "side": 1,
+      "message": "This is true for a bridge. According to 9.1.1 Routing/bridging restrictions: \"A bridge shall not route or forward packets with a broadcast destination ID.\"\n\nBut since this function impacts mctp_message_tx(), the bridge / bus owner endpoint will not be able to send broadcast messages.",
+      "parentUuid": "d72e4b2a_0e60fe7d",
+      "range": {
+        "startLine": 904,
+        "startChar": 38,
+        "endLine": 904,
+        "endChar": 68
+      },
+      "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
