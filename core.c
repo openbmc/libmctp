@@ -20,19 +20,10 @@
 #include "libmctp-cmds.h"
 #include "range.h"
 
+#include "binding.h"
 #include "container_of.h"
 
 /* Internal data structures */
-
-struct mctp_bus {
-	struct mctp_binding *binding;
-	uint8_t id;
-	bool tx_enabled;
-
-	struct mctp_pktbuf *tx_queue_head;
-	struct mctp_pktbuf *tx_queue_tail;
-};
-
 struct mctp_msg_ctx {
 	uint8_t		src;
 	uint8_t		dest;

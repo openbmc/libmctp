@@ -4,6 +4,17 @@
 #include "config.h"
 #endif
 
+#define pr_fmt(x) "astlpc: " x
+
+#include "binding.h"
+#include "container_of.h"
+#include "range.h"
+
+#include "libmctp.h"
+#include "libmctp-alloc.h"
+#include "libmctp-log.h"
+#include "libmctp-astlpc.h"
+
 #if HAVE_ENDIAN_H
 #include <endian.h>
 #endif
@@ -15,15 +26,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define pr_fmt(x) "astlpc: " x
-
-#include "libmctp.h"
-#include "libmctp-alloc.h"
-#include "libmctp-log.h"
-#include "libmctp-astlpc.h"
-#include "container_of.h"
-#include "range.h"
 
 #ifdef MCTP_HAVE_FILEIO
 
