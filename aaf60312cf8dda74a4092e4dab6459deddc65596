@@ -144,6 +144,29 @@
     },
     {
       "key": {
+        "uuid": "bb8b90e3_3b9580ba",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-06-29T09:28:11Z",
+      "side": 1,
+      "message": "Is this for our own endpoint ?",
+      "range": {
+        "startLine": 112,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 36
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c310660b_3c5183f7",
         "filename": "libmctp.h",
         "patchSetId": 5
@@ -188,6 +211,29 @@
       "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71668916_35c9fb47",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-06-29T09:28:11Z",
+      "side": 1,
+      "message": "is this unique id to represent bus ? If yes, shouldn\u0027t we handle auto allocation/de-allocation of new bus id when a user adds/removes route ?",
+      "range": {
+        "startLine": 118,
+        "startChar": 16,
+        "endLine": 118,
+        "endChar": 58
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
