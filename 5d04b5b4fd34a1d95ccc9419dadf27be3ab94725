@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c221150_aae4ba48",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-06-29T10:14:54Z",
+      "side": 1,
+      "message": "I think the library should be a simple tool to handle tx,rx and routing. We shouldn\u0027t handle responding to the command transparently inside the library",
+      "range": {
+        "startLine": 332,
+        "startChar": 0,
+        "endLine": 344,
+        "endChar": 1
+      },
+      "revId": "5d04b5b4fd34a1d95ccc9419dadf27be3ab94725",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    }
+  ]
+}
