@@ -3,10 +3,17 @@
 #ifndef _MCTP_TESTS_TEST_UTILS_H
 #define _MCTP_TESTS_TEST_UTILS_H
 
+#include "binding.h"
+
 #include <libmctp.h>
 #include <container_of.h>
 
 /* test binding implementation */
+struct mctp_binding_test {
+	struct mctp_binding binding;
+	struct mctp_pktbuf *pkt;
+};
+#define binding_to_test(b) container_of(b, struct mctp_binding_test, binding)
 
 /* standard binding interface */
 struct mctp_binding_test *mctp_binding_test_init(void);
