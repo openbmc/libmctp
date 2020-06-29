@@ -7,6 +7,7 @@
 #include <libmctp-alloc.h>
 
 #include "test-utils.h"
+#include "binding.h"
 
 struct mctp_binding_test {
 	struct mctp_binding	binding;

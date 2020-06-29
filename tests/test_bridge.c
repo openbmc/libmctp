@@ -1,14 +1,16 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
+#include "binding.h"
+
+#include "libmctp.h"
+#include "libmctp-alloc.h"
+
+#include "test-utils.h"
+
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <libmctp.h>
-#include <libmctp-alloc.h>
-
-#include "test-utils.h"
 
 struct mctp_binding_bridge {
 	struct mctp_binding	binding;
