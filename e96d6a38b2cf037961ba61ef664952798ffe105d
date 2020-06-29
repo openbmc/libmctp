@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af3d9a47_dae3c272",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-06-29T11:58:21Z",
+      "side": 1,
+      "message": "As discussed in the call, if each binding is being handled by a separate process (ex:multiple instances of mctp daemon with each instance managing a binding), then mctp_send_tx_queue might not be an appropriate thing to do. We will have to consider whether the EID in the route table is being handled by current process or by a third party process and make the decision about who transmits the packet.",
+      "range": {
+        "startLine": 593,
+        "startChar": 0,
+        "endLine": 615,
+        "endChar": 2
+      },
+      "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d72e4b2a_0e60fe7d",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 904,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-06-29T11:58:21Z",
+      "side": 1,
+      "message": "This is debatable. We can still get a MCTP packet with destination EID 0, and the match should occur for the bus we received the packet on. This can happen if two devices on the same bus decide to talk only using physical addressing OR we received packets before bus owner assigns EIDs.\n\nFor broadcast messages, all routes should be a match.",
+      "range": {
+        "startLine": 904,
+        "startChar": 38,
+        "endLine": 904,
+        "endChar": 68
+      },
+      "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    }
+  ]
+}
