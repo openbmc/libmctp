@@ -121,7 +121,7 @@ void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, size_t size)
 {
 	void *buf;
 
-	assert(size < (pkt->size - pkt->end));
+	assert(size <= (pkt->size - pkt->end));
 	buf = pkt->data + pkt->end;
 	pkt->end += size;
 	return buf;
