@@ -564,6 +564,61 @@ static void test_mctp_route_table_remove_notify(void)
 	mctp_destroy(mctp);
 }
 
+static void test_mctp_route_table_allocate_one(void)
+{
+	const struct mctp_route *alloc;
+	struct mctp_route route = { 0 };
+	struct mctp_eid_range range;
+	struct mctp *mctp;
+	int rc;
+
+	mctp = mctp_init();
+	assert(mctp);
+
+	range = (struct mctp_eid_range){ .first = 9, .last = 9 };
+	rc = mctp_route_set_dynamic_pool(mctp, &range);
+	assert(!rc);
+	route.type = MCTP_ROUTE_TYPE_LOCAL;
+	alloc = mctp_route_allocate(mctp, &route, 1);
+	assert(alloc);
+	assert(alloc->type == MCTP_ROUTE_TYPE_LOCAL);
+	assert(alloc->range.first == 9);
+	assert(alloc->range.last == 9);
+
+	mctp_destroy(mctp);
+}
+
+static void test_mctp_route_table_allocate_invalid(void)
+{
+	const struct mctp_route *alloc;
+	struct mctp_route route = { 0 };
+	struct mctp_eid_range range;
+	struct mctp *mctp;
+	int rc;
+
+	mctp = mctp_init();
+	assert(mctp);
+
+	/* Attempt allocation before dynamic pool is configured */
+	alloc = mctp_route_allocate(mctp, &route, 1);
+	assert(!alloc);
+
+	/* Configure a single-EID dynamic pool */
+	range = (struct mctp_eid_range){ .first = 9, .last = 9 };
+	rc = mctp_route_set_dynamic_pool(mctp, &range);
+	assert(!rc);
+
+	/* Dynamic pool starts at 9, so overflow the last EID calculation */
+	alloc = mctp_route_allocate(mctp, &route, UINT8_MAX);
+	assert(!alloc);
+
+	/* Request exceeds the dynamic pool size */
+	alloc = mctp_route_allocate(mctp, &route, range.last - range.first + 2);
+	assert(!alloc);
+
+	mctp_destroy(mctp);
+}
+
 int main(void)
 {
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
@@ -581,6 +636,8 @@ int main(void)
 	test_mctp_route_table_remove_referenced();
 	test_mctp_route_table_add_notify();
 	test_mctp_route_table_remove_notify();
+	test_mctp_route_table_allocate_one();
+	test_mctp_route_table_allocate_invalid();
 
 	return 0;
 }

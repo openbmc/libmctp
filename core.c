@@ -72,6 +72,8 @@ struct mctp {
 	size_t max_message_size;
 
 	struct mctp_route_entry *routes;
+	struct mctp_eid_range dynamic_pool;
+	uint8_t dynamic;
 };
 
 #ifndef BUILD_ASSERT
@@ -894,6 +896,94 @@ int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route)
 	mctp_route_notify(mctp, event);
 
 	return rc;
+}
+
+int mctp_route_set_dynamic_pool(struct mctp *mctp,
+				const struct mctp_eid_range *range)
+{
+	if (!(mctp && range))
+		return -EINVAL;
+
+	if (!mctp_eid_range_is_routable(mctp, range))
+		return -EINVAL;
+
+	mctp->dynamic_pool = *range;
+	mctp->dynamic = range->first;
+
+	return 0;
+}
+
+/* Caller steals ownership of the route */
+const struct mctp_route *mctp_route_allocate(struct mctp *mctp,
+					     const struct mctp_route *route,
+					     uint8_t len)
+{
+	struct mctp_route_entry *match;
+	struct mctp_eid_range range;
+	struct mctp_route alloc;
+	int rc;
+
+	if (!(mctp && route && len))
+		return NULL;
+
+	if (!(route->type == MCTP_ROUTE_TYPE_LOCAL ||
+	      route->type == MCTP_ROUTE_TYPE_DOWNSTREAM))
+		return NULL;
+
+	if (route->type == MCTP_ROUTE_TYPE_LOCAL && len != 1)
+		return NULL;
+
+	if (!(route->range.first == 0 && route->range.last == 0)) {
+		mctp_prerr("Route range must be zeroed");
+		return NULL;
+	}
+
+	alloc = *route;
+
+	/* XXX: Implement a proper allocation and re-use policy: 8.17.6 */
+	assert(mctp_eid_range_is_routable(mctp, &mctp->dynamic_pool));
+
+	if ((uint8_t)(mctp->dynamic + len) < mctp->dynamic) {
+		mctp_prerr("Failed to allocate %" PRIu8
+			   " dynamic endpoint ID%s: Out of range request",
+			   len, len > 1 ? "s" : "");
+		return NULL;
+	}
+
+	if (mctp->dynamic + (len - 1) > mctp->dynamic_pool.last) {
+		mctp_prerr("Failed to allocate %" PRIu8
+			   " dynamic endpoint ID%s: Request exceeds pool limit",
+			   len, len > 1 ? "s" : "");
+		return NULL;
+	}
+
+	range = (struct mctp_eid_range){
+		.first = mctp->dynamic,
+		.last = mctp->dynamic + len - 1,
+	};
+
+	if (!mctp_eid_range_is_routable(mctp, &range)) {
+		mctp_prerr("Failed to allocate %" PRIu8
+			   " dynamic endpoint ID%s: Proposed range [%" PRIu8
+			   ", %" PRIu8 "] is invalid",
+			   len, len > 1 ? "s" : "", range.first, range.last);
+		return NULL;
+	}
+
+	mctp->dynamic += len;
+
+	alloc.range = range;
+
+	rc = mctp_route_insert(mctp, &alloc);
+	if (rc < 0) {
+		mctp_prerr("Failed to insert allocated route: %d", rc);
+		return NULL;
+	}
+
+	/* Maybe mctp_route_insert() should return a pointer? */
+	match = __mctp_route_list_match(mctp, mctp->routes, &alloc,
+					MCTP_ROUTE_MATCH_ROUTE);
+	return match ? &match->route : NULL;
 }
 
 void mctp_route_table_dump(const struct mctp *mctp, int level)
