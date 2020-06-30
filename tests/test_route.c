@@ -428,11 +428,15 @@ static void test_mctp_route_table_insert_delete_intersect(void)
 	assert(match);
 	mctp_route_put(match);
 
+	mctp_route_table_dump(mctp, MCTP_LOG_DEBUG);
+
 	rc = mctp_route_delete(mctp, &test_intersect[0]);
 
 	match = mctp_route_match(mctp, &test_intersect[10],
 				 MCTP_ROUTE_MATCH_EID);
 	assert(!match);
+
+	mctp_route_table_dump(mctp, MCTP_LOG_DEBUG);
 
 	mctp_destroy(mctp);
 }

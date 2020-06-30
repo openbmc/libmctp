@@ -896,6 +896,44 @@ int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route)
 	return rc;
 }
 
+void mctp_route_table_dump(const struct mctp *mctp, int level)
+{
+	struct mctp_route_entry *cur;
+
+	if (!mctp) {
+		mctp_prwarn("Can't dump route table from NULL context");
+		return;
+	}
+
+	if (!mctp->routes) {
+		mctp_prlog(level, "Route table is empty");
+		return;
+	}
+
+	cur = mctp->routes;
+
+	mctp_prlog(level, "|  Range  | Type | Device | Refs |");
+	mctp_prlog(level, "+---------+------+--------+------+");
+	do {
+		if (cur->route.range.first == cur->route.range.last) {
+			mctp_prlog(level,
+				   "|   %3" PRIu8 "   | %4" PRIu8 " | %3" PRIu8
+				   ":%-2" PRIx64 " |  %3lu |",
+				   cur->route.range.first, cur->route.type,
+				   cur->route.device.bus,
+				   cur->route.device.address, cur->refs);
+		} else {
+			mctp_prlog(level,
+				   "| %3" PRIu8 "-%-3" PRIu8 " | %4" PRIu8
+				   " | %3" PRIu8 ":%-2" PRIx64 " |  %3lu |",
+				   cur->route.range.first,
+				   cur->route.range.last, cur->route.type,
+				   cur->route.device.bus,
+				   cur->route.device.address, cur->refs);
+		}
+	} while ((cur = cur->next));
+}
+
 /* Core API functions */
 struct mctp *mctp_init(void)
 {
