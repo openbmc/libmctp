@@ -1,0 +1,10 @@
+Ok-To-Test+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+1: Sumanth Bhat <sumanth.bhat@linux.intel.com>
+Code-Review+1: Iwona Winiarska <iwona.winiarska@intel.com>
+Code-Review+2: Andrew Jeffery <andrew@aj.id.au>
+Submitted-by: Andrew Jeffery <andrew@aj.id.au>
+Submitted-at: Tue, 30 Jun 2020 12:29:21 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/libmctp/+/34191
+Project: openbmc/libmctp
+Branch: refs/heads/master
