@@ -172,6 +172,12 @@ int mctp_route_remove(struct mctp *mctp, const struct mctp_route *route);
 int mctp_route_insert(struct mctp *mctp, const struct mctp_route *route);
 int mctp_route_delete(struct mctp *mctp, const struct mctp_route *route);
 
+int mctp_route_set_dynamic_pool(struct mctp *mctp,
+				const struct mctp_eid_range *range);
+const struct mctp_route *mctp_route_allocate(struct mctp *mctp,
+					     const struct mctp_route *route,
+					     uint8_t len);
+
 void mctp_route_table_dump(const struct mctp *mctp, int level);
 
 typedef void (*mctp_route_notify_fn)(void *data,
