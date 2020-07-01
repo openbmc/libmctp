@@ -57,6 +57,7 @@ struct mctp {
 		ROUTE_ENDPOINT,
 		ROUTE_BRIDGE,
 	}			route_policy;
+	uint32_t max_message_size;
 };
 
 #ifndef BUILD_ASSERT
@@ -66,6 +67,12 @@ struct mctp {
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+#endif
+
+/* 64kb should be sufficient for a single message. Applications
+ * requiring higher sizes can override by setting max_message_size.*/
+#ifndef MCTP_MAX_MESSAGE_SIZE
+#define MCTP_MAX_MESSAGE_SIZE 65536
 #endif
 
 static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
@@ -195,7 +202,7 @@ static void mctp_msg_ctx_reset(struct mctp_msg_ctx *ctx)
 }
 
 static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
-		struct mctp_pktbuf *pkt)
+		struct mctp_pktbuf *pkt, uint32_t max_size)
 {
 	size_t len;
 
@@ -211,6 +218,11 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 		} else {
 			new_alloc_size = ctx->buf_alloc_size * 2;
 		}
+
+		/* Don't allow heap to grow beyond a limit */
+		if (new_alloc_size > max_size)
+			return -1;
+
 
 		lbuf = __mctp_realloc(ctx->buf, new_alloc_size);
 		if (lbuf) {
@@ -234,9 +246,18 @@ struct mctp *mctp_init(void)
 	struct mctp *mctp;
 
 	mctp = __mctp_alloc(sizeof(*mctp));
-	memset(mctp, 0, sizeof(*mctp));
 
+	if (mctp)
+	{
+		memset(mctp, 0, sizeof(*mctp));
+		mctp->max_message_size = MCTP_MAX_MESSAGE_SIZE;
+	}
 	return mctp;
+}
+
+void mctp_set_max_message_size(struct mctp *mctp, uint32_t message_size)
+{
+	mctp->max_message_size = message_size;
 }
 
 void mctp_destroy(struct mctp *mctp)
@@ -466,7 +487,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 					hdr->src, hdr->dest, tag);
 		}
 
-		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
+		rc = mctp_msg_ctx_add_pkt(ctx, pkt, mctp->max_message_size);
 		if (rc) {
 			mctp_msg_ctx_drop(ctx);
 		} else {
@@ -490,7 +511,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 			goto out;
 		}
 
-		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
+		rc = mctp_msg_ctx_add_pkt(ctx, pkt, mctp->max_message_size);
 		if (!rc)
 			mctp_rx(mctp, bus, ctx->src, ctx->dest,
 					ctx->buf, ctx->buf_size);
@@ -513,7 +534,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 			goto out;
 		}
 
-		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
+		rc = mctp_msg_ctx_add_pkt(ctx, pkt, mctp->max_message_size);
 		if (rc) {
 			mctp_msg_ctx_drop(ctx);
 			goto out;
