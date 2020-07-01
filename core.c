@@ -438,6 +438,10 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 	assert(bus);
 
+	/* Drop packet if it was smaller than mctp hdr size */
+	if (mctp_pktbuf_size(pkt) <= sizeof(struct mctp_hdr))
+		goto out;
+
 	hdr = mctp_pktbuf_hdr(pkt);
 
 	/* small optimisation: don't bother reassembly if we're going to
