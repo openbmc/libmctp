@@ -212,6 +212,10 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 			new_alloc_size = ctx->buf_alloc_size * 2;
 		}
 
+		//Don't allow heap to grow beyond a limit
+		if(new_alloc_size > MCTP_MAX_MESSAGE_SIZE)
+			return -1;
+
 		lbuf = __mctp_realloc(ctx->buf, new_alloc_size);
 		if (lbuf) {
 			ctx->buf = lbuf;

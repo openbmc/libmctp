@@ -40,6 +40,8 @@ struct mctp_hdr {
 #define MCTP_PACKET_SIZE(unit)	((unit) + sizeof(struct mctp_hdr))
 #define MCTP_BODY_SIZE(unit)	((unit) - sizeof(struct mctp_hdr))
 
+#define MCTP_MAX_MESSAGE_SIZE 65536 //64kb should be sufficient for a single msg
+
 /* packet buffers */
 
 struct mctp_pktbuf {
