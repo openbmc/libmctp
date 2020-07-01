@@ -4,13 +4,18 @@
 #undef NDEBUG
 #endif
 
+#include "test-utils.h"
+
 #include "libmctp.h"
+#include "libmctp-alloc.h"
+#include "libmctp-log.h"
 
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -32,7 +37,8 @@ static void construct_route_table_from_static(struct mctp *mctp,
 static const struct mctp_route test_add_one[] = {
 	{ .range = { .first = 8, .last = 8 },
 	  .device = { .bus = 0, .address = 0, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL }
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0, }
 };
 
 static void test_mctp_route_table_add_one(void)
@@ -57,10 +63,12 @@ static void test_mctp_route_table_add_one(void)
 static const struct mctp_route test_add_two[] = {
 	{ .range = { .first = 8, .last = 8 },
 	  .device = { .bus = 0, .address = 0, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL },
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 },
 	{ .range = { .first = 9, .last = 9 },
 	  .device = { .bus = 0, .address = 1, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL }
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 }
 };
 
 static void test_mctp_route_table_add_two(void)
@@ -90,19 +98,24 @@ static void test_mctp_route_table_add_two(void)
 static const struct mctp_route test_add_eid_conflict[] = {
 	{ .range = { .first = 9, .last = 11 },
 	  .device = { .bus = 0, .address = 1, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL },
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 },
 	{ .range = { .first = 8, .last = 10 },
 	  .device = { .bus = 0, .address = 0, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL },
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 },
 	{ .range = { .first = 10, .last = 12 },
 	  .device = { .bus = 0, .address = 1, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL },
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 },
 	{ .range = { .first = 8, .last = 12 },
 	  .device = { .bus = 0, .address = 1, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL },
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 },
 	{ .range = { .first = 10, .last = 10 },
 	  .device = { .bus = 0, .address = 1, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL },
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 },
 };
 
 static void test_mctp_route_table_add_eid_conflict(void)
@@ -134,10 +147,12 @@ static void test_mctp_route_table_add_eid_conflict(void)
 static const struct mctp_route test_add_bus_addr_conflict[] = {
 	{ .range = { .first = 8, .last = 8 },
 	  .device = { .bus = 0, .address = 0, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL },
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 },
 	{ .range = { .first = 9, .last = 9 },
 	  .device = { .bus = 0, .address = 0, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL }
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 }
 };
 
 static void test_mctp_route_table_add_bus_addr_conflict(void)
@@ -236,13 +251,16 @@ static void test_mctp_route_table_remove_last(void)
 static const struct mctp_route test_remove_middle[] = {
 	{ .range = { .first = 8, .last = 8 },
 	  .device = { .bus = 0, .address = 0, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL },
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 },
 	{ .range = { .first = 9, .last = 9 },
 	  .device = { .bus = 0, .address = 1, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL },
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 },
 	{ .range = { .first = 10, .last = 10 },
 	  .device = { .bus = 0, .address = 2, },
-	  .type = MCTP_ROUTE_TYPE_LOCAL }
+	  .type = MCTP_ROUTE_TYPE_LOCAL,
+	  .flags = 0 }
 };
 
 static void test_mctp_route_table_remove_middle(void)
@@ -309,43 +327,54 @@ static const struct mctp_route test_intersect[] = {
 	/* Insert a route covering the normal EID range */
 	[0] = { .range = { .first = 8, .last = 254 },
 		.device = { .bus = 0, .address = 0, },
-		.type = MCTP_ROUTE_TYPE_LOCAL },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.flags = 0 },
 
 	/* Insert a route covering the first half, truncating the first route */
 	[1] = { .range = { .first = 8, .last = 130 },
 		.device = { .bus = 0, .address = 1, },
-		.type = MCTP_ROUTE_TYPE_LOCAL },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.flags = 0 },
 	[2] = { .range = { .first = 131, .last = 254 },
 		.device = { .bus = 0, .address = 0, },
-		.type = MCTP_ROUTE_TYPE_LOCAL },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.flags = 0 },
 
 	/* Insert a route intersecting both existing routes */
 	[3] = { .range = { .first = 70, .last = 191 },
 		.device = { .bus = 0, .address = 2, },
-		.type = MCTP_ROUTE_TYPE_LOCAL },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.flags = 0 },
 	[4] = { .range = { .first = 8, .last = 69 },
 		.device = { .bus = 0, .address = 1, },
-		.type = MCTP_ROUTE_TYPE_LOCAL },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.flags = 0 },
 	[5] = { .range = { .first = 192, .last = 254 },
 		.device = { .bus = 0, .address = 0, },
-		.type = MCTP_ROUTE_TYPE_LOCAL },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.flags = 0 },
 
 	/* Insert a route in a subset of the third route's range */
 	[6] = { .range = { .first = 100, .last = 130 },
 		.device = { .bus = 0, .address = 3, },
-		.type = MCTP_ROUTE_TYPE_LOCAL },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.flags = 0 },
 	[7] = { .range = { .first = 8, .last = 69 },
 		.device = { .bus = 0, .address = 1, },
-		.type = MCTP_ROUTE_TYPE_LOCAL },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.flags = 0 },
 	[8] = { .range = { .first = 70, .last = 99 },
 		.device = { .bus = 0, .address = 2, },
-		.type = MCTP_ROUTE_TYPE_LOCAL },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.flags = 0 },
 	[9] = { .range = { .first = 131, .last = 191 },
 		.device = { .bus = 0, .address = 2, },
-		.type = MCTP_ROUTE_TYPE_LOCAL },
+		.type = MCTP_ROUTE_TYPE_LOCAL,
+		.flags = 0 },
 	[10] = { .range = { .first = 192, .last = 254 },
 		 .device = { .bus = 0, .address = 0, },
-		 .type = MCTP_ROUTE_TYPE_LOCAL },
+		 .type = MCTP_ROUTE_TYPE_LOCAL,
+		 .flags = 0 },
 };
 
 static void test_mctp_route_table_insert_delete_intersect(void)
@@ -479,6 +508,7 @@ static void test_mctp_route_table_add_notify(void)
 			.range = { .first = 8, .last = 8 },
 			.device = { .bus = 0, .address = 0, },
 			.type = MCTP_ROUTE_TYPE_ENDPOINT,
+			.flags = 0,
 		},
 	};
 
@@ -513,6 +543,7 @@ static void test_mctp_route_table_remove_notify(void)
 			.range = { .first = 8, .last = 8 },
 			.type = MCTP_ROUTE_TYPE_ENDPOINT,
 			.device = { .bus = 0, .address = 0, },
+			.flags = 0,
 		},
 	};
 
@@ -558,6 +589,89 @@ static void test_mctp_route_table_allocate_one(void)
 	mctp_destroy(mctp);
 }
 
+static void test_mctp_route_table_allocate_one_provisional(void)
+{
+	const struct mctp_route *alloc;
+	struct mctp_route route = { 0 };
+	struct mctp *mctp;
+
+	mctp = mctp_init();
+	assert(mctp);
+
+	route.flags = MCTP_ROUTE_FLAG_PROVISIONAL;
+	alloc = mctp_route_allocate(mctp, &route, 1);
+	assert(alloc);
+	assert(alloc->range.first == 254);
+	assert(alloc->range.last == 254);
+
+	mctp_destroy(mctp);
+}
+
+void test_mctp_route_query_provisional_one(void)
+{
+	struct mctp_binding_test *binding;
+	const struct mctp_route *alloc;
+	struct mctp_route route = { 0 };
+	uint8_t data = 0x5a;
+	struct mctp *mctp;
+	mctp_eid_t dest;
+	int rc;
+
+	mctp_test_stack_init(&mctp, &binding, MCTP_EID_NULL);
+	assert(mctp);
+
+	route.flags = MCTP_ROUTE_FLAG_PROVISIONAL;
+	alloc = mctp_route_allocate(mctp, &route, 1);
+	assert(alloc);
+	dest = mctp_route_as_eid(alloc);
+	rc = mctp_message_tx(mctp, dest, &data, sizeof(data));
+	assert(!rc);
+
+	assert(binding->pkt);
+	assert(((uint8_t *)binding->pkt->data)[0] == 0);
+	__mctp_free(binding->pkt);
+
+	mctp_binding_test_destroy(binding);
+	mctp_destroy(mctp);
+}
+
+static void test_rx(mctp_eid_t eid, void *data, void *msg, size_t len)
+{
+	struct mctp *mctp = data;
+
+	(void)msg;
+	(void)len;
+	assert(mctp_eid_is_valid(mctp, eid) && !mctp_eid_is_special(mctp, eid));
+	assert(eid.flags & MCTP_EID_FLAG_PROVISIONAL);
+}
+
+void test_mctp_route_respond_provisional_one(void)
+{
+	struct mctp_device dev = { .bus = 0, .address = 1 };
+	struct mctp_binding_test *binding;
+	struct mctp *mctp;
+
+	struct {
+		struct mctp_hdr hdr;
+		uint8_t payload[1];
+	} pktbuf;
+
+	mctp_test_stack_init(&mctp, &binding, MCTP_EID_NULL);
+	assert(mctp);
+
+	mctp_set_rx_all(mctp, test_rx, mctp);
+
+	memset(&pktbuf.hdr, 0, sizeof(pktbuf.hdr));
+	pktbuf.hdr.src = 0;
+	pktbuf.hdr.dest = 0;
+	pktbuf.hdr.flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM;
+
+	mctp_binding_test_rx_raw(binding, &dev, &pktbuf, sizeof(pktbuf));
+
+	mctp_binding_test_destroy(binding);
+	mctp_destroy(mctp);
+}
+
 static void test_mctp_route_table_allocate_invalid(void)
 {
 	const struct mctp_route *alloc;
@@ -589,6 +703,96 @@ static void test_mctp_route_table_allocate_invalid(void)
 	mctp_destroy(mctp);
 }
 
+static void test_mctp_route_table_allocate_provisional_overlap(void)
+{
+	const struct mctp_route *alloc;
+	struct mctp_route route = { 0 };
+	struct mctp_eid_range range;
+	mctp_eid_t peid, feid;
+	struct mctp *mctp;
+	int rc;
+
+	mctp = mctp_init();
+	assert(mctp);
+
+	/* Configure the dynamic pool to cover the first provisional EID */
+	range = (struct mctp_eid_range){ .first = 254, .last = 254 };
+	rc = mctp_route_set_dynamic_pool(mctp, &range);
+	assert(!rc);
+
+	/* Allocate a provisional EID */
+	route.flags = MCTP_ROUTE_FLAG_PROVISIONAL;
+	alloc = mctp_route_allocate(mctp, &route, 1);
+	assert(alloc);
+	peid = mctp_route_as_eid(alloc);
+	assert(mctp_eid_is_valid(mctp, peid) &&
+	       !mctp_eid_is_special(mctp, peid));
+	assert(peid.flags & MCTP_EID_FLAG_PROVISIONAL);
+
+	/* Allocate a formal EID */
+	route.flags = 0;
+	alloc = mctp_route_allocate(mctp, &route, 1);
+	assert(alloc);
+	feid = mctp_route_as_eid(alloc);
+	assert(mctp_eid_is_valid(mctp, feid) &&
+	       !mctp_eid_is_special(mctp, feid));
+	assert(!(feid.flags & MCTP_EID_FLAG_PROVISIONAL));
+
+	/* Make sure both coexist and are not equal */
+	assert(peid.id == feid.id);
+	assert(!mctp_eid_equal(peid, feid));
+
+	mctp_destroy(mctp);
+}
+
+static void test_mctp_route_get_by_device_overlap(void)
+{
+	const struct mctp_route *alloc, *match;
+	struct mctp_route route = { 0 };
+	struct mctp_eid_range range;
+	struct mctp *mctp;
+	int rc;
+
+	mctp = mctp_init();
+	assert(mctp);
+
+	/* Configure the dynamic pool to cover the first provisional EID */
+	range = (struct mctp_eid_range){ .first = 254, .last = 254 };
+	rc = mctp_route_set_dynamic_pool(mctp, &range);
+	assert(!rc);
+
+	/* Allocate a provisional EID */
+	route.flags = MCTP_ROUTE_FLAG_PROVISIONAL;
+	alloc = mctp_route_allocate(mctp, &route, 1);
+	assert(alloc);
+	assert(mctp_device_equal(&route.device, &alloc->device));
+	match = mctp_route_get_by_device(mctp, &route.device);
+	assert(mctp_device_equal(&route.device, &match->device));
+	assert(match->flags & MCTP_ROUTE_FLAG_PROVISIONAL);
+	mctp_route_put(match);
+
+	/* Allocate a formal EID */
+	route.flags = 0;
+	alloc = mctp_route_allocate(mctp, &route, 1);
+	assert(mctp_device_equal(&route.device, &alloc->device));
+	assert(alloc);
+	match = mctp_route_get_by_device(mctp, &route.device);
+	assert(mctp_device_equal(&route.device, &match->device));
+	assert(!(match->flags & MCTP_ROUTE_FLAG_PROVISIONAL));
+
+	/* Assert the provisional route still exists, shadowed by formal */
+	route = *match;
+	mctp_route_put(match);
+
+	route.flags = MCTP_ROUTE_FLAG_PROVISIONAL;
+	match = mctp_route_match(mctp, &route, MCTP_ROUTE_MATCH_ROUTE);
+	mctp_route_table_dump(mctp, MCTP_LOG_DEBUG);
+	assert(match);
+	mctp_route_put(match);
+
+	mctp_destroy(mctp);
+}
+
 int main(void)
 {
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
@@ -607,6 +811,11 @@ int main(void)
 	test_mctp_route_table_remove_notify();
 	test_mctp_route_table_allocate_one();
 	test_mctp_route_table_allocate_invalid();
+	test_mctp_route_table_allocate_one_provisional();
+	test_mctp_route_query_provisional_one();
+	test_mctp_route_respond_provisional_one();
+	test_mctp_route_table_allocate_provisional_overlap();
+	test_mctp_route_get_by_device_overlap();
 
 	return 0;
 }

@@ -38,8 +38,8 @@ static void create_packet(struct mctp_hdr *pkt,
 		mctp_eid_t src, mctp_eid_t dest)
 {
 	memset(pkt, 0, sizeof(*pkt));
-	pkt->src = src;
-	pkt->dest = dest;
+	pkt->src = src.id;
+	pkt->dest = dest.id;
 	pkt->flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM;
 }
 
@@ -47,10 +47,11 @@ static void create_packet(struct mctp_hdr *pkt,
 
 void test_eid_rx(void)
 {
-	struct test_ctx _ctx, *ctx = &_ctx;
+	const struct mctp_device dev = { .bus = 0, .address = 0 };
 	const mctp_eid_t local_eid = MCTP_EID(8);
 	const mctp_eid_t remote_eid = MCTP_EID(9);
 	const mctp_eid_t other_eid = MCTP_EID(10);
+	struct test_ctx _ctx, *ctx = &_ctx;
 	struct {
 		struct mctp_hdr	hdr;
 		uint8_t		payload[1];
@@ -65,7 +66,7 @@ void test_eid_rx(void)
 
 	create_packet(&pktbuf.hdr, remote_eid, local_eid);
 
-	mctp_binding_test_rx_raw(ctx->binding, &pktbuf, sizeof(pktbuf));
+	mctp_binding_test_rx_raw(ctx->binding, &dev, &pktbuf, sizeof(pktbuf));
 
 	assert(ctx->rx_count == 1);
 	assert(mctp_eid_equal(ctx->src_eid, remote_eid));
@@ -75,7 +76,7 @@ void test_eid_rx(void)
 
 	create_packet(&pktbuf.hdr, remote_eid, other_eid);
 
-	mctp_binding_test_rx_raw(ctx->binding, &pktbuf, sizeof(pktbuf));
+	mctp_binding_test_rx_raw(ctx->binding, &dev, &pktbuf, sizeof(pktbuf));
 
 	assert(ctx->rx_count == 0);
 

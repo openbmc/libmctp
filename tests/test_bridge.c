@@ -60,14 +60,14 @@ static void mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 	hdr = mctp_pktbuf_hdr(pkt);
 	hdr->flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM;
 
-	hdr->src = src;
-	hdr->dest = dest;
+	hdr->src = src.id;
+	hdr->dest = dest.id;
 
 	buf = mctp_pktbuf_data(pkt);
 	*buf = key;
 
 	binding->rx_count++;
-	mctp_bus_rx(&binding->binding, pkt);
+	mctp_bus_rx(&binding->binding, NULL, pkt);
 }
 
 static struct mctp_binding_bridge *mctp_binding_bridge_init(void)
