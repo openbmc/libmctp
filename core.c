@@ -228,6 +228,58 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 	return 0;
 }
 
+/* Endpoint ID and Routing APIs */
+bool mctp_eid_is_valid(const struct mctp *mctp __attribute__((unused)),
+		       mctp_eid_t eid)
+{
+	return eid == MCTP_EID_NULL || eid >= 8;
+}
+
+bool mctp_eid_is_special(const struct mctp *mctp __attribute__((unused)),
+			 mctp_eid_t eid)
+{
+	return eid == MCTP_EID_NULL || eid == MCTP_EID_BROADCAST;
+}
+
+bool mctp_eid_range_is_valid(const struct mctp *mctp,
+			     const struct mctp_eid_range *range)
+{
+	bool valid, special;
+
+	assert(range);
+
+	valid = mctp_eid_is_valid(mctp, range->first);
+	special = mctp_eid_is_special(mctp, range->first) ||
+		  mctp_eid_is_special(mctp, range->last);
+
+	return range->first <= range->last && valid && !special;
+}
+
+int mctp_eid_range_equal(const struct mctp *mctp __attribute__((unused)),
+			 const struct mctp_eid_range *a,
+			 const struct mctp_eid_range *b)
+{
+	return a->first == b->first && a->last == b->last;
+}
+
+int mctp_eid_range_contains(const struct mctp *mctp __attribute__((unused)),
+			    const struct mctp_eid_range *range, mctp_eid_t eid)
+{
+	assert(mctp_eid_range_is_valid(mctp, range));
+
+	return eid >= range->first && eid <= range->last;
+}
+
+int mctp_eid_range_intersects(const struct mctp *mctp,
+			      const struct mctp_eid_range *a,
+			      const struct mctp_eid_range *b)
+{
+	return mctp_eid_range_contains(mctp, a, b->first) ||
+	       mctp_eid_range_contains(mctp, a, b->last) ||
+	       mctp_eid_range_contains(mctp, b, a->first) ||
+	       mctp_eid_range_contains(mctp, b, a->last);
+}
+
 /* Core API functions */
 struct mctp *mctp_init(void)
 {
