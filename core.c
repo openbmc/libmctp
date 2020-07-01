@@ -445,6 +445,10 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 	if (mctp->route_policy == ROUTE_ENDPOINT && hdr->dest != bus->eid)
 		goto out;
 
+	/*Drop packet if it was smaller than mctp hdr size*/
+	if (mctp_pktbuf_size(pkt) <= sizeof(struct mctp_hdr))
+		goto out;
+
 	flags = hdr->flags_seq_tag & (MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM);
 	tag = (hdr->flags_seq_tag >> MCTP_HDR_TAG_SHIFT) & MCTP_HDR_TAG_MASK;
 	seq = (hdr->flags_seq_tag >> MCTP_HDR_SEQ_SHIFT) & MCTP_HDR_SEQ_MASK;
