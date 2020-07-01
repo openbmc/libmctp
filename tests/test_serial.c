@@ -99,6 +99,7 @@ int main(void)
 		.range = { .first = 9, .last = 9 },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0,
 	};
 	rc = mctp_route_insert(scenario[0].mctp, &route);
 	assert(!rc);
@@ -120,6 +121,7 @@ int main(void)
 		.range = { .first = 8, .last = 8 },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0,
 	};
 	rc = mctp_route_insert(scenario[1].mctp, &route);
 	assert(!rc);

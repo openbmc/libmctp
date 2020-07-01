@@ -211,6 +211,7 @@ static void network_init(struct astlpc_test *ctx)
 		.range = { .first = 9, .last = 9 },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0
 	};
 	rc = mctp_route_insert(ctx->bmc.mctp, &route);
 	assert(!rc);
@@ -224,6 +225,7 @@ static void network_init(struct astlpc_test *ctx)
 		.range = { .first = 8, .last = 8 },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0
 	};
 	rc = mctp_route_insert(ctx->host.mctp, &route);
 	assert(!rc);
@@ -589,6 +591,7 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 		.range = { .first = 9, .last = 9 },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0,
 	};
 	rc = mctp_route_insert(ctx.bmc.mctp, &route);
 	assert(!rc);
@@ -609,6 +612,7 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 		.range = { .first = 8, .last = 8 },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0
 	};
 	rc = mctp_route_insert(ctx.host.mctp, &route);
 	assert(!rc);

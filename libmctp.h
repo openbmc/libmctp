@@ -14,8 +14,16 @@ extern "C" {
 
 struct mctp;
 struct mctp_bus;
-typedef uint8_t mctp_eid_t;
-#define MCTP_EID(id) (id)
+struct mctp_binding;
+
+typedef struct {
+	uint8_t id;
+
+#define MCTP_EID_FLAG_PROVISIONAL (1 << 0)
+	uint8_t flags;
+} mctp_eid_t;
+
+#define MCTP_EID(id) ((mctp_eid_t){ id, 0 })
 
 /* Special Endpoint ID values */
 #define MCTP_EID_NULL	   MCTP_EID(0)
@@ -25,8 +33,8 @@ bool mctp_eid_equal(mctp_eid_t a, mctp_eid_t b);
 
 /* Inclusive range */
 struct mctp_eid_range {
-	mctp_eid_t first;
-	mctp_eid_t last;
+	uint8_t first;
+	uint8_t last;
 };
 
 bool mctp_eid_is_valid(const struct mctp *mctp, mctp_eid_t eid);
@@ -131,6 +139,9 @@ struct mctp_route {
 #define MCTP_ROUTE_TYPE_DOWNSTREAM 2
 #define MCTP_ROUTE_TYPE_LOCAL	   3
 	uint8_t type;
+
+#define MCTP_ROUTE_FLAG_PROVISIONAL (1 << 0)
+	uint32_t flags;
 };
 
 struct mctp_route_entry {
@@ -203,7 +214,8 @@ void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable);
  * Receive a packet from binding to core. Takes ownership of pkt, free()-ing it
  * after use.
  */
-void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
+void mctp_bus_rx(struct mctp_binding *binding, const struct mctp_device *dsrc,
+		 struct mctp_pktbuf *pkt);
 
 /* environment-specific allocation */
 void mctp_set_alloc_ops(void *(*alloc)(size_t),

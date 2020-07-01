@@ -24,13 +24,13 @@
 
 /* Internal data structures */
 struct mctp_msg_ctx {
-	uint8_t		src;
-	uint8_t		dest;
-	uint8_t		tag;
-	uint8_t		last_seq;
-	void		*buf;
-	size_t		buf_size;
-	size_t		buf_alloc_size;
+	mctp_eid_t src;
+	mctp_eid_t dest;
+	uint8_t tag;
+	uint8_t last_seq;
+	void *buf;
+	size_t buf_size;
+	size_t buf_alloc_size;
 };
 
 struct mctp {
@@ -52,6 +52,7 @@ struct mctp {
 
 	struct mctp_route_entry *routes;
 	struct mctp_eid_range dynamic_pool;
+	uint8_t provisional;
 	uint8_t dynamic;
 };
 
@@ -140,7 +141,8 @@ int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, size_t len)
 
 /* Message reassembly */
 static struct mctp_msg_ctx *mctp_msg_ctx_lookup(struct mctp *mctp,
-		uint8_t src, uint8_t dest, uint8_t tag)
+						mctp_eid_t src, mctp_eid_t dest,
+						uint8_t tag)
 {
 	unsigned int i;
 
@@ -148,7 +150,8 @@ static struct mctp_msg_ctx *mctp_msg_ctx_lookup(struct mctp *mctp,
 	 * message contexts */
 	for (i = 0; i < ARRAY_SIZE(mctp->msg_ctxs); i++) {
 		struct mctp_msg_ctx *ctx = &mctp->msg_ctxs[i];
-		if (ctx->src == src && ctx->dest == dest && ctx->tag == tag)
+		if (mctp_eid_equal(ctx->src, src) &&
+		    mctp_eid_equal(ctx->dest, dest) && ctx->tag == tag)
 			return ctx;
 	}
 
@@ -156,14 +159,15 @@ static struct mctp_msg_ctx *mctp_msg_ctx_lookup(struct mctp *mctp,
 }
 
 static struct mctp_msg_ctx *mctp_msg_ctx_create(struct mctp *mctp,
-		uint8_t src, uint8_t dest, uint8_t tag)
+						mctp_eid_t src, mctp_eid_t dest,
+						uint8_t tag)
 {
 	struct mctp_msg_ctx *ctx = NULL;
 	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(mctp->msg_ctxs); i++) {
 		struct mctp_msg_ctx *tmp = &mctp->msg_ctxs[i];
-		if (!tmp->src) {
+		if (mctp_eid_equal(tmp->src, MCTP_EID_NULL)) {
 			ctx = tmp;
 			break;
 		}
@@ -182,7 +186,7 @@ static struct mctp_msg_ctx *mctp_msg_ctx_create(struct mctp *mctp,
 
 static void mctp_msg_ctx_drop(struct mctp_msg_ctx *ctx)
 {
-	ctx->src = 0;
+	ctx->src = MCTP_EID_NULL;
 }
 
 static void mctp_msg_ctx_reset(struct mctp_msg_ctx *ctx)
@@ -227,13 +231,13 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 /* Endpoint ID and Routing APIs */
 bool mctp_eid_equal(mctp_eid_t a, mctp_eid_t b)
 {
-	return a == b;
+	return a.id == b.id && a.flags == b.flags;
 }
 
 bool mctp_eid_is_valid(const struct mctp *mctp __attribute__((unused)),
 		       mctp_eid_t eid)
 {
-	return mctp_eid_equal(eid, MCTP_EID_NULL) || eid >= 8;
+	return mctp_eid_equal(eid, MCTP_EID_NULL) || eid.id >= 8;
 }
 
 bool mctp_eid_is_special(const struct mctp *mctp __attribute__((unused)),
@@ -269,7 +273,7 @@ int mctp_eid_range_contains(const struct mctp *mctp __attribute__((unused)),
 {
 	assert(mctp_eid_range_is_valid(mctp, range));
 
-	return eid >= range->first && eid <= range->last;
+	return eid.id >= range->first && eid.id <= range->last;
 }
 
 int mctp_eid_range_intersects(const struct mctp *mctp,
@@ -336,9 +340,9 @@ static void mctp_route_entry_get(struct mctp_route_entry *entry)
 	if (entry->refs == ULONG_MAX) {
 		mctp_prerr(
 			"%s: Route entry reference count is saturated for { [ %" PRIu8
-			", %" PRIu8 " ] } ",
+			", %" PRIu8 " ], 0x%08" PRIx32 " } ",
 			__func__, entry->route.range.first,
-			entry->route.range.last);
+			entry->route.range.last, entry->route.flags);
 		return;
 	}
 
@@ -359,9 +363,9 @@ static void mctp_route_entry_put(struct mctp_route_entry *entry)
 	if (entry->refs == ULONG_MAX) {
 		mctp_prerr(
 			"%s: Route entry reference count is saturated for { [ %" PRIu8
-			", %" PRIu8 " ] } ",
+			", %" PRIu8 " ], 0x%08" PRIx32 " } ",
 			__func__, entry->route.range.first,
-			entry->route.range.last);
+			entry->route.range.last, entry->route.flags);
 		return;
 	}
 
@@ -387,6 +391,7 @@ void mctp_route_put(const struct mctp_route *route)
 	mctp_route_entry_put(entry);
 }
 
+/* Always respects the route flags */
 static struct mctp_route_entry *
 __mctp_route_list_match(const struct mctp *mctp, struct mctp_route_entry *head,
 			const struct mctp_route *route, uint32_t mode)
@@ -397,7 +402,7 @@ __mctp_route_list_match(const struct mctp *mctp, struct mctp_route_entry *head,
 	assert(mctp);
 	assert(route);
 
-	if (!mode)
+	if (!(head && mode))
 		return NULL;
 
 	/* Mutually exclusive */
@@ -406,7 +411,10 @@ __mctp_route_list_match(const struct mctp *mctp, struct mctp_route_entry *head,
 		return NULL;
 
 	cur = head;
-	while (cur) {
+	do {
+		if (cur->route.flags != route->flags)
+			continue;
+
 		if (mode & MCTP_ROUTE_MATCH_ROUTE) {
 			bool range, device, type;
 
@@ -444,9 +452,7 @@ __mctp_route_list_match(const struct mctp *mctp, struct mctp_route_entry *head,
 			if (cur->route.type == route->type)
 				break;
 		}
-
-		cur = cur->next;
-	}
+	} while ((cur = cur->next));
 
 	return cur;
 }
@@ -495,8 +501,10 @@ const struct mctp_route *mctp_route_get_by_eid(struct mctp *mctp,
 	if (!mctp_eid_is_valid(mctp, eid) || mctp_eid_is_special(mctp, eid))
 		return NULL;
 
-	route.range.first = eid;
-	route.range.last = eid;
+	route.range.first = eid.id;
+	route.range.last = eid.id;
+	if (eid.flags & MCTP_EID_FLAG_PROVISIONAL)
+		route.flags = MCTP_ROUTE_FLAG_PROVISIONAL;
 
 	return mctp_route_match(mctp, &route, MCTP_ROUTE_MATCH_EID);
 }
@@ -519,19 +527,35 @@ const struct mctp_route *mctp_route_get_by_type(struct mctp *mctp, uint8_t type)
 const struct mctp_route *mctp_route_get_by_device(struct mctp *mctp,
 						  const struct mctp_device *dev)
 {
+	const struct mctp_route *match;
 	struct mctp_route route = { 0 };
 
 	route.device = *dev;
 
-	return mctp_route_match(mctp, &route, MCTP_ROUTE_MATCH_DEVICE);
+	/* Prefer a formal route */
+	match = mctp_route_match(mctp, &route, MCTP_ROUTE_MATCH_DEVICE);
+	if (!match) {
+		/* Otherwise try a provisional route */
+		route.flags |= MCTP_ROUTE_FLAG_PROVISIONAL;
+		match = mctp_route_match(mctp, &route, MCTP_ROUTE_MATCH_DEVICE);
+	}
+
+	return match;
 }
 
 mctp_eid_t mctp_route_as_eid(const struct mctp_route *route)
 {
+	int provisional;
+
 	assert(route);
 	assert(route->range.first == route->range.last);
 
-	return MCTP_EID(route->range.first);
+	provisional = !!(route->flags & MCTP_ROUTE_FLAG_PROVISIONAL);
+
+	return (mctp_eid_t){
+		.id = route->range.first,
+		.flags = provisional * MCTP_EID_FLAG_PROVISIONAL,
+	};
 }
 
 static struct mctp_route_entry *__mctp_route_add(struct mctp_route_entry **head,
@@ -842,42 +866,66 @@ const struct mctp_route *mctp_route_allocate(struct mctp *mctp,
 
 	/* XXX: Implement a proper allocation and re-use policy: 8.17.6 */
 
-	if (!mctp_eid_range_is_valid(mctp, &mctp->dynamic_pool)) {
-		mctp_prerr(
-			"Failed to allocate %" PRIu8
-			" dynamic endpoint ID%s: Dynamic endpoint ID pool is invalid",
-			len, len > 1 ? "s" : "");
-		return NULL;
+	if (route->flags & MCTP_ROUTE_FLAG_PROVISIONAL) {
+		/*
+		 * Only allocate provisional EIDs to communicate with local
+		 * devices.
+		 */
+		assert(len == 1);
+
+		range = (struct mctp_eid_range){ .first = mctp->provisional -
+							  len + 1,
+						 .last = mctp->provisional };
+
+		if (!mctp_eid_range_is_valid(mctp, &range)) {
+			mctp_prerr(
+				"Failed to allocate provisional endpoint ID");
+			return NULL;
+		}
+
+		mctp->provisional -= len;
+	} else {
+		if (!mctp_eid_range_is_valid(mctp, &mctp->dynamic_pool)) {
+			mctp_prerr(
+				"Failed to allocate %" PRIu8
+				" dynamic endpoint ID%s: Dynamic endpoint ID pool is invalid",
+				len, len > 1 ? "s" : "");
+			return NULL;
+		}
+
+		if ((uint8_t)(mctp->dynamic + len) < mctp->dynamic) {
+			mctp_prerr(
+				"Failed to allocate %" PRIu8
+				" dynamic endpoint ID%s: Out of range request",
+				len, len > 1 ? "s" : "");
+			return NULL;
+		}
+
+		if (mctp->dynamic + (len - 1) > mctp->dynamic_pool.last) {
+			mctp_prerr(
+				"Failed to allocate %" PRIu8
+				" dynamic endpoint ID%s: Request exceeds pool limit",
+				len, len > 1 ? "s" : "");
+			return NULL;
+		}
+
+		range = (struct mctp_eid_range){
+			.first = mctp->dynamic,
+			.last = mctp->dynamic + len - 1,
+		};
+
+		if (!mctp_eid_range_is_valid(mctp, &range)) {
+			mctp_prerr(
+				"Failed to allocate %" PRIu8
+				" dynamic endpoint ID%s: Proposed range [%" PRIu8
+				", %" PRIu8 "] is invalid",
+				len, len > 1 ? "s" : "", range.first,
+				range.last);
+			return NULL;
+		}
+
+		mctp->dynamic += len;
 	}
-
-	if ((uint8_t)(mctp->dynamic + len) < mctp->dynamic) {
-		mctp_prerr("Failed to allocate %" PRIu8
-			   " dynamic endpoint ID%s: Out of range request",
-			   len, len > 1 ? "s" : "");
-		return NULL;
-	}
-
-	if (mctp->dynamic + (len - 1) > mctp->dynamic_pool.last) {
-		mctp_prerr("Failed to allocate %" PRIu8
-			   " dynamic endpoint ID%s: Request exceeds pool limit",
-			   len, len > 1 ? "s" : "");
-		return NULL;
-	}
-
-	range = (struct mctp_eid_range){
-		.first = mctp->dynamic,
-		.last = mctp->dynamic + len - 1,
-	};
-
-	if (!mctp_eid_range_is_valid(mctp, &range)) {
-		mctp_prerr("Failed to allocate %" PRIu8
-			   " dynamic endpoint ID%s: Proposed range [%" PRIu8
-			   ", %" PRIu8 "] is invalid",
-			   len, len > 1 ? "s" : "", range.first, range.last);
-		return NULL;
-	}
-
-	mctp->dynamic += len;
 
 	alloc.range = range;
 	alloc.type = MCTP_ROUTE_TYPE_LOCAL;
@@ -905,23 +953,25 @@ void mctp_route_table_dump(const struct mctp *mctp, int level)
 
 	cur = mctp->routes;
 
-	mctp_prlog(level, "|  Range  | Type | Device |");
-	mctp_prlog(level, "+---------+------+--------+");
+	mctp_prlog(level, "|  Range  | Type |   Flags  | Device |");
+	mctp_prlog(level, "+---------+------+----------+--------+");
 	do {
 		if (cur->route.range.first == cur->route.range.last) {
 			mctp_prlog(level,
-				   "|   %3" PRIu8 "   | %4" PRIu8 " | %3" PRIu8
-				   ":%-2" PRIx64 " |",
+				   "|   %3" PRIu8 "   | %4" PRIu8
+				   " | %08" PRIx32 " | %3" PRIu8 ":%-2" PRIx64
+				   " |",
 				   cur->route.range.first, cur->route.type,
-				   cur->route.device.bus,
+				   cur->route.flags, cur->route.device.bus,
 				   cur->route.device.address);
 		} else {
 			mctp_prlog(level,
 				   "| %3" PRIu8 "-%-3" PRIu8 " | %4" PRIu8
-				   " | %3" PRIu8 ":%-2" PRIx64 " |",
+				   " | %08" PRIx32 " | %3" PRIu8 ":%-2" PRIx64
+				   " |",
 				   cur->route.range.first,
 				   cur->route.range.last, cur->route.type,
-				   cur->route.device.bus,
+				   cur->route.flags, cur->route.device.bus,
 				   cur->route.device.address);
 		}
 	} while ((cur = cur->next));
@@ -934,6 +984,7 @@ struct mctp *mctp_init(void)
 
 	mctp = __mctp_alloc(sizeof(*mctp));
 	memset(mctp, 0, sizeof(*mctp));
+	mctp->provisional = 254;
 
 	return mctp;
 }
@@ -976,7 +1027,7 @@ static struct mctp_bus *find_bus_for_eid(struct mctp *mctp, mctp_eid_t dest)
 	} else {
 		mctp_prerr("Invalid bus ID %" PRIu8
 			   " (of %d) in route for endpoint %" PRIu8,
-			   match->device.bus, mctp->n_busses, dest);
+			   match->device.bus, mctp->n_busses, dest.id);
 		bus = NULL;
 	}
 
@@ -1011,9 +1062,11 @@ int mctp_register_bus(struct mctp *mctp,
 	if (mctp_eid_is_valid(mctp, eid) && !mctp_eid_is_special(mctp, eid)) {
 		/* Locally deliver packets destined for the provided endpoint */
 		route = (struct mctp_route){
-			.range = { .first = eid, .last = eid },
+			.range = { .first = eid.id, .last = eid.id },
 			.type = MCTP_ROUTE_TYPE_ENDPOINT,
 			.device = { .bus = bid, .address = 0 },
+			.flags = (!!(eid.flags & MCTP_EID_FLAG_PROVISIONAL)) *
+				 MCTP_ROUTE_FLAG_PROVISIONAL,
 		};
 		rc = mctp_route_insert(mctp, &route);
 		if (rc < 0) {
@@ -1059,18 +1112,20 @@ int mctp_bridge_busses(struct mctp *mctp, struct mctp_binding *b1,
 	b2->mctp = mctp;
 
 	route = (struct mctp_route){
-		.range = { .first = eid1, .last = eid1 },
+		.range = { .first = eid1.id, .last = eid1.id },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0,
 	};
 	rc = mctp_route_insert(mctp, &route);
 	if (rc < 0)
 		goto cleanup;
 
 	route = (struct mctp_route){
-		.range = { .first = eid2, .last = eid2 },
+		.range = { .first = eid2.id, .last = eid2.id },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 1, .address = 0, },
+		.flags = 0,
 	};
 	rc = mctp_route_insert(mctp, &route);
 	if (rc < 0)
@@ -1200,6 +1255,43 @@ static void mctp_send_tx_queue(struct mctp_bus *bus)
 		bus->tx_queue_tail = NULL;
 }
 
+static mctp_eid_t mctp_resolve_source(struct mctp *mctp,
+				      const struct mctp_device *dsrc,
+				      struct mctp_hdr *hdr)
+{
+	const struct mctp_route *match;
+	struct mctp_route route = { 0 };
+	mctp_eid_t src;
+
+	/* If the source has a non-null EID then just route it directly */
+	src = MCTP_EID(hdr->src);
+	if (!mctp_eid_equal(src, MCTP_EID_NULL))
+		return src;
+
+	/* Otherwise, check if we can find an existing EID */
+	match = mctp_route_get_by_device(mctp, dsrc);
+	if (match) {
+		/* Deliver the message as if it were from the existing EID */
+		src = mctp_route_as_eid(match);
+		mctp_route_put(match);
+		return src;
+	}
+
+	/* If there's no existing EID, allocate a provisional EID */
+	route.device = *dsrc;
+	route.flags = MCTP_ROUTE_FLAG_PROVISIONAL;
+	match = mctp_route_allocate(mctp, &route, 1);
+	if (!match) {
+		mctp_prerr(
+			"Failed to allocate route, dropping packet from device { %" PRIu8
+			", %" PRIx64 " }",
+			dsrc->bus, dsrc->address);
+		return MCTP_EID_NULL;
+	}
+
+	return mctp_route_as_eid(match);
+}
+
 static void mctp_bus_route(struct mctp_binding *binding,
 			   const struct mctp_route *route,
 			   struct mctp_pktbuf *rx_pkt)
@@ -1254,6 +1346,7 @@ out:
 }
 
 static void mctp_bus_assemble(struct mctp_binding *binding,
+			      const struct mctp_device *dsrc,
 			      struct mctp_pktbuf *pkt)
 {
 	struct mctp_bus *bus = binding->bus;
@@ -1261,11 +1354,20 @@ static void mctp_bus_assemble(struct mctp_binding *binding,
 	uint8_t flags, exp_seq, seq, tag;
 	struct mctp_msg_ctx *ctx;
 	struct mctp_hdr *hdr;
+	mctp_eid_t src, dest;
 	size_t len;
 	void *p;
 	int rc;
 
 	hdr = mctp_pktbuf_hdr(pkt);
+
+	dest = MCTP_EID(hdr->dest);
+	src = mctp_resolve_source(mctp, dsrc, hdr);
+	if (mctp_eid_equal(src, MCTP_EID_NULL)) {
+		mctp_prerr(
+			"Failed to resolve source endpoint ID, dropping packet");
+		return;
+	}
 
 	flags = hdr->flags_seq_tag & (MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM);
 	tag = (hdr->flags_seq_tag >> MCTP_HDR_TAG_SHIFT) & MCTP_HDR_TAG_MASK;
@@ -1277,19 +1379,18 @@ static void mctp_bus_assemble(struct mctp_binding *binding,
 		 * no need to create a message context */
 		len = pkt->end - pkt->mctp_hdr_off - sizeof(struct mctp_hdr);
 		p = pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr);
-		mctp_rx(mctp, bus, MCTP_EID(hdr->src), p, len);
+		mctp_rx(mctp, bus, src, p, len);
 		break;
 
 	case MCTP_HDR_FLAG_SOM:
 		/* start of a new message - start the new context for
 		 * future message reception. If an existing context is
 		 * already present, drop it. */
-		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, hdr->dest, tag);
+		ctx = mctp_msg_ctx_lookup(mctp, src, dest, tag);
 		if (ctx) {
 			mctp_msg_ctx_reset(ctx);
 		} else {
-			ctx = mctp_msg_ctx_create(mctp,
-					hdr->src, hdr->dest, tag);
+			ctx = mctp_msg_ctx_create(mctp, src, dest, tag);
 		}
 
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
@@ -1302,7 +1403,7 @@ static void mctp_bus_assemble(struct mctp_binding *binding,
 		break;
 
 	case MCTP_HDR_FLAG_EOM:
-		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, hdr->dest, tag);
+		ctx = mctp_msg_ctx_lookup(mctp, src, dest, tag);
 		if (!ctx)
 			goto out;
 
@@ -1317,16 +1418,18 @@ static void mctp_bus_assemble(struct mctp_binding *binding,
 		}
 
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
-		if (!rc)
-			mctp_rx(mctp, bus, MCTP_EID(ctx->src), ctx->buf,
-				ctx->buf_size);
+		if (!rc) {
+			len = ctx->buf_size;
+			p = ctx->buf;
+			mctp_rx(mctp, bus, src, p, len);
+		}
 
 		mctp_msg_ctx_drop(ctx);
 		break;
 
 	case 0:
 		/* Neither SOM nor EOM */
-		ctx = mctp_msg_ctx_lookup(mctp, hdr->src,hdr->dest, tag);
+		ctx = mctp_msg_ctx_lookup(mctp, src, dest, tag);
 		if (!ctx)
 			goto out;
 
@@ -1352,7 +1455,8 @@ out:
 	mctp_pktbuf_free(pkt);
 }
 
-void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
+void mctp_bus_rx(struct mctp_binding *binding, const struct mctp_device *dsrc,
+		 struct mctp_pktbuf *pkt)
 {
 	struct mctp *mctp = binding->mctp;
 	const struct mctp_route *match;
@@ -1363,7 +1467,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 	dest = MCTP_EID(hdr->dest);
 	if (mctp_eid_equal(dest, MCTP_EID_NULL)) {
-		mctp_bus_assemble(binding, pkt);
+		mctp_bus_assemble(binding, dsrc, pkt);
 		return;
 	}
 
@@ -1375,7 +1479,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 	}
 
 	if (match->type == MCTP_ROUTE_TYPE_ENDPOINT)
-		mctp_bus_assemble(binding, pkt);
+		mctp_bus_assemble(binding, dsrc, pkt);
 	else
 		mctp_bus_route(binding, match, pkt);
 
@@ -1401,12 +1505,14 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 
 	max_payload_len = bus->binding->pkt_size - sizeof(*hdr);
 
-	mctp_prdebug("%s: Generating packets for transmission of %zu byte message from %hhu to %hhu",
-		     __func__, msg_len, src, dest);
+	mctp_prdebug(
+		"%s: Generating packets for transmission of %zu byte message from %hhu to %hhu",
+		__func__, msg_len, src.id, dest.id);
 
 	route = mctp_route_get_by_eid(bus->binding->mctp, dest);
 	if (!route) {
-		mctp_prerr("Failed to find route for endpoint %" PRIu8, dest);
+		mctp_prerr("Failed to find route for endpoint %" PRIu8,
+			   dest.id);
 		return -ENXIO;
 	}
 
@@ -1424,10 +1530,11 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 
 		/* todo: tags */
 		hdr->ver = bus->binding->version & 0xf;
-		hdr->dest = dest;
-		hdr->src = src;
-		hdr->flags_seq_tag = MCTP_HDR_FLAG_TO |
-			(0 << MCTP_HDR_TAG_SHIFT);
+		hdr->dest =
+			dest.flags & MCTP_EID_FLAG_PROVISIONAL ? 0 : dest.id;
+		hdr->src = src.flags & MCTP_EID_FLAG_PROVISIONAL ? 0 : src.id;
+		hdr->flags_seq_tag =
+			MCTP_HDR_FLAG_TO | (0 << MCTP_HDR_TAG_SHIFT);
 
 		if (i == 0)
 			hdr->flags_seq_tag |= MCTP_HDR_FLAG_SOM;
@@ -1480,7 +1587,8 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t dest, void *msg, size_t len)
 		/* Fall back to the NULL EID if we're sending locally */
 		match = mctp_route_get_by_eid(mctp, dest);
 		assert(match);
-		if (match->type != MCTP_ROUTE_TYPE_LOCAL) {
+		if (!(match->type == MCTP_ROUTE_TYPE_LOCAL ||
+		      match->flags & MCTP_ROUTE_FLAG_PROVISIONAL)) {
 			/* Can't use a NULL EID for a non-local device */
 			mctp_route_put(match);
 			return -ENXIO;
