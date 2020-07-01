@@ -440,6 +440,10 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 	hdr = mctp_pktbuf_hdr(pkt);
 
+	/* Drop packet if it was smaller than mctp hdr size */
+	if (mctp_pktbuf_size(pkt) <= sizeof(struct mctp_hdr))
+		goto out;
+
 	/* small optimisation: don't bother reassembly if we're going to
 	 * drop the packet in mctp_rx anyway */
 	if (mctp->route_policy == ROUTE_ENDPOINT && hdr->dest != bus->eid)
