@@ -234,7 +234,9 @@ struct mctp *mctp_init(void)
 	struct mctp *mctp;
 
 	mctp = __mctp_alloc(sizeof(*mctp));
-	memset(mctp, 0, sizeof(*mctp));
+
+	if (!mctp)
+		return NULL;
 
 	return mctp;
 }
@@ -470,7 +472,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 					hdr->src, hdr->dest, tag);
 		}
 
-		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
+		rc = mctp_msg_ctx_add_pkt(ctx, pkt, mctp->max_message_size);
 		if (rc) {
 			mctp_msg_ctx_drop(ctx);
 		} else {
@@ -494,7 +496,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 			goto out;
 		}
 
-		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
+		rc = mctp_msg_ctx_add_pkt(ctx, pkt, mctp->max_message_size);
 		if (!rc)
 			mctp_rx(mctp, bus, ctx->src, ctx->dest,
 					ctx->buf, ctx->buf_size);
@@ -517,7 +519,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 			goto out;
 		}
 
-		rc = mctp_msg_ctx_add_pkt(ctx, pkt);
+		rc = mctp_msg_ctx_add_pkt(ctx, pkt, mctp->max_message_size);
 		if (rc) {
 			mctp_msg_ctx_drop(ctx);
 			goto out;
