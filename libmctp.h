@@ -14,9 +14,32 @@ extern "C" {
 
 typedef uint8_t mctp_eid_t;
 
+struct mctp;
+struct mctp_bus;
+
 /* Special Endpoint ID values */
 #define MCTP_EID_NULL 0
 #define MCTP_EID_BROADCAST 0xff
+
+/* Inclusive range */
+struct mctp_eid_range {
+	mctp_eid_t first;
+	mctp_eid_t last;
+};
+
+bool mctp_eid_is_valid(const struct mctp *mctp, mctp_eid_t eid);
+bool mctp_eid_is_special(const struct mctp *mctp, mctp_eid_t eid);
+bool mctp_eid_range_is_routable(const struct mctp *mctp,
+				const struct mctp_eid_range *range);
+bool mctp_eid_range_contains(const struct mctp *mctp,
+			     const struct mctp_eid_range *range,
+			     mctp_eid_t eid);
+bool mctp_eid_range_equal(const struct mctp *mctp,
+			  const struct mctp_eid_range *a,
+			  const struct mctp_eid_range *b);
+int mctp_eid_range_intersects(const struct mctp *mctp,
+			      const struct mctp_eid_range *a,
+			      const struct mctp_eid_range *b);
 
 /* MCTP packet definitions */
 struct mctp_hdr {
@@ -61,9 +84,6 @@ void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, size_t size);
 int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, size_t len);
 
 /* MCTP core */
-struct mctp;
-struct mctp_bus;
-
 struct mctp *mctp_init(void);
 void mctp_set_max_message_size(struct mctp *mctp, size_t message_size);
 void mctp_destroy(struct mctp *mctp);
