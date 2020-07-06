@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6c1a7c2b_d658d868",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 1000164
+      },
+      "writtenOn": "2020-07-06T16:24:04Z",
+      "side": 1,
+      "message": "is this redundant to the while loop checking for null?",
+      "range": {
+        "startLine": 535,
+        "startChar": 2,
+        "endLine": 539,
+        "endChar": 3
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
