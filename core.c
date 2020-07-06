@@ -526,26 +526,47 @@ out:
 	mctp_pktbuf_free(pkt);
 }
 
-static int mctp_packet_tx(struct mctp_bus *bus,
-		struct mctp_pktbuf *pkt)
+static void flush_message(struct mctp_bus *bus)
+{
+	struct mctp_pktbuf *pkt;
+
+	while (pkt = bus->tx_queue_head) {
+		bus->tx_queue_head = pkt->next;
+		//If EOM of the message is reached then stop flushing
+		if (mctp_pktbuf_hdr(pkt)->flags_seq_tag & MCTP_HDR_FLAG_EOM) {
+			mctp_pktbuf_free(pkt);
+			break;
+		}
+		mctp_pktbuf_free(pkt);
+	}
+}
+
+static int mctp_packet_tx(struct mctp_bus *bus, struct mctp_pktbuf *pkt)
 {
 	if (!bus->tx_enabled)
-		return -1;
+		return TX_DISABLED_ERR;
 
 	return bus->binding->tx(bus->binding, pkt);
 }
 
-static void mctp_send_tx_queue(struct mctp_bus *bus)
+static int mctp_send_tx_queue(struct mctp_bus *bus)
 {
 	struct mctp_pktbuf *pkt;
+	int rc;
 
 	while ((pkt = bus->tx_queue_head)) {
-		int rc;
-
 		rc = mctp_packet_tx(bus, pkt);
-		if (rc)
-			break;
 
+		if (rc < 0) {
+			if (rc == TX_DISABLED_ERR)
+				break;
+			else {
+				mctp_prerr(
+					"Failed to tx mctp packet;flushing message");
+				flush_message(bus);
+				continue;
+			}
+		}
 		bus->tx_queue_head = pkt->next;
 		mctp_pktbuf_free(pkt);
 	}
@@ -553,6 +574,7 @@ static void mctp_send_tx_queue(struct mctp_bus *bus)
 	if (!bus->tx_queue_head)
 		bus->tx_queue_tail = NULL;
 
+	return rc;
 }
 
 void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
@@ -614,9 +636,7 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 
 	mctp_prdebug("%s: Enqueued %d packets", __func__, i);
 
-	mctp_send_tx_queue(bus);
-
-	return 0;
+	return mctp_send_tx_queue(bus);
 }
 
 int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
