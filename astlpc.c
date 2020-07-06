@@ -214,7 +214,6 @@ static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 	 * interrupt is triggered, and can be ignored by the host.
 	 */
 	data = 0xff;
-	status |= KCS_STATUS_OBF;
 
 	rc = mctp_astlpc_kcs_write(astlpc, MCTP_ASTLPC_KCS_REG_STATUS, status);
 	if (rc) {
@@ -414,8 +413,12 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 
 	mctp_astlpc_lpc_write(astlpc, &hdr, 0, sizeof(hdr));
 
-	/* set status indicating that the BMC is now active */
-	status = KCS_STATUS_BMC_READY | KCS_STATUS_OBF;
+	/*
+	 * Set status indicating that the BMC is now active. Be explicit about
+	 * clearing OBF; we're reinitialising the binding and so any previous
+	 * buffer state is irrelevant.
+	 */
+	status = KCS_STATUS_BMC_READY & ~KCS_STATUS_OBF;
 	return mctp_astlpc_kcs_set_status(astlpc, status);
 }
 
