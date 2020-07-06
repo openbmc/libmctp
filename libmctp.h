@@ -40,6 +40,8 @@ struct mctp_hdr {
 #define MCTP_PACKET_SIZE(unit)	((unit) + sizeof(struct mctp_hdr))
 #define MCTP_BODY_SIZE(unit)	((unit) - sizeof(struct mctp_hdr))
 
+#define TX_DISABLED_ERR (-1024)
+
 /* packet buffers */
 
 struct mctp_pktbuf {

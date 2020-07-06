@@ -256,7 +256,7 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 
 	/* BMC sends a message */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
-	assert(rc == 0);
+	assert(rc == 0 || rc == TX_DISABLED_ERR);
 
 	/* Host receives the first packet */
 	mctp_astlpc_poll(ctx.host.astlpc);
