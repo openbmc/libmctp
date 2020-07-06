@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "11fb20f8_f3b8783a",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-07-06T08:32:18Z",
+      "side": 1,
+      "message": "Shouldn\u0027t route_notify be optional ? Suppose a simplistic endpoint is trying to use libmctp and if it doesn\u0027t bother about route tables, it might not register a callback for this.",
+      "range": {
+        "startLine": 698,
+        "startChar": 1,
+        "endLine": 698,
+        "endChar": 28
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    }
+  ]
+}
