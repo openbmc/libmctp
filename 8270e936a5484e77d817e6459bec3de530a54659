@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b888e4ec_41daff96",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2020-07-06T07:12:46Z",
+      "side": 1,
+      "message": "Can we use a generic list type here? or even ccan/list.h?\n\nThis would mean you don\u0027t need to reimplement list traversal/manipulation over again.",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "18cee7da_fdb269b4",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2020-07-06T07:12:46Z",
+      "side": 1,
+      "message": "If I could put memes in gerrit comments, one would go here 😀",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aecec76f_05b74042",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2020-07-06T07:12:46Z",
+      "side": 1,
+      "message": "It\u0027s not super clear on which entity is responsible for manipulating the routing table. For example, should a caller be at the \"application layer\" of a MCTP stack? (in which case, doing routing table manipulation would appear odd). Can you either expand on this section of the API, or provide an example or two in a separate doc?",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "274b7581_b7cf2a89",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2020-07-06T07:12:46Z",
+      "side": 1,
+      "message": "What does this represent?",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8b540741_803a58f0",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2020-07-06T07:12:46Z",
+      "side": 1,
+      "message": "These could do with some explanation of the values (what\u0027s upstream \u0026 downstream?), which might work better as an enum.",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
