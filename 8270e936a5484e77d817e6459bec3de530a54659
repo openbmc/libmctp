@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "36482bc9_fa32e372",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T05:50:48Z",
+      "side": 1,
+      "message": "Yeah, I definitely had ccan/list.h on my mind, but I figured I\u0027d explore exactly what we needed with a bespoke implementation.\n\nHaving read the patch(es), you think we should switch?",
+      "parentUuid": "b888e4ec_41daff96",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "18cee7da_fdb269b4",
         "filename": "core.c",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2020-07-06T07:12:46Z",
       "side": 1,
       "message": "If I could put memes in gerrit comments, one would go here 😀",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b03f1b2_f2f1034c",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T05:50:48Z",
+      "side": 1,
+      "message": "Haha, well there\u0027s no locking elsewhere in libmctp currently, so if you\u0027re using it multi-threaded you\u0027re (probably) already broken. Maybe we shouldn\u0027t make it worse, but that\u0027s not something I wanted to worry about in this series. At least there\u0027s note :P\n\nDo you think I should do something different?",
+      "parentUuid": "18cee7da_fdb269b4",
       "revId": "8270e936a5484e77d817e6459bec3de530a54659",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "2ce425d2_6c4fbb0d",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T05:50:48Z",
+      "side": 1,
+      "message": "Right, so the answer is two entities:\n\n1. The application where the application is the entity setting up the network - we need to add routes as the network is initialised and then both add and remove routes as dynamic devices come and go.\n2. Bindings: when certain packets are received or packets are received from certain addresses, bindings need to manipulate the route table. This actually ends up taking place in core.c with the binding providing the physical address information for the packet to the core in the form of the `struct mctp_device` that you\u0027re querying below.",
+      "parentUuid": "aecec76f_05b74042",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "274b7581_b7cf2a89",
         "filename": "libmctp.h",
         "patchSetId": 6
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "b3264b87_1b1218bf",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T05:50:48Z",
+      "side": 1,
+      "message": "The physical address of a device on a local bus. In the case of a bridge there will be more than one bus, so we need the bus index represented as well. This information is stored in the route table and is also passed between bindings and the core (mctp_bus_rx) for each packet received. In the case of NULL EIDs, it\u0027s the struct mctp_device associated with the packet that allows us to determine the appropriate provisional route.",
+      "parentUuid": "274b7581_b7cf2a89",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8b540741_803a58f0",
         "filename": "libmctp.h",
         "patchSetId": 6
@@ -81,6 +153,24 @@
       "writtenOn": "2020-07-06T07:12:46Z",
       "side": 1,
       "message": "These could do with some explanation of the values (what\u0027s upstream \u0026 downstream?), which might work better as an enum.",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "864ee592_ad5dc75e",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T05:50:48Z",
+      "side": 1,
+      "message": "Yes, I should put a comment in here as Richard and Iwona were discussing it on previous revisions of the patch. It\u0027s mostly covered by DSP0236 v1.3.1 9.1.6. The type MCTP_ROUTE_TYPE_ENDPOINT refers to a locally owned EID. We need MCTP_ROUTE_TYPE_LOCAL to correctly reply to `Resolve Endpoint ID` queries (i.e. have the source device send packets directly to the destination device rather than force the bridge to route all packets for each device on the bus).\n\nAs for enum, I agree, but they have an ambiguous type size. For public interfaces I think we should use well-defined type sizes to make it easier to interface with the APIs (it makes it more obvious when you break the ABI).",
+      "parentUuid": "8b540741_803a58f0",
       "revId": "8270e936a5484e77d817e6459bec3de530a54659",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
