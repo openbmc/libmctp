@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "f6d8d98f_e66bb7aa",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-07-07T07:55:19Z",
+      "side": 1,
+      "message": "Sure. Also, since this is a static function, mctp_ prefix might not be essential.",
+      "parentUuid": "1fc3cbe0_b09afb1d",
+      "range": {
+        "startLine": 529,
+        "startChar": 12,
+        "endLine": 529,
+        "endChar": 25
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6c1a7c2b_d658d868",
         "filename": "core.c",
         "patchSetId": 3
@@ -96,6 +120,30 @@
     },
     {
       "key": {
+        "uuid": "f472c57c_7af9f160",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-07-07T07:55:19Z",
+      "side": 1,
+      "message": "Valid. Agree there.",
+      "parentUuid": "f37b2f6d_5b6e9ec2",
+      "range": {
+        "startLine": 535,
+        "startChar": 2,
+        "endLine": 539,
+        "endChar": 3
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8648d738_03abae69",
         "filename": "core.c",
         "patchSetId": 3
@@ -119,6 +167,30 @@
     },
     {
       "key": {
+        "uuid": "16b8f0a5_85f315c0",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-07-07T07:55:19Z",
+      "side": 1,
+      "message": "Agree",
+      "parentUuid": "8648d738_03abae69",
+      "range": {
+        "startLine": 561,
+        "startChar": 3,
+        "endLine": 568,
+        "endChar": 4
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6d1e35dc_44559ae9",
         "filename": "tests/test_astlpc.c",
         "patchSetId": 3
@@ -130,6 +202,30 @@
       "writtenOn": "2020-07-07T06:46:29Z",
       "side": 1,
       "message": "Why was this necessary? It shouldn\u0027t be the case. Did you see test failures?",
+      "range": {
+        "startLine": 259,
+        "startChar": 15,
+        "endLine": 259,
+        "endChar": 40
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6082ea81_6075453b",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-07-07T07:55:19Z",
+      "side": 1,
+      "message": "Yes. There were test failures. I am not very familiar with lpc, assumed it might be due to tx getting disabled somewhere.",
+      "parentUuid": "6d1e35dc_44559ae9",
       "range": {
         "startLine": 259,
         "startChar": 15,
