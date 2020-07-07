@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "fc152a85_e4aa3580",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T04:54:51Z",
+      "side": 1,
+      "message": "That macro hasn\u0027t yet been introduced. It comes later in the series. I believe it gets fixed eventually because mctp_eid_t changes to a struct.",
+      "parentUuid": "b8f1568e_fa8ab976",
+      "range": {
+        "startLine": 235,
+        "startChar": 39,
+        "endLine": 235,
+        "endChar": 40
+      },
+      "revId": "7fcf274e15a3185746023783520d41ed36a4eb0f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "928add26_faa0b6df",
         "filename": "core.c",
         "patchSetId": 1
@@ -71,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "c7d122a4_2b1df8b3",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T04:54:51Z",
+      "side": 1,
+      "message": "I can\u0027t see a reason not to now. Probably just force of habit :)",
+      "parentUuid": "928add26_faa0b6df",
+      "range": {
+        "startLine": 258,
+        "startChar": 0,
+        "endLine": 258,
+        "endChar": 3
+      },
+      "revId": "7fcf274e15a3185746023783520d41ed36a4eb0f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "471b718a_14fe465d",
         "filename": "core.c",
         "patchSetId": 1
@@ -91,6 +139,30 @@
       "revId": "7fcf274e15a3185746023783520d41ed36a4eb0f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb691523_bea76c80",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T04:54:51Z",
+      "side": 1,
+      "message": "Well, it\u0027s questionable, but because of the assert, and I\u0027m trying to get the interfaces right in the face of future MCTP specification releases that might make use of the reserved EID values. If that happens then we need to know which MCTP protocol version we\u0027re using to determine what\u0027s valid.",
+      "parentUuid": "471b718a_14fe465d",
+      "range": {
+        "startLine": 265,
+        "startChar": 28,
+        "endLine": 265,
+        "endChar": 75
+      },
+      "revId": "7fcf274e15a3185746023783520d41ed36a4eb0f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
