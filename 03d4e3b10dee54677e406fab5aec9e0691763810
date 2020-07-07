@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "1fc3cbe0_b09afb1d",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:46:29Z",
+      "side": 1,
+      "message": "Flush to me implies that we\u0027ll block until we\u0027ve sent it out. How about mctp_drop_tx_queue_head?",
+      "range": {
+        "startLine": 529,
+        "startChar": 12,
+        "endLine": 529,
+        "endChar": 25
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6c1a7c2b_d658d868",
         "filename": "core.c",
         "patchSetId": 3
@@ -42,6 +65,99 @@
         "startChar": 2,
         "endLine": 539,
         "endChar": 3
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f37b2f6d_5b6e9ec2",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:46:29Z",
+      "side": 1,
+      "message": "Having two mctp_pktbuf_free()s here makes it harder to read than I think is necessary. How about this if we want to free the packet regardless:\n\n bool eom \u003d false;\n while ((pkt \u003d bus-\u003etx_queue_head) \u0026\u0026 !eom) {\n  eom \u003d mctp_pktbuf_hdr(pkt)-\u003eflags_seq_tag \u0026 MCTP_HDR_FLAG_EOM;\n  bus-\u003etx_queue_head \u003d pkt-\u003enext;\n  mctp_pktbuf_free(pkt);\n }",
+      "parentUuid": "54e1ca57_64d15cc3",
+      "range": {
+        "startLine": 535,
+        "startChar": 2,
+        "endLine": 539,
+        "endChar": 3
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8648d738_03abae69",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:46:29Z",
+      "side": 1,
+      "message": "Lets just do this in mctp_packet_tx() to avoid having to specially handle the !TX_DISABLED_ERR case. That way we can drop the TX_DISABLED_ERR symbol as well.",
+      "range": {
+        "startLine": 561,
+        "startChar": 3,
+        "endLine": 568,
+        "endChar": 4
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d1e35dc_44559ae9",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:46:29Z",
+      "side": 1,
+      "message": "Why was this necessary? It shouldn\u0027t be the case. Did you see test failures?",
+      "range": {
+        "startLine": 259,
+        "startChar": 15,
+        "endLine": 259,
+        "endChar": 40
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "26adf086_0d9d2675",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 636,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:46:29Z",
+      "side": 1,
+      "message": "As above.",
+      "range": {
+        "startLine": 636,
+        "startChar": 15,
+        "endLine": 636,
+        "endChar": 40
       },
       "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
