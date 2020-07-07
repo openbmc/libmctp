@@ -95,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "f65603cb_f6f31e91",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:10:55Z",
+      "side": 1,
+      "message": "Ack!",
+      "parentUuid": "3db7cc11_9184394c",
+      "range": {
+        "startLine": 349,
+        "startChar": 15,
+        "endLine": 349,
+        "endChar": 17
+      },
+      "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "af3d9a47_dae3c272",
         "filename": "core.c",
         "patchSetId": 3
@@ -115,6 +139,53 @@
       "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7909fde4_6a7270ea",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:10:55Z",
+      "side": 1,
+      "message": "I\u0027ve given this some more thought below:\n\nhttps://lists.ozlabs.org/pipermail/openbmc/2020-July/022186.html",
+      "parentUuid": "af3d9a47_dae3c272",
+      "range": {
+        "startLine": 593,
+        "startChar": 0,
+        "endLine": 615,
+        "endChar": 2
+      },
+      "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "681a6b23_bf749c82",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:10:55Z",
+      "side": 1,
+      "message": "Need to check that the EID is routable, and if not do something else. I need to think about what that something else is though; in the case of a bridge it\u0027s not obvious where to send a broadcast message besides all attached busses?",
+      "range": {
+        "startLine": 778,
+        "startChar": 1,
+        "endLine": 778,
+        "endChar": 35
+      },
+      "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     },
     {
       "key": {
@@ -153,6 +224,30 @@
       "side": 1,
       "message": "This is true for a bridge. According to 9.1.1 Routing/bridging restrictions: \"A bridge shall not route or forward packets with a broadcast destination ID.\"\n\nBut since this function impacts mctp_message_tx(), the bridge / bus owner endpoint will not be able to send broadcast messages.",
       "parentUuid": "d72e4b2a_0e60fe7d",
+      "range": {
+        "startLine": 904,
+        "startChar": 38,
+        "endLine": 904,
+        "endChar": 68
+      },
+      "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3a073120_e1e6d39a",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 904,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:10:55Z",
+      "side": 1,
+      "message": "\u003e But since this function impacts mctp_message_tx(), the bridge / bus owner endpoint will not be able to send broadcast messages.\n\nThis is a good point. I think we need some extra logic before the find_bus_by_eid() call to handle broadcasts in mctp_message_tx().",
+      "parentUuid": "21ed82c6_6383b7b2",
       "range": {
         "startLine": 904,
         "startChar": 38,
