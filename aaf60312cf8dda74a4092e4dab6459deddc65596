@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "217d852d_cd50f83a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T05:21:40Z",
+      "side": 1,
+      "message": "I\u0027m not sure I completely follow your last point. Can you explain it another way? Also can you expand on the security concern?\n\nAs for the concern about the impact on the routing table, have you reviewed the top patch in the series that introduces the provisional endpoint IDs? Hopefully that\u0027s informative. The bulk of the change is to do with widening the mctp_eid_t type.",
+      "parentUuid": "2c5b6960_f0d3038f",
+      "range": {
+        "startLine": 10,
+        "startChar": 45,
+        "endLine": 11,
+        "endChar": 26
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f2fb99b8_c7935e87",
         "filename": "core.c",
         "patchSetId": 5
@@ -84,6 +108,30 @@
       "writtenOn": "2020-06-29T20:42:28Z",
       "side": 1,
       "message": "I don\u0027t see it being used anywhere. Leftover?",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 23
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "909e3cc4_167835e9",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T05:21:40Z",
+      "side": 1,
+      "message": "Yep, this is cruft, will remove it.",
+      "parentUuid": "f2fb99b8_c7935e87",
       "range": {
         "startLine": 49,
         "startChar": 0,
@@ -191,6 +239,30 @@
     },
     {
       "key": {
+        "uuid": "c1cf5b88_981817ba",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T05:21:40Z",
+      "side": 1,
+      "message": "\u003e Ok, but I\u0027m wondering how this function is supposed to be used, because right now it is called just in the mctp_eid_range_is_valid(), where we also need to filter if the given eid is not special.\n\nSo mctp_eid_is_valid() is asking a general question about the provided EID; mctp_eid_is_special() is asking a specific question about whether it\u0027s unassignable, and using both in combination allows you to derive whether an EID is assignable. What would you like to see done?",
+      "parentUuid": "d6d0a023_ad53040d",
+      "range": {
+        "startLine": 85,
+        "startChar": 8,
+        "endLine": 85,
+        "endChar": 28
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "973e07f8_3e0c8ac3",
         "filename": "core.c",
         "patchSetId": 5
@@ -202,6 +274,30 @@
       "writtenOn": "2020-06-29T20:42:28Z",
       "side": 1,
       "message": "Why is it not \"bool\"? Same for the next two.",
+      "range": {
+        "startLine": 108,
+        "startChar": 0,
+        "endLine": 108,
+        "endChar": 3
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bc197fcf_fb71391d",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T05:21:40Z",
+      "side": 1,
+      "message": "Yeah, I think that\u0027s probably a better idea :)",
+      "parentUuid": "973e07f8_3e0c8ac3",
       "range": {
         "startLine": 108,
         "startChar": 0,
@@ -419,6 +515,30 @@
       "side": 1,
       "message": "No need to change in this patchset, to keep this patchset simple",
       "parentUuid": "62d8e5f2_928b95c7",
+      "range": {
+        "startLine": 119,
+        "startChar": 22,
+        "endLine": 119,
+        "endChar": 51
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5b3b3313_82d0d8ca",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T05:21:40Z",
+      "side": 1,
+      "message": "Well, except that it changes the public interface of the library. If we can agree to go one direction or the other, it would be best to implement whichever we choose in the patch that introduces the member.",
+      "parentUuid": "5abecc16_7592bc03",
       "range": {
         "startLine": 119,
         "startChar": 22,
