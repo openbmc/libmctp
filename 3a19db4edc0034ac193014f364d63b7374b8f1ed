@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "23fce704_06332f1b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:04:21Z",
+      "side": 1,
+      "message": "I ended up fixing this, so note to self to remove it.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 50
+      },
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2e7769f9_7398a7eb",
         "filename": "core.c",
         "patchSetId": 5
@@ -13,6 +36,24 @@
       "writtenOn": "2020-07-06T07:13:28Z",
       "side": 1,
       "message": "So we used to use struct mctp_bus to represent attaching an EID to a binding (essentially, just a (binding, eid) pair). Now that we\u0027re using the route table, is that separation of binding and bus still needed? ie., should we move all of this into struct mctp_binding perhaps?\n\n[This may help with future confusion - you have mctp_bus_* functions below that operate on a binding, not a bus]",
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0df1e35c_0beb60e9",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:04:21Z",
+      "side": 1,
+      "message": "Right, yeah, I think you\u0027re onto something there. Though the naming of the mctp_bus_* functions was pretty loosely done, I just needed a name and didn\u0027t really consider your distinction above :)",
+      "parentUuid": "2e7769f9_7398a7eb",
       "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -36,6 +77,24 @@
     },
     {
       "key": {
+        "uuid": "8f9952bd_afffe27a",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1020,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:04:21Z",
+      "side": 1,
+      "message": "Right! And that would get rid of the caveat in the docs in the header. I like it.",
+      "parentUuid": "0322c1f8_cc485a87",
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bdb12e5d_8b4547f1",
         "filename": "core.c",
         "patchSetId": 5
@@ -47,6 +106,47 @@
       "writtenOn": "2020-07-06T07:13:28Z",
       "side": 1,
       "message": "This might be neater to just assign to route.range / route.type / route.device directly.",
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "02ced409_e36c47a0",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1070,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:04:21Z",
+      "side": 1,
+      "message": "Yeah, I experimented with this approach to avoid the visual redundancy, but I\u0027m not sure it\u0027s any clearer with the extra line noise. However, we\u0027d have an extra two lines then to assign to the range and device members:\n\n route.range.first \u003d eid1;\n route.range.last \u003d eid1;\n route.type \u003d MCTP_ROUTE_TYPE_LOCAL;\n route.device.bus \u003d 0;\n route.device.address \u003d 0;\n\nPerhaps your suggestion is less surprising and that\u0027s a readability win its own right...",
+      "parentUuid": "bdb12e5d_8b4547f1",
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d6ae0065_44db1c7b",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1444,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-07T06:04:21Z",
+      "side": 1,
+      "message": "Can pull this call out along with the call on 1455 and put it before the return.",
+      "range": {
+        "startLine": 1444,
+        "startChar": 2,
+        "endLine": 1444,
+        "endChar": 24
+      },
       "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
