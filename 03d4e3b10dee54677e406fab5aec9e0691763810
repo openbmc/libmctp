@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "61513d56_afee6357",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-08T00:16:33Z",
+      "side": 1,
+      "message": "Right, but having it prefixed makes stack traces easier to interpret.",
+      "parentUuid": "f6d8d98f_e66bb7aa",
+      "range": {
+        "startLine": 529,
+        "startChar": 12,
+        "endLine": 529,
+        "endChar": 25
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6c1a7c2b_d658d868",
         "filename": "core.c",
         "patchSetId": 3
@@ -226,6 +250,30 @@
       "side": 1,
       "message": "Yes. There were test failures. I am not very familiar with lpc, assumed it might be due to tx getting disabled somewhere.",
       "parentUuid": "6d1e35dc_44559ae9",
+      "range": {
+        "startLine": 259,
+        "startChar": 15,
+        "endLine": 259,
+        "endChar": 40
+      },
+      "revId": "03d4e3b10dee54677e406fab5aec9e0691763810",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2f317b72_59d55b65",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-07-08T00:16:33Z",
+      "side": 1,
+      "message": "I\u0027ll have a play with the revised patch to understand what\u0027s going on. This should not be necessary; it\u0027s possible that the test might need to be rearranged slightly (the binding transmit is disabled between mctp_astlpc_poll() calls).",
+      "parentUuid": "6082ea81_6075453b",
       "range": {
         "startLine": 259,
         "startChar": 15,
