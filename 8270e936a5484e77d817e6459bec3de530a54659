@@ -72,6 +72,52 @@
     },
     {
       "key": {
+        "uuid": "1dee2fbe_d42e596f",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2020-07-13T22:09:56Z",
+      "side": 1,
+      "message": "Since it is the exported function, isn\u0027t it better to return error to client?\nWe should probably avoid letting users trigger asserts inside library, in other words, asserts should be something internal for libmctp.",
+      "range": {
+        "startLine": 534,
+        "startChar": 1,
+        "endLine": 535,
+        "endChar": 49
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ab97ff91_a2c85d94",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2020-07-13T22:09:56Z",
+      "side": 1,
+      "message": "Same here.",
+      "range": {
+        "startLine": 568,
+        "startChar": 1,
+        "endLine": 568,
+        "endChar": 14
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "aecec76f_05b74042",
         "filename": "libmctp.h",
         "patchSetId": 6
