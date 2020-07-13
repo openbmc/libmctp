@@ -263,6 +263,30 @@
     },
     {
       "key": {
+        "uuid": "7820b47a_4c49cb04",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2020-07-13T22:09:56Z",
+      "side": 1,
+      "message": "I was just wondering whether this is something that\u0027s just supposed to be used for routing, or something general. For a general \"anything that\u0027s not reserved\" that\u0027s fine. If it was just for routing (but I get it, it\u0027s not), NULL eid is not valid, since need to route by physical address (and probably need a separate API for that), I think similar thing applies for broadcasts (MCTP network-wide broadcasts are not supported). So nothing in particular to be done - just this discussion is fine :)",
+      "parentUuid": "c1cf5b88_981817ba",
+      "range": {
+        "startLine": 85,
+        "startChar": 8,
+        "endLine": 85,
+        "endChar": 28
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "973e07f8_3e0c8ac3",
         "filename": "core.c",
         "patchSetId": 5
