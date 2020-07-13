@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a7d27ee7_4814e194",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2020-07-13T22:28:34Z",
+      "side": 1,
+      "message": "We should probably also change type for src and dest in mctp_msg_ctx_lookup() and mctp_msg_ctx_create() in core.c (it will be done later in series - 34293, but it could be moved here) and in rx_message() functions in utils.",
+      "range": {
+        "startLine": 9,
+        "startChar": 25,
+        "endLine": 9,
+        "endChar": 45
+      },
+      "revId": "59024163898ddcb84876a412bd0ce0e2d30c2a33",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
