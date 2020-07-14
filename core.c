@@ -246,6 +246,10 @@ struct mctp *mctp_init(void)
 	struct mctp *mctp;
 
 	mctp = __mctp_alloc(sizeof(*mctp));
+
+	if(!mctp)
+		return NULL;
+
 	memset(mctp, 0, sizeof(*mctp));
 	mctp->max_message_size = MCTP_MAX_MESSAGE_SIZE;
 
