@@ -95,6 +95,29 @@
     },
     {
       "key": {
+        "uuid": "0bcd3cb3_f6f05c79",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:32:57Z",
+      "side": 1,
+      "message": "this must be LOCAL right?\nThis ENDPOINT is kind of confusing with the usage. I visualize only 3 routing types,\nUPSTREAM, DOWNSTREAM \u0026 LOCAL. We will provide routing table update accordingly based on the bus in which the request came in right? that\u0027s the plan right?\n\nSay Figure 11 in the base spec DSP0236 1.3.1\nBridge X has 2 ports, and it will not advertise EID8 to the bridge y through routing table, instead it will indicate EID 11(Self), EID12,13 (Device A \u0026 B), EID 17(Bridge + EID18-EID19 through Bridge z), EID 9to 10 (through Bridge self - through bus 1). itself.",
+      "range": {
+        "startLine": 1024,
+        "startChar": 11,
+        "endLine": 1024,
+        "endChar": 36
+      },
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bdb12e5d_8b4547f1",
         "filename": "core.c",
         "patchSetId": 5
@@ -124,6 +147,52 @@
       "side": 1,
       "message": "Yeah, I experimented with this approach to avoid the visual redundancy, but I\u0027m not sure it\u0027s any clearer with the extra line noise. However, we\u0027d have an extra two lines then to assign to the range and device members:\n\n route.range.first \u003d eid1;\n route.range.last \u003d eid1;\n route.type \u003d MCTP_ROUTE_TYPE_LOCAL;\n route.device.bus \u003d 0;\n route.device.address \u003d 0;\n\nPerhaps your suggestion is less surprising and that\u0027s a readability win its own right...",
       "parentUuid": "bdb12e5d_8b4547f1",
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "081ffaad_8771da15",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1233,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:32:57Z",
+      "side": 1,
+      "message": "this brings another perspective, that the pkt header pad must be the largest of binding medium supported. \nLet me know if you disagree, if you agree, then this can be of separate commit",
+      "range": {
+        "startLine": 1231,
+        "startChar": 0,
+        "endLine": 1233,
+        "endChar": 34
+      },
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e706aaf6_daee665a",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1354,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:32:57Z",
+      "side": 1,
+      "message": "when we support multiple bus registration in single bridge, then EID match will happen for the port EID (self) of different bus too. Do we allow it ?",
+      "range": {
+        "startLine": 1354,
+        "startChar": 9,
+        "endLine": 1354,
+        "endChar": 30
+      },
       "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true

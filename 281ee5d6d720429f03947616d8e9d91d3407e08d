@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "918e2e2e_eeda53e2",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:32:57Z",
+      "side": 0,
+      "message": "where is this getting moved now ?\nor going to use only routing table for this ? \nQuestion is how we will track the EID (self) for the particular binding? \nNote: \nNote: Either we are using same EID for all the binding / different EID (self) for different binding.",
+      "range": {
+        "startLine": 27,
+        "startChar": 1,
+        "endLine": 27,
+        "endChar": 16
+      },
+      "revId": "281ee5d6d720429f03947616d8e9d91d3407e08d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4110ffc2_c1f2aca3",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:32:57Z",
+      "side": 0,
+      "message": "we still need this to understand whether it is special EID\u0027s request?",
+      "range": {
+        "startLine": 1179,
+        "startChar": 31,
+        "endLine": 1179,
+        "endChar": 41
+      },
+      "revId": "281ee5d6d720429f03947616d8e9d91d3407e08d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
