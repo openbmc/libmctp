@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ba1764b_b1c73db9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T17:54:33Z",
+      "side": 1,
+      "message": "1. Going to end up with one Provisional EID for all the bus/address of the device which is in communication. \n(i.e), say when we are in bridge, we need to issue SetEndPointID with Destination NULL EID for that address (making a provisional EID).\n2. Need to understand the management of the same? When we will remove, from the way i see this, it is never going to be removed and will stay. \n3. Problem will happen (not worried about this one that much though), when the addressing exceeds with addition \u0026 removal of device.\nNote: Because even in that case for NULL EID to work (for assigning proper EID, we need provisional EID).",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 14
+      },
+      "revId": "7a7c06d0809f5eda3cb4506b8ba5e5ae33f2c517",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fc4137e7_83fb0517",
+        "filename": "core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1272,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T17:54:33Z",
+      "side": 1,
+      "message": "There is a problem here. \nSay, we have proper EID for a source, but the source is requesting a command with NULL SRC_EID, then we need to respond with NULL_EID. This case will have a problem with that approach, as it will match a valid one.",
+      "revId": "7a7c06d0809f5eda3cb4506b8ba5e5ae33f2c517",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
