@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7649918b_5aede7f4",
+        "filename": "core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1257,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:41:39Z",
+      "side": 1,
+      "message": "we don\u0027t need this if the pkt can hold max pad / header size of all the bindings so that we need to clean \u0026 re-format the header rather than copying the the MCTP packet as such.",
+      "range": {
+        "startLine": 1240,
+        "startChar": 1,
+        "endLine": 1257,
+        "endChar": 65
+      },
+      "revId": "448af98618fe980adfdd6af3dde35b6017c3c3ad",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0ddcabee_409de12b",
+        "filename": "libmctp.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:41:39Z",
+      "side": 1,
+      "message": "Why do we need to maintain this in the core. This will cause confusion with OEM binding type implementation if any. i.e. It is responsibility of tx to fill the medium specific header before transmission, and it should accordingly handle this ? \nWith this being kept in the binding_tx there are advantages for this, we frame it, when we are going to send it out. Also, any medium specific sequence or filling fields can be correctly formed.\n\nNote: There are certain advantage / disadvantage for both the models. The disadvantage i forsee in the other end is\n1. Binding must have this implementation --\u003e checking route and doing the same\n2. By that time, when TX is doing the same, route table shouldn\u0027t be updated (But i am not worried about this one, much, as in any way, we need to clear out the pkts in queue based on routing update).",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 209,
+        "endChar": 41
+      },
+      "revId": "448af98618fe980adfdd6af3dde35b6017c3c3ad",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
