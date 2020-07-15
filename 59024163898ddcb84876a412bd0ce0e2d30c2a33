@@ -22,6 +22,30 @@
       "revId": "59024163898ddcb84876a412bd0ce0e2d30c2a33",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5b8cd6d1_f549d380",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:32:22Z",
+      "side": 1,
+      "message": "+1. would be nice to see this as base patchset, rather than doing after introducing routing",
+      "parentUuid": "a7d27ee7_4814e194",
+      "range": {
+        "startLine": 9,
+        "startChar": 25,
+        "endLine": 9,
+        "endChar": 45
+      },
+      "revId": "59024163898ddcb84876a412bd0ce0e2d30c2a33",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
