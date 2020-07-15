@@ -119,6 +119,29 @@
     },
     {
       "key": {
+        "uuid": "d635217a_4eb3d084",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:32:57Z",
+      "side": 1,
+      "message": "Technically, we can have multiple buses right? what\u0027s the reason, in specifying only 2 buses here?",
+      "range": {
+        "startLine": 404,
+        "startChar": 4,
+        "endLine": 404,
+        "endChar": 22
+      },
+      "revId": "e96d6a38b2cf037961ba61ef664952798ffe105d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "af3d9a47_dae3c272",
         "filename": "core.c",
         "patchSetId": 3
