@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d46d58e0_88110b92",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 837,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:30:27Z",
+      "side": 1,
+      "message": "This API requires re-work \ni.e Route_allocate must accept bus \u0026 device address when it is allocating with the length (DOWNSTREAM). \nWe need allocation as follows\n1. Allocation to DOWNSTREAM EP\n2. Allocation to DOWNSTREAM Bridge (with single EID only)\n3. Allocation to DOWNSTREAM Bridge (with range)\n4. Allocation to DOWNSTREAM Bridge (only range)\n\nNote: In case of local usage, then len in the param is unnecessary.",
+      "range": {
+        "startLine": 837,
+        "startChar": 25,
+        "endLine": 837,
+        "endChar": 44
+      },
+      "revId": "11cb464ef4fa429ed6f44af77b986116ee44b65a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "78373a67_2d317b74",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 894,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:30:27Z",
+      "side": 1,
+      "message": "This must be DOWNSTREAM. Local must be used the bridge ports and not to the downstream devices. \nCorrect me, if this API is not for reserving an EID for a particular device.",
+      "range": {
+        "startLine": 894,
+        "startChar": 14,
+        "endLine": 894,
+        "endChar": 35
+      },
+      "revId": "11cb464ef4fa429ed6f44af77b986116ee44b65a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
