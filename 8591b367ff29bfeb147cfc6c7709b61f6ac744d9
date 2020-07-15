@@ -2,6 +2,69 @@
   "comments": [
     {
       "key": {
+        "uuid": "739bb01f_960eccbc",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:29:25Z",
+      "side": 1,
+      "message": "Clarification: Can you tell what\u0027s the purpose of event Ptr \u0026 Table Ptr ? \nAre we going to maintain single head routing table or 2 ? couldn\u0027t able to understand the purpose and real use case scenario, please clarify",
+      "range": {
+        "startLine": 577,
+        "startChar": 21,
+        "endLine": 578,
+        "endChar": 40
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7fcd6422_8916ad91",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 582,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:29:25Z",
+      "side": 1,
+      "message": "assert for eventp \u003d\u003d tablep ?",
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8d79f2bd_af62ff6f",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 616,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:29:25Z",
+      "side": 1,
+      "message": "Now, the entry ptr is moved to eventp, when this will be called for mctp_route_list_remove(*eventp, entry) followed by mctp_route_put(entry)? to free the same?",
+      "range": {
+        "startLine": 616,
+        "startChar": 40,
+        "endLine": 616,
+        "endChar": 45
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "11fb20f8_f3b8783a",
         "filename": "core.c",
         "patchSetId": 3
@@ -42,6 +105,92 @@
         "startChar": 1,
         "endLine": 698,
         "endChar": 28
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a2bc5e47_f522a843",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 732,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:29:25Z",
+      "side": 1,
+      "message": "How about a comment to state route_match will increment ref, so decrement the same? or let\u0027s use __mctp_route_list_match which won\u0027t increment the ref",
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fb0e1d21_4ff6c9f5",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 764,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:29:25Z",
+      "side": 1,
+      "message": "764 \u0026  769 is unnecessary i.e. ref is incremented @764 and decremented @ 769 and freed. \n\nIf we remove both, then with no notifycallabck, it will be freed in mctp_route_event_remove and for registered notify callback, it will be freed after mctp_route_notify",
+      "range": {
+        "startLine": 764,
+        "startChar": 1,
+        "endLine": 764,
+        "endChar": 29
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6e666dc6_17eae4fe",
+        "filename": "libmctp.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:29:25Z",
+      "side": 1,
+      "message": "Need the design logic here\n1. Purpose of event Ptr ? --\u003e If it is just for event notification, then do we need this ref? It can be cleared after that right?\n2. Do we have plan to pass the reference to application and expect application to free the same at later stage?",
+      "range": {
+        "startLine": 138,
+        "startChar": 1,
+        "endLine": 138,
+        "endChar": 20
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "625b6c03_c298d641",
+        "filename": "libmctp.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:29:25Z",
+      "side": 1,
+      "message": "Duplicate already @ line 161.",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 52
       },
       "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
