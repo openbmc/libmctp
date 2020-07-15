@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0bf56b4a_06a08166",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-15T09:29:34Z",
+      "side": 1,
+      "message": "How about dumping the ref count too (It will help us to identify the ownership count too).",
+      "revId": "cd87ba18d4dca1b70e5375248c2fd077eb32a9d4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
