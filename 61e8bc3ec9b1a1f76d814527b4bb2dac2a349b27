@@ -72,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "52f5f182_68dd6b2e",
+        "filename": "core.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 551,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2020-07-17T08:59:46Z",
+      "side": 1,
+      "message": "That would be mostly avoid introducing new symbols",
+      "parentUuid": "a16e3c70_5a5ed933",
+      "range": {
+        "startLine": 551,
+        "startChar": 9,
+        "endLine": 551,
+        "endChar": 12
+      },
+      "revId": "61e8bc3ec9b1a1f76d814527b4bb2dac2a349b27",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1c8a0281_45de7b77",
         "filename": "core.c",
         "patchSetId": 4
