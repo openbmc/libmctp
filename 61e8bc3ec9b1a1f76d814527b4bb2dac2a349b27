@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ef2d620_9cd8e893",
+        "filename": "core.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 542,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-17T02:14:35Z",
+      "side": 1,
+      "message": "1. We are going to have a problem here, when bridging concept (in review) by andrew get\u0027s merged. \nIn case of bridging, there will be a chance that it is the only packet, and we can\u0027t even find EOM packet for it (as it will come late). So, we need to watch other stuff as well. (i.e. EID / MsgTag along with EOM monitoring, or else it\u0027s better to have a index count / relation count in the pkt so that the same can be dropped).",
+      "range": {
+        "startLine": 537,
+        "startChar": 0,
+        "endLine": 542,
+        "endChar": 2
+      },
+      "revId": "61e8bc3ec9b1a1f76d814527b4bb2dac2a349b27",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be4ac6e3_6f20baee",
+        "filename": "core.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 551,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-17T02:14:35Z",
+      "side": 1,
+      "message": "Not related to this patch, but better to have a ERROR NO for this",
+      "range": {
+        "startLine": 551,
+        "startChar": 9,
+        "endLine": 551,
+        "endChar": 12
+      },
+      "revId": "61e8bc3ec9b1a1f76d814527b4bb2dac2a349b27",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c8a0281_45de7b77",
+        "filename": "core.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-17T02:14:35Z",
+      "side": 1,
+      "message": "we should break only if it is due to tx_enabled \u003d\u003d false error, for other packets we must continue\ni.e. Just because one packet transmission failed, we shouldn\u0027t break for others, we must continue till the queue is empty or till tx_enabled becomes false.",
+      "range": {
+        "startLine": 570,
+        "startChar": 2,
+        "endLine": 571,
+        "endChar": 10
+      },
+      "revId": "61e8bc3ec9b1a1f76d814527b4bb2dac2a349b27",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cf0147e5_5062215a",
+        "filename": "core.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 642,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-17T02:14:35Z",
+      "side": 1,
+      "message": "this is going to cause confusion.\ni.e. \nWith current code in place, we may end up sending error of the packet which is already in queue, which is getting dropped and it will cause confusion.\n\nElse we need to ignore tx_enabled \u003d\u003d false error, and can propagate only the last transmission error to the packet (when we transmit the whole queue). \n\nAnyway, application can never know this one for sure, and hence there is no point in indicating error through this mechanism.",
+      "range": {
+        "startLine": 642,
+        "startChar": 1,
+        "endLine": 642,
+        "endChar": 32
+      },
+      "revId": "61e8bc3ec9b1a1f76d814527b4bb2dac2a349b27",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
