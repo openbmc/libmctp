@@ -118,6 +118,30 @@
     },
     {
       "key": {
+        "uuid": "a41c6131_df474c88",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-27T03:56:48Z",
+      "side": 1,
+      "message": "Ignore the comment regarding LOCAL. As discussed in WG, ENDPOINT usage is correct here.",
+      "parentUuid": "0bcd3cb3_f6f05c79",
+      "range": {
+        "startLine": 1024,
+        "startChar": 11,
+        "endLine": 1024,
+        "endChar": 36
+      },
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bdb12e5d_8b4547f1",
         "filename": "core.c",
         "patchSetId": 5
