@@ -211,6 +211,30 @@
     },
     {
       "key": {
+        "uuid": "ee298be8_e7d10f88",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-07-27T03:51:25Z",
+      "side": 1,
+      "message": "Discussed the same in WG, and thanks for the clairifcation, that this will be used for internal EID management.",
+      "parentUuid": "f782eae2_ea868245",
+      "range": {
+        "startLine": 127,
+        "startChar": 8,
+        "endLine": 127,
+        "endChar": 36
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8b540741_803a58f0",
         "filename": "libmctp.h",
         "patchSetId": 6
