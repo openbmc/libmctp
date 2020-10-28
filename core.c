@@ -16,6 +16,7 @@
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
 #include "libmctp-cmds.h"
+#include "range.h"
 
 /* Internal data structures */
 
@@ -214,7 +215,7 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 
 		/* @todo: finer-grained allocation */
 		if (!ctx->buf_alloc_size) {
-			new_alloc_size = 4096;
+			new_alloc_size = MAX(len, 4096UL);
 		} else {
 			new_alloc_size = ctx->buf_alloc_size * 2;
 		}
