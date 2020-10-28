@@ -95,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "d5b8c13a_c277054c",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-10-28T11:54:57Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "1dee2fbe_d42e596f",
+      "range": {
+        "startLine": 534,
+        "startChar": 1,
+        "endLine": 535,
+        "endChar": 49
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ab97ff91_a2c85d94",
         "filename": "core.c",
         "patchSetId": 6
@@ -111,6 +135,53 @@
         "startChar": 1,
         "endLine": 568,
         "endChar": 14
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "025145bb_d02cb4e6",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-10-28T11:54:57Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "ab97ff91_a2c85d94",
+      "range": {
+        "startLine": 568,
+        "startChar": 1,
+        "endLine": 568,
+        "endChar": 14
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c643ecd1_4912b4f2",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-10-28T11:54:57Z",
+      "side": 1,
+      "message": "Fix these too.",
+      "range": {
+        "startLine": 584,
+        "startChar": 1,
+        "endLine": 586,
+        "endChar": 15
       },
       "revId": "8270e936a5484e77d817e6459bec3de530a54659",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
@@ -304,6 +375,24 @@
       "writtenOn": "2020-07-15T09:26:06Z",
       "side": 1,
       "message": "Also, are we planning to introduce API to get the Routing table entry based on the bus lookup. \nThis is needed as we may need to send / cleanup routing table accordingly.",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c93ce0c_146b501b",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-10-28T11:54:57Z",
+      "side": 1,
+      "message": "Hmm, I\u0027ll think about that.",
+      "parentUuid": "dccd0b21_b60b3a37",
       "revId": "8270e936a5484e77d817e6459bec3de530a54659",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
