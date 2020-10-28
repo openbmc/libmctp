@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "59c34762_e7691f5d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-10-28T12:37:51Z",
+      "side": 1,
+      "message": "The provisional EID can be removed once it is no longer useful to whoever created it. If the device sends packets with a NULL EID then a new provisional EID will be created for it.",
+      "parentUuid": "1ba1764b_b1c73db9",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 14
+      },
+      "revId": "7a7c06d0809f5eda3cb4506b8ba5e5ae33f2c517",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "fc4137e7_83fb0517",
         "filename": "core.c",
         "patchSetId": 2
@@ -36,6 +60,24 @@
       "writtenOn": "2020-07-15T17:54:33Z",
       "side": 1,
       "message": "There is a problem here. \nSay, we have proper EID for a source, but the source is requesting a command with NULL SRC_EID, then we need to respond with NULL_EID. This case will have a problem with that approach, as it will match a valid one.",
+      "revId": "7a7c06d0809f5eda3cb4506b8ba5e5ae33f2c517",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "96d4f000_0a108323",
+        "filename": "core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1272,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-10-28T12:37:51Z",
+      "side": 1,
+      "message": "The intent of the API design is that you can\u0027t send to a NULL EID, you first have to allocate a provisional EID and use that.",
+      "parentUuid": "fc4137e7_83fb0517",
       "revId": "7a7c06d0809f5eda3cb4506b8ba5e5ae33f2c517",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
