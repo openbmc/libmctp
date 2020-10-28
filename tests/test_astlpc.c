@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/random.h>
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -1070,6 +1071,58 @@ static void astlpc_test_negotiate_mtu_low_high(void)
 	free(lpc_mem);
 }
 
+static void astlpc_test_send_large_packet(void)
+{
+	struct astlpc_endpoint bmc, host;
+	uint8_t kcs[2] = { 0 };
+	void *lpc_mem;
+	ssize_t got;
+	void *msg;
+	int rc;
+
+	/* Test harness initialisation */
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(lpc_mem);
+
+	/* BMC initialisation */
+	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, 8192, &kcs,
+			   lpc_mem);
+	assert(!rc);
+
+	/* Host initialisation */
+	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, 8192, &kcs,
+			   lpc_mem);
+	assert(!rc);
+
+	rc = mctp_astlpc_poll(bmc.astlpc);
+	assert(rc == 0);
+
+	rc = mctp_astlpc_poll(host.astlpc);
+	assert(rc == 0);
+
+	msg = malloc(2 * MCTP_BODY_SIZE(8192));
+	assert(msg);
+
+	got = getrandom(msg, 2 * MCTP_BODY_SIZE(8192), 0);
+	assert(got == 2 * MCTP_BODY_SIZE(8192));
+
+	rc = mctp_message_tx(host.mctp, 8, msg, 2 * MCTP_BODY_SIZE(8192));
+	assert(rc == 0);
+	rc = mctp_astlpc_poll(bmc.astlpc);
+	assert(rc == 0);
+	rc = mctp_astlpc_poll(host.astlpc);
+	assert(rc == 0);
+	rc = mctp_astlpc_poll(bmc.astlpc);
+	assert(rc == 0);
+	rc = mctp_astlpc_poll(host.astlpc);
+	assert(rc == 0);
+
+	free(msg);
+	endpoint_destroy(&host);
+	endpoint_destroy(&bmc);
+	free(lpc_mem);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -1109,6 +1162,7 @@ static const struct {
 	TEST_CASE(astlpc_test_buffers_bad_host_init),
 	TEST_CASE(astlpc_test_negotiate_increased_mtu),
 	TEST_CASE(astlpc_test_negotiate_mtu_low_high),
+	TEST_CASE(astlpc_test_send_large_packet),
 };
 /* clang-format on */
 
