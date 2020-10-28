@@ -105,6 +105,12 @@ static int mctp_astlpc_mmio_kcs_write(void *data,
 
 	return 0;
 }
+
+static const struct mctp_binding_astlpc_ops astlpc_direct_mmio_ops = {
+	.kcs_read = mctp_astlpc_mmio_kcs_read,
+	.kcs_write = mctp_astlpc_mmio_kcs_write,
+};
+
 int mctp_astlpc_mmio_lpc_read(void *data, void *buf, long offset, size_t len)
 {
 	struct mctp_binding_astlpc_mmio *mmio = binding_to_mmio(data);
@@ -134,6 +140,13 @@ int mctp_astlpc_mmio_lpc_write(void *data, const void *buf, long offset,
 	return 0;
 }
 
+static const struct mctp_binding_astlpc_ops astlpc_indirect_mmio_ops = {
+	.kcs_read = mctp_astlpc_mmio_kcs_read,
+	.kcs_write = mctp_astlpc_mmio_kcs_write,
+	.lpc_read = mctp_astlpc_mmio_lpc_read,
+	.lpc_write = mctp_astlpc_mmio_lpc_write,
+};
+
 #define __unused __attribute__((unused))
 
 static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
@@ -151,18 +164,6 @@ static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
 
 	test->count++;
 }
-
-static const struct mctp_binding_astlpc_ops astlpc_direct_mmio_ops = {
-	.kcs_read = mctp_astlpc_mmio_kcs_read,
-	.kcs_write = mctp_astlpc_mmio_kcs_write,
-};
-
-static const struct mctp_binding_astlpc_ops astlpc_indirect_mmio_ops = {
-	.kcs_read = mctp_astlpc_mmio_kcs_read,
-	.kcs_write = mctp_astlpc_mmio_kcs_write,
-	.lpc_read = mctp_astlpc_mmio_lpc_read,
-	.lpc_write = mctp_astlpc_mmio_lpc_write,
-};
 
 static int endpoint_init(struct astlpc_endpoint *ep, mctp_eid_t eid,
 			 uint8_t mode, uint32_t mtu, uint8_t (*kcs)[2],
