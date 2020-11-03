@@ -212,7 +212,7 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 		size_t new_alloc_size;
 		void *lbuf;
 
-		/* @todo: finer-grained allocation, size limits */
+		/* @todo: finer-grained allocation */
 		if (!ctx->buf_alloc_size) {
 			new_alloc_size = 4096;
 		} else {
