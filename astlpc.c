@@ -23,6 +23,7 @@
 #include "libmctp-log.h"
 #include "libmctp-astlpc.h"
 #include "container_of.h"
+#include "range.h"
 
 #ifdef MCTP_HAVE_FILEIO
 
@@ -128,20 +129,6 @@ static const uint32_t control_size = 0x100;
 #define KCS_STATUS_CHANNEL_ACTIVE	0x40
 #define KCS_STATUS_IBF			0x02
 #define KCS_STATUS_OBF			0x01
-
-#define MIN(a, b)                                                              \
-	({                                                                     \
-		typeof(a) _a = a;                                              \
-		typeof(b) _b = b;                                              \
-		_a < _b ? _a : _b;                                             \
-	})
-
-#define MAX(a, b)                                                              \
-	({                                                                     \
-		typeof(a) _a = a;                                              \
-		typeof(b) _b = b;                                              \
-		_a > _b ? _a : _b;                                             \
-	})
 
 static inline int mctp_astlpc_kcs_write(struct mctp_binding_astlpc *astlpc,
 					enum mctp_binding_astlpc_kcs_reg reg,
