@@ -287,6 +287,30 @@
     },
     {
       "key": {
+        "uuid": "efbf13ec_80f42cbf",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-04T00:25:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7820b47a_4c49cb04",
+      "range": {
+        "startLine": 85,
+        "startChar": 8,
+        "endLine": 85,
+        "endChar": 28
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "973e07f8_3e0c8ac3",
         "filename": "core.c",
         "patchSetId": 5
@@ -331,6 +355,30 @@
       "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3bdf799d_2d6ce13e",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-04T00:25:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc197fcf_fb71391d",
+      "range": {
+        "startLine": 108,
+        "startChar": 0,
+        "endLine": 108,
+        "endChar": 3
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -415,6 +463,30 @@
       "writtenOn": "2020-06-29T09:28:11Z",
       "side": 1,
       "message": "is this unique id to represent bus ? If yes, shouldn\u0027t we handle auto allocation/de-allocation of new bus id when a user adds/removes route ?",
+      "range": {
+        "startLine": 118,
+        "startChar": 16,
+        "endLine": 118,
+        "endChar": 58
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c823662f_c92f7761",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-04T00:25:41Z",
+      "side": 1,
+      "message": "This is unique to the bus instance attached to the mctp context. It\u0027s not unique to the network.",
+      "parentUuid": "71668916_35c9fb47",
       "range": {
         "startLine": 118,
         "startChar": 16,
@@ -572,6 +644,30 @@
       "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6074a9ca_3a3fb0f7",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-04T00:25:41Z",
+      "side": 1,
+      "message": "I\u0027ll keep it as it is for the moment, we\u0027ll bump the major version if we eventually decide to break it.",
+      "parentUuid": "5b3b3313_82d0d8ca",
+      "range": {
+        "startLine": 119,
+        "startChar": 22,
+        "endLine": 119,
+        "endChar": 51
+      },
+      "revId": "aaf60312cf8dda74a4092e4dab6459deddc65596",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
