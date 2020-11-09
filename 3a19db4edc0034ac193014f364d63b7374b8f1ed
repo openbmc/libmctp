@@ -84,6 +84,24 @@
     },
     {
       "key": {
+        "uuid": "555ae99c_88c3954d",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T06:05:47Z",
+      "side": 1,
+      "message": "Actually, it might pay to keep `struct mctp_bus` to hold at least the bus ID, as this isn\u0027t really something that\u0027s of direct concern to the binding implementation (it\u0027s bridge-configuration-dependent). I think we can discuss shifting the other members out of `struct mctp_bus` outside of this series.\n\nI\u0027ll fix up the function names though.",
+      "parentUuid": "0df1e35c_0beb60e9",
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0322c1f8_cc485a87",
         "filename": "core.c",
         "patchSetId": 5
