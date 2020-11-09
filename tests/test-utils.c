@@ -47,7 +47,7 @@ void mctp_binding_test_rx_raw(struct mctp_binding_test *test,
 	pkt = mctp_pktbuf_alloc(&test->binding, len);
 	assert(pkt);
 	memcpy(mctp_pktbuf_hdr(pkt), buf, len);
-	mctp_bus_rx(&test->binding, pkt);
+	mctp_binding_rx(&test->binding, pkt);
 }
 
 void mctp_binding_test_register_bus(struct mctp_binding_test *binding,

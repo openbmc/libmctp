@@ -245,7 +245,7 @@ void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable);
  * Receive a packet from binding to core. Takes ownership of pkt, free()-ing it
  * after use.
  */
-void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
+void mctp_binding_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
 
 /* environment-specific allocation */
 void mctp_set_alloc_ops(void *(*alloc)(size_t),

@@ -56,7 +56,7 @@ static void mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 	*buf = key;
 
 	binding->rx_count++;
-	mctp_bus_rx(&binding->binding, pkt);
+	mctp_binding_rx(&binding->binding, pkt);
 }
 
 static struct mctp_binding_bridge *mctp_binding_bridge_init(void)

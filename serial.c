@@ -162,7 +162,7 @@ static void mctp_serial_finish_packet(struct mctp_binding_serial *serial,
 	assert(pkt);
 
 	if (valid)
-		mctp_bus_rx(&serial->binding, pkt);
+		mctp_binding_rx(&serial->binding, pkt);
 
 	serial->rx_pkt = NULL;
 }
