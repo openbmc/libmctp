@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "2fe17430_11891f6d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T03:28:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23fce704_06332f1b",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 50
+      },
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2e7769f9_7398a7eb",
         "filename": "core.c",
         "patchSetId": 5
@@ -142,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "6aa12f5f_be0bd731",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T03:28:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a41c6131_df474c88",
+      "range": {
+        "startLine": 1024,
+        "startChar": 11,
+        "endLine": 1024,
+        "endChar": 36
+      },
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bdb12e5d_8b4547f1",
         "filename": "core.c",
         "patchSetId": 5
@@ -200,6 +248,30 @@
     },
     {
       "key": {
+        "uuid": "44a7f6ce_89825684",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1233,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T03:28:00Z",
+      "side": 1,
+      "message": "I think this is addressed by my series to better exploit the packet padding. Let me follow up.",
+      "parentUuid": "081ffaad_8771da15",
+      "range": {
+        "startLine": 1231,
+        "startChar": 0,
+        "endLine": 1233,
+        "endChar": 34
+      },
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e706aaf6_daee665a",
         "filename": "core.c",
         "patchSetId": 5
@@ -223,6 +295,30 @@
     },
     {
       "key": {
+        "uuid": "9ac8d65d_014fdc68",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1354,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T03:28:00Z",
+      "side": 1,
+      "message": "Yes, this is handled by the lookup. It will find the entry in the route table that matches `dest`. Below we test if the result is of route type MCTP_ROUTE_TYPE_ENDPOINT, and if it is we deliver it locally.",
+      "parentUuid": "e706aaf6_daee665a",
+      "range": {
+        "startLine": 1354,
+        "startChar": 9,
+        "endLine": 1354,
+        "endChar": 30
+      },
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d6ae0065_44db1c7b",
         "filename": "core.c",
         "patchSetId": 5
@@ -243,6 +339,30 @@
       "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bc9d99a6_d285bafa",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1444,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T03:28:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6ae0065_44db1c7b",
+      "range": {
+        "startLine": 1444,
+        "startChar": 2,
+        "endLine": 1444,
+        "endChar": 24
+      },
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }

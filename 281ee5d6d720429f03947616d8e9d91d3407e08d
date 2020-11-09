@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "83d35548_8e86ac06",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T03:28:00Z",
+      "side": 0,
+      "message": "\u003e where is this getting moved now ?\n\nIt\u0027s not moved, it\u0027s removed. This is tracked via MCTP_ROUTE_TYPE_ENDPOINT entries in the context\u0027s route table.\n\n\u003e or going to use only routing table for this ? \n\nRight.\n\n\u003e Question is how we will track the EID (self) for the particular binding? \n\nThe MCTP_ROUTE_TYPE_ENDPOINT entry is associated with a particular port in the route table via its struct mctp_device.",
+      "parentUuid": "918e2e2e_eeda53e2",
+      "range": {
+        "startLine": 27,
+        "startChar": 1,
+        "endLine": 27,
+        "endChar": 16
+      },
+      "revId": "281ee5d6d720429f03947616d8e9d91d3407e08d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4110ffc2_c1f2aca3",
         "filename": "core.c",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2020-07-15T09:32:57Z",
       "side": 0,
       "message": "we still need this to understand whether it is special EID\u0027s request?",
+      "range": {
+        "startLine": 1179,
+        "startChar": 31,
+        "endLine": 1179,
+        "endChar": 41
+      },
+      "revId": "281ee5d6d720429f03947616d8e9d91d3407e08d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7e73035a_d66ad831",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T03:28:00Z",
+      "side": 0,
+      "message": "Let me check what I\u0027ve done here.",
+      "parentUuid": "4110ffc2_c1f2aca3",
       "range": {
         "startLine": 1179,
         "startChar": 31,
