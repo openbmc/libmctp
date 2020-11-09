@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "5da9d4d1_b8e8d33b",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T11:12:50Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "83d35548_8e86ac06",
+      "range": {
+        "startLine": 27,
+        "startChar": 1,
+        "endLine": 27,
+        "endChar": 16
+      },
+      "revId": "281ee5d6d720429f03947616d8e9d91d3407e08d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4110ffc2_c1f2aca3",
         "filename": "core.c",
         "patchSetId": 5
@@ -93,6 +117,30 @@
       "revId": "281ee5d6d720429f03947616d8e9d91d3407e08d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "10a6e2d7_b106cba2",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T11:12:50Z",
+      "side": 0,
+      "message": "I think this ended up unused. I think we need to do a fair bit more to completely meet the requirements of the base spec - we need to pass the message terminus components to the receiver (source endpoint ID, tag owner bit and message tag value). I think you\u0027re hinting at that we need to reply with the source set to the destination EID of the request. I\u0027ve concluded that we need to track the outstanding requests in order to do this.\n\nWe\u0027ll need a follow-up series to deal with that.",
+      "parentUuid": "7e73035a_d66ad831",
+      "range": {
+        "startLine": 1179,
+        "startChar": 31,
+        "endLine": 1179,
+        "endChar": 41
+      },
+      "revId": "281ee5d6d720429f03947616d8e9d91d3407e08d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }

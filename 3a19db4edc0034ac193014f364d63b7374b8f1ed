@@ -102,6 +102,24 @@
     },
     {
       "key": {
+        "uuid": "a6391362_b845db80",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T11:12:50Z",
+      "side": 1,
+      "message": "Done. I\u0027ve renamed mctp_bus_rx() as well (as a separate patch), given it took a binding pointer as a parameter.",
+      "parentUuid": "555ae99c_88c3954d",
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0322c1f8_cc485a87",
         "filename": "core.c",
         "patchSetId": 5
@@ -134,6 +152,24 @@
       "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3fedba1f_da72c247",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1020,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T11:12:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f9952bd_afffe27a",
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -243,6 +279,24 @@
     },
     {
       "key": {
+        "uuid": "68981f4e_3ab46e19",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1070,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T11:12:50Z",
+      "side": 1,
+      "message": "Leaving it as is to avoid more patch churn. We can replace it later if the pattern irritates enough people.",
+      "parentUuid": "02ced409_e36c47a0",
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "081ffaad_8771da15",
         "filename": "core.c",
         "patchSetId": 5
@@ -287,6 +341,30 @@
       "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e1645e1c_eece3a3f",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1233,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T11:12:50Z",
+      "side": 1,
+      "message": "As it stands at this patch the two upstream binding implementations don\u0027t pack the medium-specific header into the packet (they do kinda ad-hoc packing of the data instead), so this isn\u0027t a concern *yet*. This changes with the patches later in the series to better exploit the packet padding as I noted above, but the issue you identified here also gets fixed.",
+      "parentUuid": "44a7f6ce_89825684",
+      "range": {
+        "startLine": 1231,
+        "startChar": 0,
+        "endLine": 1233,
+        "endChar": 34
+      },
+      "revId": "3a19db4edc0034ac193014f364d63b7374b8f1ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
