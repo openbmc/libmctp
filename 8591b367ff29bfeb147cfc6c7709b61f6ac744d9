@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "c4a755f5_403cb463",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T02:27:39Z",
+      "side": 1,
+      "message": "the mctp_route_event_*() APIs are for building a temporary structure that represents the _change_ to the context\u0027s route table.\n\n\u003e Are we going to maintain single head routing table or 2 ?\n\nSo in light of the explanation above, we are maintaining _one_ route table in the context, but we need to build temporary \u0027event\u0027 tables to attach to the route table update notification (i.e. these temporary \u0027event\u0027 tables represent the difference between the old and new states of the main route table).\n\n\u003e couldn\u0027t able to understand the purpose and real use case scenario, please clarify\n\nThe context\u0027s owner can register a route table update notification callback that will be passed these update event tables as a parameter. This allows the owner to learn of updates that occur as a result of, for example, a Set Endpoint ID command. The route table update notification callback enables maintenance of higher level representations of the route table (e.g. a D-Bus representation).",
+      "parentUuid": "739bb01f_960eccbc",
+      "range": {
+        "startLine": 577,
+        "startChar": 21,
+        "endLine": 578,
+        "endChar": 40
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7fcd6422_8916ad91",
         "filename": "core.c",
         "patchSetId": 3
@@ -39,6 +63,24 @@
       "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "beb7d115_3c8ab10b",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 582,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T02:27:39Z",
+      "side": 1,
+      "message": "No, eventp and tablep are separate tables as outlined above. eventp represents the delta between the main route table states, while tablep is the main route table (associated with the libmctp context).",
+      "parentUuid": "7fcd6422_8916ad91",
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -62,6 +104,30 @@
       "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b6601bbd_ca746040",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 616,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T02:27:39Z",
+      "side": 1,
+      "message": "After the route table update event notification callback is called (if it has been set by the context owner). See line 700.",
+      "parentUuid": "8d79f2bd_af62ff6f",
+      "range": {
+        "startLine": 616,
+        "startChar": 40,
+        "endLine": 616,
+        "endChar": 45
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -112,6 +178,30 @@
     },
     {
       "key": {
+        "uuid": "33b8c7c3_cfc64e2e",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T02:27:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f641f7fa_c9494705",
+      "range": {
+        "startLine": 698,
+        "startChar": 1,
+        "endLine": 698,
+        "endChar": 28
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a2bc5e47_f522a843",
         "filename": "core.c",
         "patchSetId": 3
@@ -126,6 +216,24 @@
       "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6669b5a_515e2099",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 732,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T02:27:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2bc5e47_f522a843",
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -152,6 +260,30 @@
     },
     {
       "key": {
+        "uuid": "baddb998_e9c1c302",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 764,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T02:27:39Z",
+      "side": 1,
+      "message": "Yeah I think you\u0027re right, this is overly cautious.",
+      "parentUuid": "fb0e1d21_4ff6c9f5",
+      "range": {
+        "startLine": 764,
+        "startChar": 1,
+        "endLine": 764,
+        "endChar": 29
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e666dc6_17eae4fe",
         "filename": "libmctp.h",
         "patchSetId": 3
@@ -172,6 +304,30 @@
       "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "392b69b9_7055b6dc",
+        "filename": "libmctp.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T02:27:39Z",
+      "side": 1,
+      "message": "\u003e 1. Purpose of event Ptr ? --\u003e If it is just for event notification, then do we need this ref? It can be cleared after that right?\n\nNo, the route table is re-implemented in terms of this struct, so it\u0027s not just for events.\n\n\u003e 2. Do we have plan to pass the reference to application and expect application to free the same at later stage?\n\nThe application needs to do get/put calls as appropriate to make sure the entry isn\u0027t deleted out from underneath it. The application shouldn\u0027t be looking at or manipulating the reference count explicitly.",
+      "parentUuid": "6e666dc6_17eae4fe",
+      "range": {
+        "startLine": 138,
+        "startChar": 1,
+        "endLine": 138,
+        "endChar": 20
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -219,6 +375,30 @@
       "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "81d3992b_7fd120ca",
+        "filename": "libmctp.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T02:27:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49bc3dec_999f07ba",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 52
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
