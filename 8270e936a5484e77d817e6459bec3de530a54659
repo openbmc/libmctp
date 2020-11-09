@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "5fd42560_0e4f430d",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "Leaving it as-is for the moment. Happy to rework it after I have this series submitted if there are strong feelings about it.",
+      "parentUuid": "36482bc9_fa32e372",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "18cee7da_fdb269b4",
         "filename": "core.c",
         "patchSetId": 6
@@ -69,6 +87,24 @@
       "revId": "8270e936a5484e77d817e6459bec3de530a54659",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a8d8fca9_de438229",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "Obviously this needs some more thought about the wider context. Hopefully it doesn\u0027t come back to bite me in subtle ways, but I think it\u0027s okay for the moment.",
+      "parentUuid": "2b03f1b2_f2f1034c",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -119,6 +155,30 @@
     },
     {
       "key": {
+        "uuid": "ebfbbc41_acd0a3b4",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "Actually, this is really similar to an up-cast operation. Returning an error complicates the interface (we\u0027d need to introduce an out-parameter pointer). I think it might be better to leave the asserts, document the pre-conditions that must be met, and implement a mctp_route_is_local() implementation that callers can use to check they\u0027ve satisfied the conditions before invoking mctp_route_as_eid().",
+      "parentUuid": "d5b8c13a_c277054c",
+      "range": {
+        "startLine": 534,
+        "startChar": 1,
+        "endLine": 535,
+        "endChar": 49
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ab97ff91_a2c85d94",
         "filename": "core.c",
         "patchSetId": 6
@@ -166,6 +226,30 @@
     },
     {
       "key": {
+        "uuid": "70b498c6_ae00b8a9",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "025145bb_d02cb4e6",
+      "range": {
+        "startLine": 568,
+        "startChar": 1,
+        "endLine": 568,
+        "endChar": 14
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c643ecd1_4912b4f2",
         "filename": "core.c",
         "patchSetId": 6
@@ -177,6 +261,30 @@
       "writtenOn": "2020-10-28T11:54:57Z",
       "side": 1,
       "message": "Fix these too.",
+      "range": {
+        "startLine": 584,
+        "startChar": 1,
+        "endLine": 586,
+        "endChar": 15
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d33aaae_e06e667f",
+        "filename": "core.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "Actually, this is an internal function, so the asserts are fine. I\u0027ve added guards to the public functions.",
+      "parentUuid": "c643ecd1_4912b4f2",
       "range": {
         "startLine": 584,
         "startChar": 1,
@@ -224,6 +332,24 @@
     },
     {
       "key": {
+        "uuid": "9b514d07_429b269e",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "I intend to do a documentation series for the public API and write something up about the theory of operation. I\u0027ll include the responsibility details in that if I don\u0027t end up introducing them beforehand.",
+      "parentUuid": "2ce425d2_6c4fbb0d",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "274b7581_b7cf2a89",
         "filename": "libmctp.h",
         "patchSetId": 6
@@ -256,6 +382,24 @@
       "revId": "8270e936a5484e77d817e6459bec3de530a54659",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6ca71eb5_da328e2d",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3264b87_1b1218bf",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -303,6 +447,30 @@
       "revId": "8270e936a5484e77d817e6459bec3de530a54659",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1e115407_6e3c5e6f",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee298be8_e7d10f88",
+      "range": {
+        "startLine": 127,
+        "startChar": 8,
+        "endLine": 127,
+        "endChar": 36
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -364,6 +532,48 @@
     },
     {
       "key": {
+        "uuid": "2de7a880_0bcf6b94",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "I\u0027ve added a lengthy comment explaining the types and where to look in the base spec for further details.",
+      "parentUuid": "864ee592_ad5dc75e",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "195db166_6e8bd6fb",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "We might need to rework that when implementing Routing Information Update support. I\u0027d prefer it to leave it to then when the motivation will give us a better grasp of possible implementations in the context of the requirements.",
+      "parentUuid": "1f85b32c_c97cda50",
+      "range": {
+        "startLine": 131,
+        "startChar": 8,
+        "endLine": 131,
+        "endChar": 14
+      },
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dccd0b21_b60b3a37",
         "filename": "libmctp.h",
         "patchSetId": 6
@@ -396,6 +606,24 @@
       "revId": "8270e936a5484e77d817e6459bec3de530a54659",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "40604c09_b0deda11",
+        "filename": "libmctp.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T01:44:12Z",
+      "side": 1,
+      "message": "I think we can leave this until after we get this series submitted? It seems like a fairly well-defined concept that shouldn\u0027t result in an API incompatibility down the track.",
+      "parentUuid": "8c93ce0c_146b501b",
+      "revId": "8270e936a5484e77d817e6459bec3de530a54659",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
