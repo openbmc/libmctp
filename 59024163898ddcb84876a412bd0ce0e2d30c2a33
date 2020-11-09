@@ -70,6 +70,30 @@
       "revId": "59024163898ddcb84876a412bd0ce0e2d30c2a33",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c5cdbf1_f92e4e5c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T03:06:48Z",
+      "side": 1,
+      "message": "There are quite a few merge conflicts trying to move it around, so I\u0027d prefer just to leave it at it\u0027s current position in the stack, even if it\u0027s a bit unfortunate.",
+      "parentUuid": "82782079_e649a79f",
+      "range": {
+        "startLine": 9,
+        "startChar": 25,
+        "endLine": 9,
+        "endChar": 45
+      },
+      "revId": "59024163898ddcb84876a412bd0ce0e2d30c2a33",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
