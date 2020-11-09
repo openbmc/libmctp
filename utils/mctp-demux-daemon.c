@@ -364,9 +364,8 @@ static int client_process_recv(struct ctx *ctx, int idx)
 	eid = MCTP_EID(*(uint8_t *)ctx->buf);
 
 	if (ctx->verbose)
-		fprintf(stderr,
-			"client[%d] sent message: dest 0x%02x len %d\n",
-			idx, eid, rc - 1);
+		fprintf(stderr, "client[%d] sent message: dest 0x%02x len %d\n",
+			idx, eid.id, rc - 1);
 
 	if (mctp_eid_equal(eid, ctx->local_eid))
 		rx_message(eid, ctx, ctx->buf + 1, rc - 1);

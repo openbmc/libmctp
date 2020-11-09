@@ -1,5 +1,9 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
 #include "test-utils.h"
 #include "binding.h"
 
@@ -58,20 +62,24 @@ void mctp_binding_test_destroy(struct mctp_binding_test *test)
 }
 
 void mctp_binding_test_rx_raw(struct mctp_binding_test *test,
-		void *buf, size_t len)
+			      const struct mctp_device *dsrc, void *buf,
+			      size_t len)
 {
 	struct mctp_pktbuf *pkt;
 
 	pkt = mctp_pktbuf_alloc(&test->binding, len);
 	assert(pkt);
 	memcpy(mctp_pktbuf_hdr(pkt), buf, len);
-	mctp_binding_rx(&test->binding, pkt);
+	mctp_binding_rx(&test->binding, dsrc, pkt);
 }
 
 void mctp_binding_test_register_bus(struct mctp_binding_test *binding,
 		struct mctp *mctp, mctp_eid_t eid)
 {
-	mctp_register_endpoint(mctp, &binding->binding, eid);
+	int rc;
+
+	rc = mctp_register_endpoint(mctp, &binding->binding, eid);
+	assert(rc >= 0);
 	binding->binding.bus->tx_enabled = 1;
 }
 
