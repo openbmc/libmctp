@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ac50421a_dbb10f97",
+        "filename": "core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1257,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T12:41:16Z",
+      "side": 1,
+      "message": "What\u0027s your proposal for implementing that?",
+      "parentUuid": "7649918b_5aede7f4",
+      "range": {
+        "startLine": 1240,
+        "startChar": 1,
+        "endLine": 1257,
+        "endChar": 65
+      },
+      "revId": "448af98618fe980adfdd6af3dde35b6017c3c3ad",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0ddcabee_409de12b",
         "filename": "libmctp.h",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2020-07-15T09:41:39Z",
       "side": 1,
       "message": "Why do we need to maintain this in the core. This will cause confusion with OEM binding type implementation if any. i.e. It is responsibility of tx to fill the medium specific header before transmission, and it should accordingly handle this ? \nWith this being kept in the binding_tx there are advantages for this, we frame it, when we are going to send it out. Also, any medium specific sequence or filling fields can be correctly formed.\n\nNote: There are certain advantage / disadvantage for both the models. The disadvantage i forsee in the other end is\n1. Binding must have this implementation --\u003e checking route and doing the same\n2. By that time, when TX is doing the same, route table shouldn\u0027t be updated (But i am not worried about this one, much, as in any way, we need to clear out the pkts in queue based on routing update).",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 209,
+        "endChar": 41
+      },
+      "revId": "448af98618fe980adfdd6af3dde35b6017c3c3ad",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3c08e805_3a08d0d2",
+        "filename": "libmctp.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-11-09T12:41:16Z",
+      "side": 1,
+      "message": "\u003e Why do we need to maintain this in the core.\n\nWhat do you mean by \"in the core\"? The frame() callback is implemented by each binding, just as the tx() callback is. See the subsequent patches that implement frame() for the astlpc and serial bindings.\n\nThe point is the approach disconnects the use of the route table to frame the packet from when the packet is put out on the wire. It reduces the time we hold a reference to a route table entry from _unbounded_ to the time it takes to split a message into its constituent packets. Alternatively, we could query the route table each time we tx a packet, but that risks generating a packet stream with inconsistent terminus values (which would violate DSP0236 requirements).\n\n\u003e This will cause confusion with OEM binding type implementation if any.\n\nHow?\n\n\u003e It is responsibility of tx to fill the medium specific header before transmission, and it should accordingly handle this\n\nThe new callback just shifts that exact logic you mention out of the tx callback into the frame callback. As mentioned above, both of these callbacks are implemented by the binding. Nothing\u0027s really new in that regard, it just formalises the phases that were previously implemented by tx() in an ad-hoc way.\n\n\u003e Note: There are certain advantage / disadvantage for both the models. The disadvantage i forsee in the other end is\n\u003e 1. Binding must have this implementation --\u003e checking route and doing the same\n\u003e 2. By that time, when TX is doing the same, route table shouldn\u0027t be updated (But i am not worried about this one, much, as in any way, we need to clear out the pkts in queue based on routing update).\n\nI\u0027m not following what your models are here. Can you clarify?",
+      "parentUuid": "0ddcabee_409de12b",
       "range": {
         "startLine": 207,
         "startChar": 0,
