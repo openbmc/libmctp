@@ -1454,7 +1454,7 @@ out:
 	mctp_pktbuf_free(pkt);
 }
 
-void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
+void mctp_binding_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 {
 	struct mctp *mctp = binding->mctp;
 	const struct mctp_route *match;
