@@ -23,7 +23,8 @@ void mctp_binding_test_register_bus(struct mctp_binding_test *binding,
 
 /* internal test binding interface */
 void mctp_binding_test_rx_raw(struct mctp_binding_test *test,
-		void *buf, size_t len);
+			      const struct mctp_device *dsrc, void *buf,
+			      size_t len);
 
 /* gerneral utility functions */
 

@@ -50,7 +50,7 @@ static void rcv_ctrl_msg(struct mctp_binding *b, const void *buf, size_t len)
 {
 	struct mctp_pktbuf *pkt = mctp_pktbuf_alloc(b, len);
 	memcpy(mctp_pktbuf_hdr(pkt), buf, len);
-	mctp_binding_rx(b, pkt);
+	mctp_binding_rx(b, NULL, pkt);
 }
 
 static void setup_test_binding(struct mctp_binding *test_binding,
@@ -80,8 +80,8 @@ static void send_transport_control_message(void)
 	struct callback_data ctx;
 	static const struct msg_payload send_control_message_payload = {
 		.hdr = {
-			.dest = eid_1,
-			.src = eid_2,
+			.dest = eid_1.id,
+			.src = eid_2.id,
 			.flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM,
 		},
 		.ctrl_hdr = {

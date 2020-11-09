@@ -97,6 +97,7 @@ struct test {
 
 static void run_one_test(struct test_ctx *ctx, struct test *test)
 {
+	const struct mctp_device dev = { .bus = 0, .address = 0 };
 	const mctp_eid_t local_eid = MCTP_EID(8);
 	const mctp_eid_t remote_eid = MCTP_EID(9);
 	struct {
@@ -114,13 +115,13 @@ static void run_one_test(struct test_ctx *ctx, struct test *test)
 
 	for (i = 0; i < test->n_packets; i++) {
 		memset(&pktbuf, 0, sizeof(pktbuf));
-		pktbuf.hdr.dest = local_eid;
-		pktbuf.hdr.src = remote_eid;
+		pktbuf.hdr.dest = local_eid.id;
+		pktbuf.hdr.src = remote_eid.id;
 		pktbuf.hdr.flags_seq_tag = test->flags_seq_tags[i];
 		pktbuf.payload[0] = i;
 
-		mctp_binding_test_rx_raw(ctx->binding,
-				&pktbuf, sizeof(pktbuf));
+		mctp_binding_test_rx_raw(ctx->binding, &dev, &pktbuf,
+					 sizeof(pktbuf));
 	}
 
 	assert(ctx->rx_count == test->exp_rx_count);

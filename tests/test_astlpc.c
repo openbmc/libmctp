@@ -213,6 +213,7 @@ static void network_init(struct astlpc_test *ctx)
 		.range = { .first = 9, .last = 9 },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0
 	};
 	rc = mctp_route_insert(ctx->bmc.mctp, &route);
 	assert(!rc);
@@ -226,6 +227,7 @@ static void network_init(struct astlpc_test *ctx)
 		.range = { .first = 8, .last = 8 },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0
 	};
 	rc = mctp_route_insert(ctx->host.mctp, &route);
 	assert(!rc);
@@ -592,6 +594,7 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 		.range = { .first = 9, .last = 9 },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0,
 	};
 	rc = mctp_route_insert(ctx.bmc.mctp, &route);
 	assert(!rc);
@@ -612,6 +615,7 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 		.range = { .first = 8, .last = 8 },
 		.type = MCTP_ROUTE_TYPE_LOCAL,
 		.device = { .bus = 0, .address = 0, },
+		.flags = 0
 	};
 	rc = mctp_route_insert(ctx.host.mctp, &route);
 	assert(!rc);
@@ -1122,8 +1126,8 @@ static void astlpc_test_send_large_packet(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, 8192, &kcs,
-			   lpc_mem);
+	rc = endpoint_init(bmc, MCTP_EID(8), MCTP_BINDING_ASTLPC_MODE_BMC, 8192,
+			   &kcs, lpc_mem);
 	assert(!rc);
 	route = (struct mctp_route){
 		.range = { .first = 9, .last = 9 },
@@ -1134,8 +1138,8 @@ static void astlpc_test_send_large_packet(void)
 	assert(!rc);
 
 	/* Host initialisation */
-	rc = endpoint_init(host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, 8192, &kcs,
-			   lpc_mem);
+	rc = endpoint_init(host, MCTP_EID(9), MCTP_BINDING_ASTLPC_MODE_HOST,
+			   8192, &kcs, lpc_mem);
 	assert(!rc);
 	route = (struct mctp_route){
 		.range = { .first = 8, .last = 8 },
@@ -1159,7 +1163,8 @@ static void astlpc_test_send_large_packet(void)
 
 	memset(ctx.msg, 0x5a, 2 * MCTP_BODY_SIZE(8192));
 
-	rc = mctp_message_tx(host->mctp, 8, ctx.msg, 2 * MCTP_BODY_SIZE(8192));
+	rc = mctp_message_tx(host->mctp, MCTP_EID(8), ctx.msg,
+			     2 * MCTP_BODY_SIZE(8192));
 	assert(rc == 0);
 	rc = mctp_astlpc_poll(bmc->astlpc);
 	assert(rc == 0);
