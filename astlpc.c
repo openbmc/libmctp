@@ -800,7 +800,7 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	mctp_astlpc_lpc_read(astlpc, mctp_pktbuf_hdr(pkt),
 			     astlpc->layout.rx.offset + 4, len);
 
-	mctp_bus_rx(&astlpc->binding, pkt);
+	mctp_binding_rx(&astlpc->binding, pkt);
 
 out_complete:
 	mctp_astlpc_kcs_send(astlpc, 0x2);
