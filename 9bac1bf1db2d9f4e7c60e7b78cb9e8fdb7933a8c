@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f0226a1_0b77719f",
+        "filename": "libmctp.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2020-11-19T01:24:57Z",
+      "side": 1,
+      "message": "Why do these need a struct mctp *? You don\u0027t use it anywhere in the implementations,\nand I\u0027d expect the EID conditions to remain independent of any state of the stack.",
+      "revId": "9bac1bf1db2d9f4e7c60e7b78cb9e8fdb7933a8c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
