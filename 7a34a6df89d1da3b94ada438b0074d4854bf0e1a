@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8761c7f_a3c6eeaa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2020-11-20T02:37:17Z",
+      "side": 1,
+      "message": "Could you elaborate on why this (rendering all packets at once) is better though?\n\nIt looks like the main part of this change is that we can perform the route lookup once, during the initial message queue, rather than on each TX.\n\nHowever, that means we may be using stale physical addressing data on TX, are you OK with that? Not that it matters for either of the in-tree bindings, but we\u0027ll hit this later.\n\nIt might be worthwhile putting a comment on the binding-\u003etx() function that the packet is required to be framed.",
+      "revId": "7a34a6df89d1da3b94ada438b0074d4854bf0e1a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
