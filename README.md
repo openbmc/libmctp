@@ -5,8 +5,25 @@ This library is intended to be a portable implementation of the Management
 Component Transport Protocol (MCTP), as defined by DMTF standard "DSP0236",
 plus transport binding specifications.
 
-Currently, the library is is only at prototyping stage. Interfaces will likely
-change, and are missing lots of components of the standard.
+Contact
+-------
+
+* Email: See [MAINTAINERS](MAINTAINERS). Please also Cc openbmc@lists.ozlabs.org
+* Discord: #mctp on https://discord.gg/69Km47zH98
+* IRC: #openbmc on Freenode
+
+API/ABI Stability
+-----------------
+
+The APIs and ABI of libmctp are not yet stablised as we continue to explore
+ways to present the MCTP protocol to firmware and applications. Please bear
+with us!
+
+When we approach a complete implementation of DSP0236 we will consider the
+suitability of the API/ABI for stabilisation.
+
+In the mean time, we'd like your feedback on the library's suitability for your
+environment.
 
 Core API
 --------
