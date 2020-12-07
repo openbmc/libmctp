@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "aa21a772_e7f8b18d",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T09:01:55Z",
+      "side": 1,
+      "message": "got your angle now. Basically i envisioned it from MCTP Control commands itself. i.e. the command will notify both the lib-mctp context and the other.",
+      "parentUuid": "c4a755f5_403cb463",
+      "range": {
+        "startLine": 577,
+        "startChar": 21,
+        "endLine": 578,
+        "endChar": 40
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7fcd6422_8916ad91",
         "filename": "core.c",
         "patchSetId": 3
@@ -328,6 +352,29 @@
       "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2e5c924f_ccf6e6d2",
+        "filename": "libmctp.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T09:01:55Z",
+      "side": 1,
+      "message": "this is unused in case of regular route entry table (used only for events).",
+      "range": {
+        "startLine": 142,
+        "startChar": 10,
+        "endLine": 142,
+        "endChar": 15
+      },
+      "revId": "8591b367ff29bfeb147cfc6c7709b61f6ac744d9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     },
     {
       "key": {
