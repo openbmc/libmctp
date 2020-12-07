@@ -1,0 +1,164 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e1cd60d9_d03d5605",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T06:58:40Z",
+      "side": 1,
+      "message": "I understand the benefit it provides, such that route_entry is never freed when in use, but usage like that itself is problem. Once entry is deleted there is no point in holding the entry and we should not use that entry itself. In other words, when we receive routing table update from a bus owner, it is necessary to drop the same, just because someone is holding the entry doesn\u0027t mean they should use it. \nin short, entry search must happen everytime, else if caching / re-use is used, then it is necessary to introduce the validity of the entry, such that stale is not used.",
+      "range": {
+        "startLine": 53,
+        "startChar": 1,
+        "endLine": 53,
+        "endChar": 20
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "443db424_82e1df35",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T06:58:40Z",
+      "side": 1,
+      "message": "Please add null check for a \u0026 b else, better be static",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0c3e53eb_098d8414",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T06:58:40Z",
+      "side": 1,
+      "message": "assert(entry);",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9d4db512_bb837824",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T06:58:40Z",
+      "side": 1,
+      "message": "How we will make sure, that entry is removed and not used. There can be some code which holds, the entry refs. How we can avoid it using that entry.",
+      "range": {
+        "startLine": 647,
+        "startChar": 0,
+        "endLine": 649,
+        "endChar": 29
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8b205e0a_75c2be94",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 839,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T06:58:40Z",
+      "side": 1,
+      "message": "this needs to be removed",
+      "range": {
+        "startLine": 839,
+        "startChar": 1,
+        "endLine": 839,
+        "endChar": 29
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0eb8e60f_a2352b78",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T06:58:40Z",
+      "side": 1,
+      "message": "Returns the bus ID of the registered binding greater or equal to 0, and negative error code for any error.",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "453ef031_60875839",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T06:58:40Z",
+      "side": 1,
+      "message": "ENDPOINT_SELF or \nSELF",
+      "range": {
+        "startLine": 141,
+        "startChar": 19,
+        "endLine": 141,
+        "endChar": 28
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0e61af78_033ce85a",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T06:58:40Z",
+      "side": 1,
+      "message": "can we add --\u003e delivered to the context (self) rather than routed to another",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
