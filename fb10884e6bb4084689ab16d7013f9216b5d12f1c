@@ -159,6 +159,29 @@
       "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "91367f07_634c773b",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T07:03:17Z",
+      "side": 1,
+      "message": "Another thing which is missing is to differentiate Endpoint \u0026 Bridge devices. Planning to address it separately  ?",
+      "range": {
+        "startLine": 161,
+        "startChar": 1,
+        "endLine": 161,
+        "endChar": 14
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
