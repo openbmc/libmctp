@@ -2,6 +2,46 @@
   "comments": [
     {
       "key": {
+        "uuid": "ffd2a079_1d6914ea",
+        "filename": "core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T04:33:19Z",
+      "side": 1,
+      "message": "Suggestion: (to have fewer cycles) to have one inline static function to check in_range() (highlighted one), so that mctp_eid_range_intersects() can be updated to to check routable twice and then followed by in_range 4 times.",
+      "range": {
+        "startLine": 295,
+        "startChar": 8,
+        "endLine": 295,
+        "endChar": 50
+      },
+      "revId": "9bac1bf1db2d9f4e7c60e7b78cb9e8fdb7933a8c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "14030cac_1d974bf7",
+        "filename": "libmctp.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T04:33:19Z",
+      "side": 1,
+      "message": "Planning to add API documentation here?",
+      "revId": "9bac1bf1db2d9f4e7c60e7b78cb9e8fdb7933a8c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4f0226a1_0b77719f",
         "filename": "libmctp.h",
         "patchSetId": 2
@@ -49,6 +89,24 @@
       "side": 1,
       "message": "You\u0027re planning for libmctp to concurrently support multiple spec versions, configured at runtime, *and* expect those versions to not be backwards compatible?\n\nWhile I admire your forward-planning here, I don\u0027t share your pessimism :D",
       "parentUuid": "adf07a01_2809dc65",
+      "revId": "9bac1bf1db2d9f4e7c60e7b78cb9e8fdb7933a8c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee7b4354_632224c0",
+        "filename": "libmctp.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2020-12-07T04:33:19Z",
+      "side": 1,
+      "message": "Having future versions of MCTP specification on API is really difficult. It\u0027s better not to make any choices, until we know what is fixed.\n\nNote: I am with the idea of passing mctp structure as argument, such that any customization in terms of Special Endpoint handling can make use of it. But not sure, the usage in terms of eid range/validity check.",
+      "parentUuid": "133d664c_c1d62e30",
       "revId": "9bac1bf1db2d9f4e7c60e7b78cb9e8fdb7933a8c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
