@@ -16,6 +16,24 @@
       "revId": "7a34a6df89d1da3b94ada438b0074d4854bf0e1a",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8eb8537e_7a01936b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:53:39Z",
+      "side": 1,
+      "message": "So backing up, I think I was trying to make the provisional EIDs work without carving them out into a separate address space like the current provisional EID patch does. Framing the packets all at once was a way to ensure that we didn\u0027t hit issues with that EID being reassigned (transitioning from locally provisional to formally assigned in the global sense) in between queuing the packets and having them hit the wire.\n\nThere was one race condition that I couldn\u0027t eliminate that drove me to separate out the provisional EIDs into a separate address space.\n\nWith that, I think the motivation for the framing patches disappears. Let me double check all the reasoning.",
+      "parentUuid": "c8761c7f_a3c6eeaa",
+      "revId": "7a34a6df89d1da3b94ada438b0074d4854bf0e1a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
