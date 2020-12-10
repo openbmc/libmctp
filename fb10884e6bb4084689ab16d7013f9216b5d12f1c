@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "428fd007_30b497aa",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:32:41Z",
+      "side": 1,
+      "message": "\u003e In other words, when we receive routing table update from a bus owner, it is necessary to drop the same, just because someone is holding the entry doesn\u0027t mean they should use it. \n\nHow are you going to tell them to stop?\n\n\u003e in short, entry search must happen everytime, else if caching / re-use is used, then it is necessary to introduce the validity of the entry, such that stale is not used.\n\nDespite your effort here, the race still remains. You can\u0027t have global consistency of the route table with respect to the network when we can only be locally aware of the network state. The races are fundamental to the network. You just have to live with the timeouts.\n\nAs such I don\u0027t plan on changing this implementation. The point of the reference count is for *memory* correctness, nothing further.",
+      "parentUuid": "e1cd60d9_d03d5605",
+      "range": {
+        "startLine": 53,
+        "startChar": 1,
+        "endLine": 53,
+        "endChar": 20
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "443db424_82e1df35",
         "filename": "core.c",
         "patchSetId": 7
@@ -36,6 +60,24 @@
       "writtenOn": "2020-12-07T06:58:40Z",
       "side": 1,
       "message": "Please add null check for a \u0026 b else, better be static",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ff6ea62_13792d16",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:32:41Z",
+      "side": 1,
+      "message": "Thanks for catching that.",
+      "parentUuid": "443db424_82e1df35",
       "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "988f03d3_2c50bb86",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:32:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0c3e53eb_098d8414",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9d4db512_bb837824",
         "filename": "core.c",
         "patchSetId": 7
@@ -70,6 +130,30 @@
       "writtenOn": "2020-12-07T06:58:40Z",
       "side": 1,
       "message": "How we will make sure, that entry is removed and not used. There can be some code which holds, the entry refs. How we can avoid it using that entry.",
+      "range": {
+        "startLine": 647,
+        "startChar": 0,
+        "endLine": 649,
+        "endChar": 29
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5133b5d1_2bc82366",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:32:41Z",
+      "side": 1,
+      "message": "Hence the reference count. Whenever the other chunk of code stops using the entry, it also does the put, at which point the entry will be freed.",
+      "parentUuid": "9d4db512_bb837824",
       "range": {
         "startLine": 647,
         "startChar": 0,
@@ -105,6 +189,30 @@
     },
     {
       "key": {
+        "uuid": "8bcaf6ed_de4e41df",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 839,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:32:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8b205e0a_75c2be94",
+      "range": {
+        "startLine": 839,
+        "startChar": 1,
+        "endLine": 839,
+        "endChar": 29
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0eb8e60f_a2352b78",
         "filename": "libmctp.h",
         "patchSetId": 7
@@ -116,6 +224,24 @@
       "writtenOn": "2020-12-07T06:58:40Z",
       "side": 1,
       "message": "Returns the bus ID of the registered binding greater or equal to 0, and negative error code for any error.",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "673a6ce2_15cddf89",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:32:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0eb8e60f_a2352b78",
       "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -145,6 +271,30 @@
     },
     {
       "key": {
+        "uuid": "af78a184_9d626d65",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:32:41Z",
+      "side": 1,
+      "message": "I wish I could s/local/neighbour/ on the spec!",
+      "parentUuid": "453ef031_60875839",
+      "range": {
+        "startLine": 141,
+        "startChar": 19,
+        "endLine": 141,
+        "endChar": 28
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0e61af78_033ce85a",
         "filename": "libmctp.h",
         "patchSetId": 7
@@ -162,6 +312,24 @@
     },
     {
       "key": {
+        "uuid": "13c8e15b_725fc995",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:32:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0e61af78_033ce85a",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "91367f07_634c773b",
         "filename": "libmctp.h",
         "patchSetId": 7
@@ -173,6 +341,30 @@
       "writtenOn": "2020-12-07T07:03:17Z",
       "side": 1,
       "message": "Another thing which is missing is to differentiate Endpoint \u0026 Bridge devices. Planning to address it separately  ?",
+      "range": {
+        "startLine": 161,
+        "startChar": 1,
+        "endLine": 161,
+        "endChar": 14
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "db1ac0dd_58c86a30",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:32:41Z",
+      "side": 1,
+      "message": "Can you please outline why you think that\u0027s necessary?",
+      "parentUuid": "91367f07_634c773b",
       "range": {
         "startLine": 161,
         "startChar": 1,
