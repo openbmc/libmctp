@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "cbd390a0_0adae879",
+        "filename": "core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 946,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:41:32Z",
+      "side": 1,
+      "message": "I\u0027m not sure I follow? It\u0027s a sanity check that the pool\u0027s in a good state. It\u0027s not enough that the start EID is non-zero.",
+      "parentUuid": "7be0eff0_dbe9aef4",
+      "range": {
+        "startLine": 940,
+        "startChar": 0,
+        "endLine": 946,
+        "endChar": 2
+      },
+      "revId": "7612ce234bbb7ec050ddce7dc914aae50f26dd81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "aadce11d_d99dad8f",
         "filename": "core.c",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2020-12-07T09:22:42Z",
       "side": 1,
       "message": "you have already mentioned, the free and repurpose of the EID is not in this commit. But using only this header pointer alone won\u0027t work right? \nIt\u0027s better to create the structure, which will be able to cover it in this patchset, rather than the code, which must change.",
+      "range": {
+        "startLine": 975,
+        "startChar": 1,
+        "endLine": 975,
+        "endChar": 22
+      },
+      "revId": "7612ce234bbb7ec050ddce7dc914aae50f26dd81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a8a6ade9_dd719795",
+        "filename": "core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 975,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2020-12-10T00:41:32Z",
+      "side": 1,
+      "message": "This is a valid implementation though. It might not be the most practical, but it\u0027s a start. I don\u0027t think we should let perfect be the enemy of \"good enough\"",
+      "parentUuid": "aadce11d_d99dad8f",
       "range": {
         "startLine": 975,
         "startChar": 1,
