@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "24f5911c_91ae0509",
+        "filename": "core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-01-11T06:52:59Z",
+      "side": 1,
+      "message": "fine with that approach. Hope you have some To-do sheet / issue list, where this is tracked to be done later.",
+      "parentUuid": "c85d174e_92307a3c",
+      "range": {
+        "startLine": 295,
+        "startChar": 8,
+        "endLine": 295,
+        "endChar": 50
+      },
+      "revId": "9bac1bf1db2d9f4e7c60e7b78cb9e8fdb7933a8c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "14030cac_1d974bf7",
         "filename": "libmctp.h",
         "patchSetId": 2
@@ -167,6 +191,24 @@
       "side": 1,
       "message": "\u003e You\u0027re planning for libmctp to concurrently support multiple spec versions\n\nI don\u0027t see a reason to start preventing it :)\n\n\u003e configured at runtime\n\nWell, it\u0027s the choice of the context owner what commands and such they want to support, so it seems reasonable that libmctp should accommodate that where it can.\n\n\u003e expect those versions to not be backwards compatible?\n\nWell, the ranges are reserved, we have no idea how they\u0027ll be used?",
       "parentUuid": "ee7b4354_632224c0",
+      "revId": "9bac1bf1db2d9f4e7c60e7b78cb9e8fdb7933a8c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "685d5694_6b5768d5",
+        "filename": "libmctp.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-01-11T06:52:59Z",
+      "side": 1,
+      "message": "yes, but that\u0027s not going to change the behavior for range_equal, range_intersects or range_contains. \n\nNote: I am still with the idea of passing the argument and fine with the current API.",
+      "parentUuid": "97935fcf_bbc62dd3",
       "revId": "9bac1bf1db2d9f4e7c60e7b78cb9e8fdb7933a8c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
