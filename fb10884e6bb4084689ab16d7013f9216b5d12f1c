@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "d3bd369b_55fffc94",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-01-11T07:22:36Z",
+      "side": 1,
+      "message": "It is necessary to indicate the entry is invalid. Yes, invalid entry will be used by already cached modules, but any new query will result in matching the entry (which is not valid), and still end up in using the same, which must be avoided.\n\nIf it is required only from memory management, then it\u0027s better to introduce the validity flag (to indicate the same), so any new query, even if matched, will be forfeit, due to validity flag.\n\nNote: I am fine to address the same in separate commit too (can track the same using TO-DO or issue list)",
+      "parentUuid": "428fd007_30b497aa",
+      "range": {
+        "startLine": 53,
+        "startChar": 1,
+        "endLine": 53,
+        "endChar": 20
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "443db424_82e1df35",
         "filename": "core.c",
         "patchSetId": 7
@@ -154,6 +178,30 @@
       "side": 1,
       "message": "Hence the reference count. Whenever the other chunk of code stops using the entry, it also does the put, at which point the entry will be freed.",
       "parentUuid": "9d4db512_bb837824",
+      "range": {
+        "startLine": 647,
+        "startChar": 0,
+        "endLine": 649,
+        "endChar": 29
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8cd9e51b_acdc63c9",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-01-11T07:22:36Z",
+      "side": 1,
+      "message": "This is same as @53, It is ok to use stale entry, but not ok to continuously use it, just because someone doesn\u0027t put the reference entry.",
+      "parentUuid": "5133b5d1_2bc82366",
       "range": {
         "startLine": 647,
         "startChar": 0,
@@ -365,6 +413,30 @@
       "side": 1,
       "message": "Can you please outline why you think that\u0027s necessary?",
       "parentUuid": "91367f07_634c773b",
+      "range": {
+        "startLine": 161,
+        "startChar": 1,
+        "endLine": 161,
+        "endChar": 14
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b817759_4750c504",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-01-11T07:22:36Z",
+      "side": 1,
+      "message": "As discussed in OpenBMC PMCI WG, this is needed so that we can update all the bridge devices, when routing table update happens",
+      "parentUuid": "db1ac0dd_58c86a30",
       "range": {
         "startLine": 161,
         "startChar": 1,
