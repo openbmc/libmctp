@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "33889300_f3fb6525",
+        "filename": "core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 946,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-01-11T07:36:16Z",
+      "side": 1,
+      "message": "what i meant to say is mctp_route_set_dynamic_pool() already verified the range, hence dynamic_pool is valid one. We just need to make sure that we are having dynamic_pool before proceeding.",
+      "parentUuid": "cbd390a0_0adae879",
+      "range": {
+        "startLine": 940,
+        "startChar": 0,
+        "endLine": 946,
+        "endChar": 2
+      },
+      "revId": "7612ce234bbb7ec050ddce7dc914aae50f26dd81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "aadce11d_d99dad8f",
         "filename": "core.c",
         "patchSetId": 2
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "This is a valid implementation though. It might not be the most practical, but it\u0027s a start. I don\u0027t think we should let perfect be the enemy of \"good enough\"",
       "parentUuid": "aadce11d_d99dad8f",
+      "range": {
+        "startLine": 975,
+        "startChar": 1,
+        "endLine": 975,
+        "endChar": 22
+      },
+      "revId": "7612ce234bbb7ec050ddce7dc914aae50f26dd81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f55b7ed0_7d612b45",
+        "filename": "core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 975,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-01-11T07:36:16Z",
+      "side": 1,
+      "message": "I normally prefer broken patches and fine with start patch :), but if it is not under review on related commits, then with either TO-DO, which conveys our intention / plan, so that later if someone picks it up, message is conveyed",
+      "parentUuid": "a8a6ade9_dd719795",
       "range": {
         "startLine": 975,
         "startChar": 1,
