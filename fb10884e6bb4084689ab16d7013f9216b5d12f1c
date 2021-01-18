@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "a0f1b0a1_34ae958b",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-18T05:01:47Z",
+      "side": 1,
+      "message": "\u003e but any new query will result in matching the entry (which is not valid), and still end up in using the same\n\nThis assertion is false, and seems to be the source of your confusion. The value of the `refs` member is *separate* from whether the entry appears in the route table. The only requirement while the entry is in the table is that `refs` is greater than zero. However it is valid for `refs` to be greater than zero and for the entry to *not* be present in the route table.\n\nTo remove an entry from the table, the `next` and `prev` pointers of the entries adjacent to the one being removed are updated to point to each-other\u0027s entry, removing the current entry from the table. At this point, future queries of the table will not see the removed entry, even though it is still a valid object in memory. Only once `refs` has been decremented to zero do we free the memory, but the entry has been removed from the list (potentially) well before this point.\n\nTo demonstrate, this test passes and does not invoke undefined behaviour:\n\n static const struct mctp_route test_add_one \u003d\t{\n        .range \u003d { .first \u003d 8, .last \u003d 8 },\n\t.device \u003d { .bus \u003d 0, .address \u003d 0, },\n\t.type \u003d MCTP_ROUTE_TYPE_LOCAL,\n\t.flags \u003d 0,\n };\n\n\n static void test_mctp_route_table_remove_referenced(void)\n {\n\tconst struct mctp_route *before_remove, *after_remove;\n\tstruct mctp *mctp;\n\tint rc;\n\n\tmctp \u003d mctp_init();\n\tassert(mctp);\n\n\trc \u003d mctp_route_add(mctp, \u0026test_add_one[0]);\n\tassert(!rc);\n\n\tbefore_remove \u003d mctp_route_match(mctp, \u0026test_add_one[0],\n\t\t\t\t \t MCTP_ROUTE_MATCH_ROUTE);\n\tassert(before_remove);\n\n\trc \u003d mctp_route_remove(mctp, \u0026test_add_one[0]);\n\tassert(!rc);\n\n\tafter_remove \u003d mctp_route_match(mctp, \u0026test_add_one[0],\n\t\t\t\t \tMCTP_ROUTE_MATCH_ROUTE);\n\tassert(!after_remove);\n\n\tmctp_route_put(before_remove);\n\n\tmctp_destroy(mctp);\n }\n\nI will add it to the test suite included in this patch to capture the behaviour.",
+      "parentUuid": "d3bd369b_55fffc94",
+      "range": {
+        "startLine": 53,
+        "startChar": 1,
+        "endLine": 53,
+        "endChar": 20
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "443db424_82e1df35",
         "filename": "core.c",
         "patchSetId": 7
@@ -108,6 +132,24 @@
     },
     {
       "key": {
+        "uuid": "c445f0ea_020c6a4a",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-18T05:01:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ff6ea62_13792d16",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0c3e53eb_098d8414",
         "filename": "core.c",
         "patchSetId": 7
@@ -140,6 +182,24 @@
       "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e54060e3_76472967",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-18T05:01:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "988f03d3_2c50bb86",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -202,6 +262,30 @@
       "side": 1,
       "message": "This is same as @53, It is ok to use stale entry, but not ok to continuously use it, just because someone doesn\u0027t put the reference entry.",
       "parentUuid": "5133b5d1_2bc82366",
+      "range": {
+        "startLine": 647,
+        "startChar": 0,
+        "endLine": 649,
+        "endChar": 29
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f76db5f8_b2531a93",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-18T05:01:47Z",
+      "side": 1,
+      "message": "Can you clarify your comment here with respect to my explanation of the refs behaviour (and test case) above?",
+      "parentUuid": "8cd9e51b_acdc63c9",
       "range": {
         "startLine": 647,
         "startChar": 0,
@@ -296,6 +380,24 @@
     },
     {
       "key": {
+        "uuid": "793f2c36_5da789ec",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-18T05:01:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "673a6ce2_15cddf89",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "453ef031_60875839",
         "filename": "libmctp.h",
         "patchSetId": 7
@@ -340,6 +442,30 @@
       "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8cf355c8_4ad90aa7",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-18T05:01:47Z",
+      "side": 1,
+      "message": "I\u0027ve changed this to MCTP_ROUTE_TYPE_SELF",
+      "parentUuid": "af78a184_9d626d65",
+      "range": {
+        "startLine": 141,
+        "startChar": 19,
+        "endLine": 141,
+        "endChar": 28
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -437,6 +563,30 @@
       "side": 1,
       "message": "As discussed in OpenBMC PMCI WG, this is needed so that we can update all the bridge devices, when routing table update happens",
       "parentUuid": "db1ac0dd_58c86a30",
+      "range": {
+        "startLine": 161,
+        "startChar": 1,
+        "endLine": 161,
+        "endChar": 14
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "817eedf4_55068799",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-18T05:01:47Z",
+      "side": 1,
+      "message": "Sorry, I\u0027ve forgotten the argument. We must write these things down rather than handwave them away with \"as verbally discussed\" (that doesn\u0027t mean we can\u0027t verbally discuss them, just that the arguments need to be written down regardless).\n\nI still can\u0027t see why this distinction is necessary - all devices should become aware of changes to the network.",
+      "parentUuid": "2b817759_4750c504",
       "range": {
         "startLine": 161,
         "startChar": 1,
