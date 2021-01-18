@@ -477,7 +477,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		/* single-packet message - send straight up to rx function,
 		 * no need to create a message context */
 		len = pkt->end - pkt->mctp_hdr_off - sizeof(struct mctp_hdr);
-		p = pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr),
+		p = pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr);
 		mctp_rx(mctp, bus, hdr->src, hdr->dest, p, len);
 		break;
 
