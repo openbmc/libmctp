@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "f58830db_c6d8a777",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-18T05:10:15Z",
+      "side": 1,
+      "message": "\u003e  It is needed only in MCTP Daemon angle only.\n\nI don\u0027t see that this is true. While the route table contains more information than is necessary, it advertises *what* devices are available in the network. This is useful for applications beyond managing the MCTP network itself.\n\nIntel in particular have a DBus interface along these lines that could be updated using this mechanism.",
+      "parentUuid": "27a04e47_d15c0162",
+      "range": {
+        "startLine": 13,
+        "startChar": 52,
+        "endLine": 13,
+        "endChar": 72
+      },
+      "revId": "ec52d06c468345d9b9e83151cdcd1421b46e9cd8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0825e304_1e37c8e4",
         "filename": "core.c",
         "patchSetId": 4
@@ -105,6 +129,24 @@
       "revId": "ec52d06c468345d9b9e83151cdcd1421b46e9cd8",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "263c2cc1_c7b9f10a",
+        "filename": "core.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-18T05:10:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43a024d6_15649e01",
+      "revId": "ec52d06c468345d9b9e83151cdcd1421b46e9cd8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
