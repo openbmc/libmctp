@@ -34,6 +34,24 @@
       "revId": "8b779107e734c4ad315fa2b9ba6d516c9ff54c96",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "806797f7_e545d9d4",
+        "filename": "core.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1377,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-19T00:29:36Z",
+      "side": 0,
+      "message": "Done: https://gerrit.openbmc-project.xyz/c/openbmc/libmctp/+/39777",
+      "parentUuid": "2d2f96c9_b69a39e2",
+      "revId": "8b779107e734c4ad315fa2b9ba6d516c9ff54c96",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
