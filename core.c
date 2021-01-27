@@ -585,6 +585,12 @@ static void mctp_send_tx_queue(struct mctp_bus *bus)
 void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
 {
 	struct mctp_bus *bus = binding->bus;
+
+	if (!binding->started && enable) {
+		binding->started = true;
+		mctp_prdebug("%s binding started", binding->name);
+	}
+
 	bus->tx_enabled = enable;
 	if (enable)
 		mctp_send_tx_queue(bus);
@@ -597,6 +603,9 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 	struct mctp_pktbuf *pkt;
 	struct mctp_hdr *hdr;
 	int i;
+
+	if (!bus->binding->started)
+		return -ENXIO;
 
 	max_payload_len = bus->binding->pkt_size - sizeof(*hdr);
 

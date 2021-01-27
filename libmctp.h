@@ -100,6 +100,7 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 struct mctp_binding {
 	const char *name;
 	uint8_t version;
+	bool started;
 	struct mctp_bus *bus;
 	struct mctp *mctp;
 	int pkt_size;
