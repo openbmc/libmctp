@@ -96,10 +96,15 @@ int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data);
 int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 		void *msg, size_t msg_len);
 
+#define MCTP_BINDING_STATE_CONSTRUCTED	0
+#define MCTP_BINDING_STATE_TX_ENABLED	1
+#define MCTP_BINDING_STATE_TX_DISABLED	2
+
 /* hardware bindings */
 struct mctp_binding {
 	const char *name;
 	uint8_t version;
+	uint8_t state;
 	struct mctp_bus *bus;
 	struct mctp *mctp;
 	int pkt_size;

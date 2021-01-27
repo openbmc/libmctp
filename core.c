@@ -23,7 +23,6 @@
 struct mctp_bus {
 	mctp_eid_t		eid;
 	struct mctp_binding	*binding;
-	bool			tx_enabled;
 
 	struct mctp_pktbuf	*tx_queue_head;
 	struct mctp_pktbuf	*tx_queue_tail;
@@ -571,7 +570,7 @@ out:
 static int mctp_packet_tx(struct mctp_bus *bus,
 		struct mctp_pktbuf *pkt)
 {
-	if (!bus->tx_enabled)
+	if (bus->binding->state != MCTP_BINDING_STATE_TX_ENABLED)
 		return -1;
 
 	return bus->binding->tx(bus->binding, pkt);
@@ -600,9 +599,30 @@ static void mctp_send_tx_queue(struct mctp_bus *bus)
 void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
 {
 	struct mctp_bus *bus = binding->bus;
-	bus->tx_enabled = enable;
-	if (enable)
-		mctp_send_tx_queue(bus);
+
+	switch(binding->state) {
+	case MCTP_BINDING_STATE_CONSTRUCTED:
+		if (enable) {
+			binding->state = MCTP_BINDING_STATE_TX_ENABLED;
+			mctp_prinfo("%s binding started", binding->name);
+		}
+		break;
+	case MCTP_BINDING_STATE_TX_ENABLED:
+		if (!enable) {
+			binding->state = MCTP_BINDING_STATE_TX_DISABLED;
+			mctp_prdebug("%s binding Tx disabled", binding->name);
+		}
+		break;
+	case MCTP_BINDING_STATE_TX_DISABLED:
+		if (enable) {
+			binding->state = MCTP_BINDING_STATE_TX_ENABLED;
+			mctp_prdebug("%s binding Tx enabled", binding->name);
+			mctp_send_tx_queue(bus);
+		}
+		break;
+	default:
+		assert(false);
+	}
 }
 
 static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
@@ -612,6 +632,9 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 	struct mctp_pktbuf *pkt;
 	struct mctp_hdr *hdr;
 	int i;
+
+	if (bus->binding->state == MCTP_BINDING_STATE_CONSTRUCTED)
+		return -ENXIO;
 
 	max_payload_len = bus->binding->pkt_size - sizeof(*hdr);
 	if (max_payload_len < MCTP_BTU) {
