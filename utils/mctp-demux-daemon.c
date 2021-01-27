@@ -60,7 +60,11 @@ struct ctx {
 
 static void tx_message(struct ctx *ctx, mctp_eid_t eid, void *msg, size_t len)
 {
-	mctp_message_tx(ctx->mctp, eid, msg, len);
+	int rc;
+
+	rc = mctp_message_tx(ctx->mctp, eid, msg, len);
+	if (rc)
+		warnx("Failed to send message: %d", rc);
 }
 
 static void client_remove_inactive(struct ctx *ctx)
