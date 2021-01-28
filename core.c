@@ -614,6 +614,11 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 	int i;
 
 	max_payload_len = bus->binding->pkt_size - sizeof(*hdr);
+	if (max_payload_len < MCTP_BTU) {
+		mctp_prwarn("Invalid maximum transmission unit size: %zu",
+			    max_payload_len);
+		return -EINVAL;
+	}
 
 	mctp_prdebug("%s: Generating packets for transmission of %zu byte message from %hhu to %hhu",
 		     __func__, msg_len, src, dest);
