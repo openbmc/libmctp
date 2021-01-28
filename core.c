@@ -262,6 +262,16 @@ void mctp_set_max_message_size(struct mctp *mctp, size_t message_size)
 	mctp->max_message_size = message_size;
 }
 
+static void mctp_bus_destroy(struct mctp_bus *bus)
+{
+	while (bus->tx_queue_head) {
+		struct mctp_pktbuf *curr = bus->tx_queue_head;
+
+		bus->tx_queue_head = curr->next;
+		mctp_pktbuf_free(curr);
+	}
+}
+
 void mctp_destroy(struct mctp *mctp)
 {
 	size_t i;
@@ -273,6 +283,9 @@ void mctp_destroy(struct mctp *mctp)
 		if (tmp->buf)
 			__mctp_free(tmp->buf);
 	}
+
+	while (mctp->n_busses--)
+		mctp_bus_destroy(&mctp->busses[mctp->n_busses]);
 
 	__mctp_free(mctp->busses);
 	__mctp_free(mctp);
