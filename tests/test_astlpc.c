@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/random.h>
+#include <unistd.h>
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -1129,6 +1130,42 @@ static void astlpc_test_send_large_packet(void)
 	free(lpc_mem);
 }
 
+static void astlpc_test_tx_before_channel_init(void)
+{
+	struct astlpc_endpoint *bmc;
+	struct astlpc_test ctx;
+	uint8_t kcs[2] = { 0 };
+	uint8_t msg[MCTP_BTU];
+	void *lpc_mem;
+	int rc;
+
+	bmc = &ctx.bmc;
+
+	/* Test harness initialisation */
+	lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(lpc_mem);
+
+	/* BMC initialisation */
+	rc = endpoint_init(bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, 0, &kcs,
+			   lpc_mem);
+	assert(!rc);
+
+	memset(msg, '\0', sizeof(msg));
+
+	/*
+	 * There was once a bug where the calculated MTU was 0 and the
+	 * packetisation loop in mctp_message_tx_on_bus() allocated all the
+	 * memory. Catch the bug and avoid OOMing the test machine by
+	 * terminating after a period long enough to packetise the message.
+	 */
+	alarm(1);
+	mctp_message_tx(bmc->mctp, 9, msg, sizeof(msg));
+	alarm(0);
+
+	endpoint_destroy(bmc);
+	free(lpc_mem);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -1169,6 +1206,7 @@ static const struct {
 	TEST_CASE(astlpc_test_negotiate_increased_mtu),
 	TEST_CASE(astlpc_test_negotiate_mtu_low_high),
 	TEST_CASE(astlpc_test_send_large_packet),
+	TEST_CASE(astlpc_test_tx_before_channel_init),
 };
 /* clang-format on */
 
