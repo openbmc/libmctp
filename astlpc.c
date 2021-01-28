@@ -914,6 +914,12 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 
 	astlpc_prdebug(astlpc, "%s: data: 0x%hhx", __func__, data);
 
+	if (!astlpc->version && !(data == 0x0 || data == 0xff)) {
+		astlpc_prwarn(astlpc, "Invalid message for binding state: 0x%x",
+			      data);
+		return 0;
+	}
+
 	switch (data) {
 	case 0x0:
 		mctp_astlpc_init_channel(astlpc);
