@@ -611,6 +611,13 @@ void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
 		if (!enable)
 			return;
 
+		if (binding->pkt_size < MCTP_PACKET_SIZE(MCTP_BTU)) {
+			mctp_prerr("Cannot start %s binding with invalid MTU: %zu",
+				   binding->name,
+				   MCTP_BODY_SIZE(binding->pkt_size));
+			return;
+		}
+
 		bus->state = mctp_bus_state_tx_enabled;
 		mctp_prinfo("%s binding started", binding->name);
 		return;
@@ -643,7 +650,14 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 	if (bus->state == mctp_bus_state_constructed)
 		return -ENXIO;
 
-	max_payload_len = bus->binding->pkt_size - sizeof(*hdr);
+	max_payload_len = MCTP_BODY_SIZE(bus->binding->pkt_size);
+
+	{
+		const bool valid_mtu = max_payload_len >= MCTP_BTU;
+		assert(valid_mtu);
+		if (!valid_mtu)
+			return -EINVAL;
+	}
 
 	mctp_prdebug("%s: Generating packets for transmission of %zu byte message from %hhu to %hhu",
 		     __func__, msg_len, src, dest);
