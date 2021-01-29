@@ -337,6 +337,7 @@ int mctp_register_bus(struct mctp *mctp,
 		rc = binding->start(binding);
 		if (rc < 0) {
 			mctp_prerr("Failed to start binding: %d", rc);
+			binding->bus = NULL;
 			__mctp_free(mctp->busses);
 			mctp->busses = NULL;
 			mctp->n_busses = 0;
@@ -349,6 +350,8 @@ int mctp_register_bus(struct mctp *mctp,
 int mctp_bridge_busses(struct mctp *mctp,
 		struct mctp_binding *b1, struct mctp_binding *b2)
 {
+	int rc = 0;
+
 	assert(mctp->n_busses == 0);
 	mctp->busses = __mctp_alloc(2 * sizeof(struct mctp_bus));
 	memset(mctp->busses, 0, 2 * sizeof(struct mctp_bus));
@@ -362,13 +365,26 @@ int mctp_bridge_busses(struct mctp *mctp,
 
 	mctp->route_policy = ROUTE_BRIDGE;
 
-	if (b1->start)
-		b1->start(b1);
+	if (b1->start) {
+		rc = b1->start(b1);
+		if (rc < 0) {
+			mctp_prerr("Failed to start bridged bus %s: %d",
+				   b1->name, rc);
+			goto done;
+		}
+	}
 
-	if (b2->start)
-		b2->start(b2);
+	if (b2->start) {
+		rc = b2->start(b2);
+		if (rc < 0) {
+			mctp_prerr("Failed to start bridged bus %s: %d",
+				   b2->name, rc);
+			goto done;
+		}
+	}
 
-	return 0;
+done:
+	return rc;
 }
 
 static inline bool mctp_ctrl_cmd_is_transport(struct mctp_ctrl_msg_hdr *hdr)
