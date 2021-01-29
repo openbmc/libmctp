@@ -52,6 +52,24 @@
       "revId": "33cb5181ace7f1d0b0b797b162e3f96926b87381",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "588dc19d_0b9d8fb4",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 618,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-29T01:32:21Z",
+      "side": 1,
+      "message": "\u003e That\u0027s a little inconsistent with the existing control flow - the bindings themselves are usually responsible for setting tx state, and there wouldn\u0027t be a mechanism for them to re-enable it.\n\nRight, but how exactly *would* they recover from it? They\u0027d need to fix the MTU, and it\u0027s not obvious to me *how* the binding should determine this needs to happen, other than it should never happen in the first place.\n\n\u003e This would only be triggered by a bug in the binding, right? (having tx enabled with an invalid MTU). We could even assert()...\n\nWell, is asserting wise for bindings which can negotiate the value at runtime? I guess what\u0027s still going for assert() is that if the binding managed to negotiate a value below the BTU then it\u0027s still a bug in the binding, but asserting here still makes me a little nervous.",
+      "parentUuid": "8a99aa82_21bd7c9d",
+      "revId": "33cb5181ace7f1d0b0b797b162e3f96926b87381",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
