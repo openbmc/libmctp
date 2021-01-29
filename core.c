@@ -320,6 +320,7 @@ int mctp_register_bus(struct mctp *mctp,
 			mctp_prerr("Failed to start binding: %d", rc);
 			__mctp_free(mctp->busses);
 			mctp->busses = NULL;
+			mctp->n_busses = 0;
 		}
 	}
 
