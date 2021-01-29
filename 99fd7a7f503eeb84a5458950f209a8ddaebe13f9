@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "245df228_9c815141",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-29T01:37:22Z",
+      "side": 1,
+      "message": "Hmm. I was leading with the motivation rather than the patch implementation. There\u0027s no real impact on the binding implementations unless they chooses to care (e.g. astlpc decides to care a bit later in the series). What\u0027s perhaps a bit subtle is the expectation that bindings zero-initialise struct mctp_binding, but given we\u0027re going to shift the state back to struct mctp_bus this becomes less of a concern. Does shifting the state back to struct mctp_bus lift your concern with the commit message?",
+      "parentUuid": "d5f3aaa4_44f434a5",
+      "revId": "99fd7a7f503eeb84a5458950f209a8ddaebe13f9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "908f9498_78cb84ac",
         "filename": "libmctp.h",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "OK, if you\u0027re doing that: any thoughts about an enum instead of defines?",
       "parentUuid": "477a02c6_d8a7a0ac",
+      "revId": "99fd7a7f503eeb84a5458950f209a8ddaebe13f9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e740b1a_b4b66da0",
+        "filename": "libmctp.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-29T01:37:22Z",
+      "side": 1,
+      "message": "Yeah, I\u0027ll switch to an enum now that it will be private.",
+      "parentUuid": "8e3dee81_3a849ba1",
       "revId": "99fd7a7f503eeb84a5458950f209a8ddaebe13f9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
