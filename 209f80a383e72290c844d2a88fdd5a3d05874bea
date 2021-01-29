@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4d86fc7e_295bbf28",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-01-29T00:23:42Z",
+      "side": 1,
+      "message": "mctp-\u003ebusses is an array, no?",
+      "revId": "209f80a383e72290c844d2a88fdd5a3d05874bea",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
