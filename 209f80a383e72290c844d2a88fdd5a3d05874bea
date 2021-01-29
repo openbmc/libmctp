@@ -69,6 +69,24 @@
       "revId": "209f80a383e72290c844d2a88fdd5a3d05874bea",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5863e18d_e9190512",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-01-29T01:10:59Z",
+      "side": 1,
+      "message": "Foiled! Dammit!",
+      "parentUuid": "75e2afce_f6d84da4",
+      "revId": "209f80a383e72290c844d2a88fdd5a3d05874bea",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
