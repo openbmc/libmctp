@@ -51,6 +51,24 @@
       "revId": "99fd7a7f503eeb84a5458950f209a8ddaebe13f9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e3dee81_3a849ba1",
+        "filename": "libmctp.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-01-29T00:48:23Z",
+      "side": 1,
+      "message": "OK, if you\u0027re doing that: any thoughts about an enum instead of defines?",
+      "parentUuid": "477a02c6_d8a7a0ac",
+      "revId": "99fd7a7f503eeb84a5458950f209a8ddaebe13f9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
