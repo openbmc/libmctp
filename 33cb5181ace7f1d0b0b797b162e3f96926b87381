@@ -70,6 +70,24 @@
       "revId": "33cb5181ace7f1d0b0b797b162e3f96926b87381",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f90989ae_84a4b13e",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 618,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-01-29T01:39:20Z",
+      "side": 1,
+      "message": "Yep, I think that\u0027s a valid concern. Maybe set_tx_enabled() could log, and refuse to enable if \u003c MCTP_BTU, and then we assert here (given that this assert should no longer be reachable). Would that work?",
+      "parentUuid": "588dc19d_0b9d8fb4",
+      "revId": "33cb5181ace7f1d0b0b797b162e3f96926b87381",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
