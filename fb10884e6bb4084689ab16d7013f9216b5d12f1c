@@ -97,6 +97,30 @@
     },
     {
       "key": {
+        "uuid": "d5d9a9f1_8e9a0000",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-02-08T09:02:54Z",
+      "side": 1,
+      "message": "Ok Got it now, guess i thought you have implemented in the different style. \nIn this case line @418 needs to be updated accordingly.",
+      "parentUuid": "a0f1b0a1_34ae958b",
+      "range": {
+        "startLine": 53,
+        "startChar": 1,
+        "endLine": 53,
+        "endChar": 20
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "443db424_82e1df35",
         "filename": "core.c",
         "patchSetId": 7
@@ -200,6 +224,29 @@
       "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "302164da_9dc2b22c",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-02-08T09:02:54Z",
+      "side": 1,
+      "message": "With the flows explained above\n1. After insert\n2. Do a match\n3. Do a put --\u003e then as per the code it will be freed, and next match will fail\n\nSame will end-up in assert when there are multiple entries with prev or next pointing to valid entries.",
+      "range": {
+        "startLine": 419,
+        "startChar": 0,
+        "endLine": 421,
+        "endChar": 21
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     },
     {
       "key": {
@@ -587,6 +634,30 @@
       "side": 1,
       "message": "Sorry, I\u0027ve forgotten the argument. We must write these things down rather than handwave them away with \"as verbally discussed\" (that doesn\u0027t mean we can\u0027t verbally discuss them, just that the arguments need to be written down regardless).\n\nI still can\u0027t see why this distinction is necessary - all devices should become aware of changes to the network.",
       "parentUuid": "2b817759_4750c504",
+      "range": {
+        "startLine": 161,
+        "startChar": 1,
+        "endLine": 161,
+        "endChar": 14
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fb07aab6_caec3350",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-02-08T09:02:54Z",
+      "side": 1,
+      "message": "It was documented. We discussed that as BO, we need to send Routing table update to Bridge devices, and hence need to store that info\n\nExcerpt from OpenBMC PMCI WG \n\nRichard - Other clarification required is, in the entry we don\u0027t have a mechanism to tell whether EID is endpoint device or bridge etc. \nAndrew - For what purpose it may be needed. \nRichard - This is needed so that we will be able to indicate any routing table update to any bridge devices etc.\nAndrew - Need to investigate on this.",
+      "parentUuid": "817eedf4_55068799",
       "range": {
         "startLine": 161,
         "startChar": 1,
