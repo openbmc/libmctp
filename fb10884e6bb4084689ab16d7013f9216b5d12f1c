@@ -250,6 +250,30 @@
     },
     {
       "key": {
+        "uuid": "30796061_5df10705",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-02-09T00:57:21Z",
+      "side": 1,
+      "message": "Can you please write the code that you think will trigger the assert using the public (non-static) interfaces? That way I can add it as a test case. Right now I\u0027m not immediately following what you\u0027re outlining.\n\nHaving said that, maybe the implementation of __mctp_route_remove() addresses your concern? mctp_route_entry_put() is static and can\u0027t be directly called by user code. libmctp users must call through mctp_route_remove() (which calls __mctp_route_remove()).\n\n__mctp_route_remove() deletes the entry from the route table via mctp_route_list_remove(), and then drops the reference added in the route\u0027s initialisation in __mctp_route_add(). If anyone has done an interim match and still holds the a reference the entry won\u0027t be freed, but its next and prev pointers will have been NULL\u0027ed by mctp_route_list_remove().",
+      "parentUuid": "302164da_9dc2b22c",
+      "range": {
+        "startLine": 419,
+        "startChar": 0,
+        "endLine": 421,
+        "endChar": 21
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9d4db512_bb837824",
         "filename": "core.c",
         "patchSetId": 7
@@ -658,6 +682,30 @@
       "side": 1,
       "message": "It was documented. We discussed that as BO, we need to send Routing table update to Bridge devices, and hence need to store that info\n\nExcerpt from OpenBMC PMCI WG \n\nRichard - Other clarification required is, in the entry we don\u0027t have a mechanism to tell whether EID is endpoint device or bridge etc. \nAndrew - For what purpose it may be needed. \nRichard - This is needed so that we will be able to indicate any routing table update to any bridge devices etc.\nAndrew - Need to investigate on this.",
       "parentUuid": "817eedf4_55068799",
+      "range": {
+        "startLine": 161,
+        "startChar": 1,
+        "endLine": 161,
+        "endChar": 14
+      },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9921c7c_ce598dd9",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-02-09T00:57:21Z",
+      "side": 1,
+      "message": "It still doesn\u0027t explain why bridges need special handling. The route tables in all devices need updating, right?",
+      "parentUuid": "fb07aab6_caec3350",
       "range": {
         "startLine": 161,
         "startChar": 1,
