@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fe10e7f1_92964db9",
+        "filename": "core.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-02-10T07:41:23Z",
+      "side": 1,
+      "message": "I\u0027m guessing this should be nul-terminated - might be worth a comment.",
+      "revId": "3ed0e4e7a296aa73b7aa287f04fab397dec3c0c0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be91be94_390c4643",
+        "filename": "libmctp.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-02-10T07:41:23Z",
+      "side": 1,
+      "message": "I think the other new functions are fairly self-explanatory, but this one may need a comment - from the context here: it takes a route and returns... a route?",
+      "revId": "3ed0e4e7a296aa73b7aa287f04fab397dec3c0c0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}

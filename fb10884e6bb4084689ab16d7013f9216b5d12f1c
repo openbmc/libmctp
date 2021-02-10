@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "66036b1a_2f39c623",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-02-10T07:41:23Z",
+      "side": 1,
+      "message": "Maybe mention that the route table isn\u0027t actually used yet?",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e1cd60d9_d03d5605",
         "filename": "core.c",
         "patchSetId": 7
@@ -268,6 +285,40 @@
         "endLine": 421,
         "endChar": 21
       },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3202e89c_c5ce0ed7",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-02-10T07:41:23Z",
+      "side": 1,
+      "message": "what\u0027s a mode? you\u0027ve called this \u0027flags\u0027 in the public API. Can you add some detail here (or on mctp_route_match) about how these are used (ie, that the route matches are OR-ed)?",
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "855fb482_a6c15a34",
+        "filename": "core.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-02-10T07:41:23Z",
+      "side": 1,
+      "message": "How about:\n\n    if ((mode \u0026 MCTP_ROUTE_MATCH_EID) \u0026\u0026 (mode \u0026 MCTP_ROUTE_MATCH_RANGE))",
       "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -712,6 +763,23 @@
         "endLine": 161,
         "endChar": 14
       },
+      "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "afea7e4a_9c662f0e",
+        "filename": "libmctp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-02-10T07:41:23Z",
+      "side": 1,
+      "message": "Even though the route argument is marked const, you may want to specify that the route data is copied (and hence route may be free()d by the caller immediately on return).",
       "revId": "fb10884e6bb4084689ab16d7013f9216b5d12f1c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
