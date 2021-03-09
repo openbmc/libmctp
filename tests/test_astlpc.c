@@ -718,7 +718,10 @@ static void astlpc_test_undefined_command(void)
 	free(lpc_mem);
 }
 
-#define BUFFER_MIN ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(MCTP_BTU))
+#define BUFFER_MIN (MCTP_PACKET_SIZE(MCTP_BTU) + 4)
+static const struct mctp_binding_astlpc astlpc_layout_ctx = {
+	.proto = &astlpc_protocol_version[2],
+};
 
 static void astlpc_test_buffers_rx_offset_overflow(void)
 {
@@ -727,7 +730,7 @@ static void astlpc_test_buffers_rx_offset_overflow(void)
 		.tx = { control_size, BUFFER_MIN },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_tx_offset_overflow(void)
@@ -737,7 +740,7 @@ static void astlpc_test_buffers_tx_offset_overflow(void)
 		.tx = { UINT32_MAX, BUFFER_MIN },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_rx_size_overflow(void)
@@ -747,7 +750,7 @@ static void astlpc_test_buffers_rx_size_overflow(void)
 		.tx = { control_size, BUFFER_MIN },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_tx_size_overflow(void)
@@ -757,7 +760,7 @@ static void astlpc_test_buffers_tx_size_overflow(void)
 		.tx = { control_size + BUFFER_MIN, UINT32_MAX },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_rx_window_violation(void)
@@ -767,7 +770,7 @@ static void astlpc_test_buffers_rx_window_violation(void)
 		.tx = { control_size, BUFFER_MIN },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_tx_window_violation(void)
@@ -777,7 +780,7 @@ static void astlpc_test_buffers_tx_window_violation(void)
 		.tx = { LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_rx_size_fails_btu(void)
@@ -787,7 +790,7 @@ static void astlpc_test_buffers_rx_size_fails_btu(void)
 		.tx = { control_size + BUFFER_MIN, BUFFER_MIN },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_tx_size_fails_btu(void)
@@ -797,7 +800,7 @@ static void astlpc_test_buffers_tx_size_fails_btu(void)
 		.tx = { control_size + BUFFER_MIN, BUFFER_MIN - 1 },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_overlap_rx_low(void)
@@ -807,7 +810,7 @@ static void astlpc_test_buffers_overlap_rx_low(void)
 		.tx = { control_size + BUFFER_MIN, 2 * BUFFER_MIN },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_overlap_tx_low(void)
@@ -817,7 +820,7 @@ static void astlpc_test_buffers_overlap_tx_low(void)
 		.tx = { control_size, 2 * BUFFER_MIN },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_overlap_exact(void)
@@ -827,7 +830,7 @@ static void astlpc_test_buffers_overlap_exact(void)
 		.tx = { control_size, 2 * BUFFER_MIN },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_overlap_control(void)
@@ -837,7 +840,7 @@ static void astlpc_test_buffers_overlap_control(void)
 		.tx = { control_size + BUFFER_MIN, BUFFER_MIN },
 	};
 
-	assert(!mctp_astlpc_layout_validate(&l));
+	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
 }
 
 static void astlpc_test_buffers_bad_host_proposal(void)
@@ -1017,6 +1020,7 @@ static void astlpc_test_negotiate_mtu_low_high(void)
 {
 	struct astlpc_endpoint bmc, host;
 	uint8_t kcs[2] = { 0 };
+	uint32_t bmtu, hmtu;
 	void *lpc_mem;
 	int rc;
 
@@ -1025,13 +1029,15 @@ static void astlpc_test_negotiate_mtu_low_high(void)
 	assert(lpc_mem);
 
 	/* BMC initialisation */
-	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, 3 * MCTP_BTU,
-			   &kcs, lpc_mem);
+	bmtu = 3 * MCTP_BTU;
+	rc = endpoint_init(&bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, bmtu, &kcs,
+			   lpc_mem);
 	assert(!rc);
 
 	/* Host initialisation with low MTU */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST,
-			   2 * MCTP_BTU, &kcs, lpc_mem);
+	hmtu = 2 * MCTP_BTU;
+	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, hmtu, &kcs,
+			   lpc_mem);
 	assert(!rc);
 
 	/* Process low MTU proposal */
@@ -1043,7 +1049,7 @@ static void astlpc_test_negotiate_mtu_low_high(void)
 	assert(rc == 0);
 
 	assert(host.astlpc->layout.rx.size ==
-	       ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(2 * MCTP_BTU)));
+	       astlpc_layout_ctx.proto->packet_size(MCTP_PACKET_SIZE(hmtu)));
 
 	/* Tear-down the host so we can bring up a new one */
 	endpoint_destroy(&host);
@@ -1052,8 +1058,9 @@ static void astlpc_test_negotiate_mtu_low_high(void)
 	 * Bring up a new host endpoint with a higher MTU than we previously
 	 * negotiated
 	 */
-	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST,
-			   3 * MCTP_BTU, &kcs, lpc_mem);
+	hmtu = 3 * MCTP_BTU;
+	rc = endpoint_init(&host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, hmtu, &kcs,
+			   lpc_mem);
 	assert(!rc);
 
 	/* Process high MTU proposal */
@@ -1065,7 +1072,7 @@ static void astlpc_test_negotiate_mtu_low_high(void)
 	assert(rc == 0);
 
 	assert(host.astlpc->layout.rx.size ==
-	       ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(3 * MCTP_BTU)));
+	       astlpc_layout_ctx.proto->packet_size(MCTP_PACKET_SIZE(bmtu)));
 
 	endpoint_destroy(&host);
 	endpoint_destroy(&bmc);

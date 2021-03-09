@@ -49,6 +49,12 @@ struct mctp_astlpc_layout {
 	struct mctp_astlpc_buffer tx;
 };
 
+struct mctp_astlpc_protocol {
+	uint16_t version;
+	uint32_t (*packet_size)(uint32_t body);
+	uint32_t (*body_size)(uint32_t packet);
+};
+
 struct mctp_binding_astlpc {
 	struct mctp_binding	binding;
 
@@ -56,8 +62,9 @@ struct mctp_binding_astlpc {
 	struct mctp_astlpc_layout layout;
 
 	uint8_t mode;
-	uint16_t version;
 	uint32_t requested_mtu;
+
+	const struct mctp_astlpc_protocol *proto;
 
 	/* direct ops data */
 	struct mctp_binding_astlpc_ops ops;
@@ -98,10 +105,43 @@ struct mctp_binding_astlpc {
 #ifndef ASTLPC_VER_CUR
 #define ASTLPC_VER_CUR	2
 #endif
-
-#define ASTLPC_PACKET_SIZE(sz)	(4 + (sz))
-#define ASTLPC_BODY_SIZE(sz)	((sz) - 4)
 /* clang-format on */
+
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+#endif
+
+static uint32_t astlpc_packet_size_v1(uint32_t body)
+{
+	assert((body + 4) > body);
+
+	return body + 4;
+}
+
+static uint32_t astlpc_body_size_v1(uint32_t packet)
+{
+	assert((packet - 4) < packet);
+
+	return packet - 4;
+}
+
+static const struct mctp_astlpc_protocol astlpc_protocol_version[] = {
+	[0] = {
+		.version = 0,
+		.packet_size = NULL,
+		.body_size = NULL,
+	},
+	[1] = {
+		.version = 1,
+		.packet_size = astlpc_packet_size_v1,
+		.body_size = astlpc_body_size_v1,
+	},
+	[2] = {
+		.version = 2,
+		.packet_size = astlpc_packet_size_v1,
+		.body_size = astlpc_body_size_v1,
+	},
+};
 
 struct mctp_lpcmap_hdr {
 	uint32_t magic;
@@ -279,8 +319,10 @@ static int mctp_astlpc_layout_write(struct mctp_binding_astlpc *astlpc,
 			sizeof(rx_size_be));
 }
 
-static bool mctp_astlpc_buffer_validate(struct mctp_astlpc_buffer *buf,
-					const char *name)
+static bool
+mctp_astlpc_buffer_validate(const struct mctp_binding_astlpc *astlpc,
+			    const struct mctp_astlpc_buffer *buf,
+			    const char *name)
 {
 	/* Check for overflow */
 	if (buf->offset + buf->size < buf->offset) {
@@ -302,10 +344,11 @@ static bool mctp_astlpc_buffer_validate(struct mctp_astlpc_buffer *buf,
 	}
 
 	/* Check that the baseline transmission unit is supported */
-	if (buf->size < ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(MCTP_BTU))) {
+	if (buf->size < astlpc->proto->packet_size(MCTP_PACKET_SIZE(MCTP_BTU))) {
 		mctp_prerr(
-			"%s packet buffer too small: Require %zu bytes to support the %u byte baseline transmission unit, found %" PRIu32,
-			name, ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(MCTP_BTU)),
+			"%s packet buffer too small: Require %" PRIu32 " bytes to support the %u byte baseline transmission unit, found %" PRIu32,
+			name,
+			astlpc->proto->packet_size(MCTP_PACKET_SIZE(MCTP_BTU)),
 			MCTP_BTU, buf->size);
 		return false;
 	}
@@ -322,14 +365,16 @@ static bool mctp_astlpc_buffer_validate(struct mctp_astlpc_buffer *buf,
 	return true;
 }
 
-static bool mctp_astlpc_layout_validate(struct mctp_astlpc_layout *layout)
+static bool
+mctp_astlpc_layout_validate(const struct mctp_binding_astlpc *astlpc,
+			    const struct mctp_astlpc_layout *layout)
 {
-	struct mctp_astlpc_buffer *rx = &layout->rx;
-	struct mctp_astlpc_buffer *tx = &layout->tx;
+	const struct mctp_astlpc_buffer *rx = &layout->rx;
+	const struct mctp_astlpc_buffer *tx = &layout->tx;
 	bool rx_valid, tx_valid;
 
-	rx_valid = mctp_astlpc_buffer_validate(rx, "Rx");
-	tx_valid = mctp_astlpc_buffer_validate(tx, "Tx");
+	rx_valid = mctp_astlpc_buffer_validate(astlpc, rx, "Rx");
+	tx_valid = mctp_astlpc_buffer_validate(astlpc, tx, "Tx");
 
 	if (!(rx_valid && tx_valid))
 		return false;
@@ -350,7 +395,7 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 {
 	struct mctp_lpcmap_hdr hdr = { 0 };
 	uint8_t status;
-	size_t sz;
+	uint32_t sz;
 
 	/*
 	 * The largest buffer size is half of the allocated MCTP space
@@ -362,15 +407,16 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 	 * Trim the MTU to a multiple of 16 to meet the requirements of 12.17
 	 * Query Hop in DSP0236 v1.3.0.
 	 */
-	sz = MCTP_BODY_SIZE(ASTLPC_BODY_SIZE(sz));
+	sz = MCTP_BODY_SIZE(astlpc->proto->body_size(sz));
 	sz &= ~0xfUL;
-	sz = ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(sz));
+	sz = astlpc->proto->packet_size(MCTP_PACKET_SIZE(sz));
 
 	if (astlpc->requested_mtu) {
-		size_t r;
+		uint32_t rpkt, rmtu;
 
-		r = ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(astlpc->requested_mtu));
-		sz = MIN(sz, r);
+		rmtu = astlpc->requested_mtu;
+		rpkt = astlpc->proto->packet_size(MCTP_PACKET_SIZE(rmtu));
+		sz = MIN(sz, rpkt);
 	}
 
 	/* Flip the buffers as the names are defined in terms of the host */
@@ -380,8 +426,8 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 		astlpc->layout.tx.offset + astlpc->layout.tx.size;
 	astlpc->layout.rx.size = sz;
 
-	if (!mctp_astlpc_layout_validate(&astlpc->layout)) {
-		astlpc_prerr(astlpc, "Cannot support an MTU of %zu", sz);
+	if (!mctp_astlpc_layout_validate(astlpc, &astlpc->layout)) {
+		astlpc_prerr(astlpc, "Cannot support an MTU of %" PRIu32, sz);
 		return -EINVAL;
 	}
 
@@ -413,6 +459,8 @@ static int mctp_binding_astlpc_start_bmc(struct mctp_binding *b)
 {
 	struct mctp_binding_astlpc *astlpc =
 		container_of(b, struct mctp_binding_astlpc, binding);
+
+	astlpc->proto = &astlpc_protocol_version[ASTLPC_VER_CUR];
 
 	return mctp_astlpc_init_bmc(astlpc);
 }
@@ -453,6 +501,7 @@ static bool mctp_astlpc_validate_version(uint16_t bmc_ver_min,
 static int mctp_astlpc_negotiate_layout_host(struct mctp_binding_astlpc *astlpc)
 {
 	struct mctp_astlpc_layout layout;
+	uint32_t rmtu;
 	uint32_t sz;
 	int rc;
 
@@ -460,7 +509,7 @@ static int mctp_astlpc_negotiate_layout_host(struct mctp_binding_astlpc *astlpc)
 	if (rc < 0)
 		return rc;
 
-	if (!mctp_astlpc_layout_validate(&layout)) {
+	if (!mctp_astlpc_layout_validate(astlpc, &layout)) {
 		astlpc_prerr(
 			astlpc,
 			"BMC provided invalid buffer layout: Rx {0x%" PRIx32
@@ -473,10 +522,11 @@ static int mctp_astlpc_negotiate_layout_host(struct mctp_binding_astlpc *astlpc)
 	astlpc_prinfo(astlpc, "Desire an MTU of %" PRIu32 " bytes",
 		      astlpc->requested_mtu);
 
-	sz = ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(astlpc->requested_mtu));
+	rmtu = astlpc->requested_mtu;
+	sz = astlpc->proto->packet_size(MCTP_PACKET_SIZE(rmtu));
 	layout.rx.size = sz;
 
-	if (!mctp_astlpc_layout_validate(&layout)) {
+	if (!mctp_astlpc_layout_validate(astlpc, &layout)) {
 		astlpc_prerr(
 			astlpc,
 			"Generated invalid buffer layout with size %" PRIu32
@@ -493,11 +543,26 @@ static int mctp_astlpc_negotiate_layout_host(struct mctp_binding_astlpc *astlpc)
 	return mctp_astlpc_layout_write(astlpc, &layout);
 }
 
+static uint16_t mctp_astlpc_negotiate_version(uint16_t bmc_ver_min,
+					      uint16_t bmc_ver_cur,
+					      uint16_t host_ver_min,
+					      uint16_t host_ver_cur)
+{
+	if (!mctp_astlpc_validate_version(bmc_ver_min, bmc_ver_cur,
+					  host_ver_min, host_ver_cur))
+		return ASTLPC_VER_BAD;
+
+	if (bmc_ver_cur < host_ver_cur)
+		return bmc_ver_cur;
+
+	return host_ver_cur;
+}
+
 static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 {
 	const uint16_t ver_min_be = htobe16(ASTLPC_VER_MIN);
 	const uint16_t ver_cur_be = htobe16(ASTLPC_VER_CUR);
-	uint16_t bmc_ver_min, bmc_ver_cur;
+	uint16_t bmc_ver_min, bmc_ver_cur, negotiated;
 	struct mctp_lpcmap_hdr hdr;
 	uint8_t status;
 	int rc;
@@ -518,24 +583,27 @@ static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 	bmc_ver_min = be16toh(hdr.bmc_ver_min);
 	bmc_ver_cur = be16toh(hdr.bmc_ver_cur);
 
-	if (!mctp_astlpc_validate_version(bmc_ver_min, bmc_ver_cur,
-					  ASTLPC_VER_MIN, ASTLPC_VER_CUR)) {
+	/* Calculate the expected value of negotiated_ver */
+	negotiated = mctp_astlpc_negotiate_version(bmc_ver_min, bmc_ver_cur,
+						   ASTLPC_VER_MIN,
+						   ASTLPC_VER_CUR);
+	if (!negotiated) {
 		astlpc_prerr(astlpc, "Cannot negotiate with invalid versions");
 		return -EINVAL;
 	}
 
-	/*
-	 * Negotation always chooses the highest protocol version that
-	 * satisfies the version constraints. So check whether the BMC supports
-	 * v2, and if so, negotiate in v2 style.
-	 */
-	if (ASTLPC_VER_CUR >= 2 && bmc_ver_cur >= 2) {
+	/* Assign protocol ops so we can calculate the packet buffer sizes */
+	assert(negotiated < ARRAY_SIZE(astlpc_protocol_version));
+	astlpc->proto = &astlpc_protocol_version[negotiated];
+
+	/* Negotiate packet buffers in v2 style if the BMC supports it */
+	if (negotiated >= 2) {
 		rc = mctp_astlpc_negotiate_layout_host(astlpc);
 		if (rc < 0)
 			return rc;
 	}
 
-	/* Version negotiation */
+	/* Advertise the host's supported protocol versions */
 	mctp_astlpc_lpc_write(astlpc, &ver_min_be,
 			      offsetof(struct mctp_lpcmap_hdr, host_ver_min),
 			      sizeof(ver_min_be));
@@ -549,6 +617,18 @@ static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 	if (rc) {
 		astlpc_prwarn(astlpc, "KCS write failed");
 	}
+
+	/*
+	 * Configure the host so `astlpc->proto->version == 0` holds until we
+	 * receive a subsequent status update from the BMC. Until then,
+	 * `astlpc->proto->version == 0` indicates that we're yet to complete
+	 * the channel initialisation handshake.
+	 *
+	 * When the BMC provides a status update with KCS_STATUS_CHANNEL_ACTIVE
+	 * set we will assign the appropriate protocol ops struct in accordance
+	 * with `negotiated_ver`.
+	 */
+	astlpc->proto = &astlpc_protocol_version[ASTLPC_VER_BAD];
 
 	return rc;
 }
@@ -629,7 +709,7 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 		       "-byte packet (%hhu, %hhu, 0x%hhx)",
 		       __func__, len, hdr->src, hdr->dest, hdr->flags_seq_tag);
 
-	if (len > ASTLPC_BODY_SIZE(astlpc->layout.tx.size)) {
+	if (len > astlpc->proto->body_size(astlpc->layout.tx.size)) {
 		astlpc_prwarn(astlpc, "invalid TX len 0x%x", len);
 		return -1;
 	}
@@ -645,25 +725,10 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 	return 0;
 }
 
-static uint16_t mctp_astlpc_negotiate_version(uint16_t bmc_ver_min,
-					      uint16_t bmc_ver_cur,
-					      uint16_t host_ver_min,
-					      uint16_t host_ver_cur)
-{
-	if (!mctp_astlpc_validate_version(bmc_ver_min, bmc_ver_cur,
-					  host_ver_min, host_ver_cur))
-		return ASTLPC_VER_BAD;
-
-	if (bmc_ver_cur < host_ver_cur)
-		return bmc_ver_cur;
-
-	return host_ver_cur;
-}
-
 static uint32_t mctp_astlpc_calculate_mtu(struct mctp_binding_astlpc *astlpc,
 					  struct mctp_astlpc_layout *layout)
 {
-	uint32_t low, high, limit;
+	uint32_t low, high, limit, rpkt;
 
 	/* Derive the largest MTU the BMC _can_ support */
 	low = MIN(astlpc->layout.rx.offset, astlpc->layout.tx.offset);
@@ -672,33 +737,39 @@ static uint32_t mctp_astlpc_calculate_mtu(struct mctp_binding_astlpc *astlpc,
 
 	/* Determine the largest MTU the BMC _wants_ to support */
 	if (astlpc->requested_mtu) {
-		uint32_t req = astlpc->requested_mtu;
+		uint32_t rmtu = astlpc->requested_mtu;
 
-		limit = MIN(limit, ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(req)));
+		rpkt = astlpc->proto->packet_size(MCTP_PACKET_SIZE(rmtu));
+		limit = MIN(limit, rpkt);
 	}
 
 	/* Determine the accepted MTU, applied both directions by convention */
-	return MCTP_BODY_SIZE(ASTLPC_BODY_SIZE(MIN(limit, layout->tx.size)));
+	rpkt = MIN(limit, layout->tx.size);
+	return MCTP_BODY_SIZE(astlpc->proto->body_size(rpkt));
 }
 
-static int mctp_astlpc_negotiate_layout_bmc(struct mctp_binding_astlpc *astlpc,
-					    uint16_t version)
+static int mctp_astlpc_negotiate_layout_bmc(struct mctp_binding_astlpc *astlpc)
 {
 	struct mctp_astlpc_layout proposed, pending;
 	uint32_t sz, mtu;
 	int rc;
+
+	/* Do we have a valid protocol version? */
+	if (!astlpc->proto->version)
+		return -EINVAL;
 
 	/* Extract the host's proposed layout */
 	rc = mctp_astlpc_layout_read(astlpc, &proposed);
 	if (rc < 0)
 		return rc;
 
-	if (!mctp_astlpc_layout_validate(&proposed))
+	/* Do we have a reasonable layout? */
+	if (!mctp_astlpc_layout_validate(astlpc, &proposed))
 		return -EINVAL;
 
 	/* Negotiate the MTU */
 	mtu = mctp_astlpc_calculate_mtu(astlpc, &proposed);
-	sz = ASTLPC_PACKET_SIZE(MCTP_PACKET_SIZE(mtu));
+	sz = astlpc->proto->packet_size(MCTP_PACKET_SIZE(mtu));
 
 	/*
 	 * Use symmetric MTUs by convention and to pass constraints in rx/tx
@@ -708,7 +779,7 @@ static int mctp_astlpc_negotiate_layout_bmc(struct mctp_binding_astlpc *astlpc,
 	pending.tx.size = sz;
 	pending.rx.size = sz;
 
-	if (mctp_astlpc_layout_validate(&pending)) {
+	if (mctp_astlpc_layout_validate(astlpc, &pending)) {
 		/* We found a sensible Rx MTU, so honour it */
 		astlpc->layout = pending;
 
@@ -724,7 +795,7 @@ static int mctp_astlpc_negotiate_layout_bmc(struct mctp_binding_astlpc *astlpc,
 		return -EINVAL;
 	}
 
-	if (version >= 2)
+	if (astlpc->proto->version >= 2)
 		astlpc->binding.pkt_size = MCTP_PACKET_SIZE(mtu);
 
 	return 0;
@@ -745,13 +816,16 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 					      be16toh(hdr.host_ver_min),
 					      be16toh(hdr.host_ver_cur));
 
+	/* MTU negotiation requires knowing which protocol we'll use */
+	assert(negotiated < ARRAY_SIZE(astlpc_protocol_version));
+	astlpc->proto = &astlpc_protocol_version[negotiated];
+
 	/* Host Rx MTU negotiation: Failure terminates channel init */
-	rc = mctp_astlpc_negotiate_layout_bmc(astlpc, negotiated);
+	rc = mctp_astlpc_negotiate_layout_bmc(astlpc);
 	if (rc < 0)
 		negotiated = ASTLPC_VER_BAD;
 
 	/* Populate the negotiated version */
-	astlpc->version = negotiated;
 	negotiated_be = htobe16(negotiated);
 	mctp_astlpc_lpc_write(astlpc, &negotiated_be,
 			      offsetof(struct mctp_lpcmap_hdr, negotiated_ver),
@@ -764,7 +838,7 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 			      negotiated);
 		status |= KCS_STATUS_CHANNEL_ACTIVE;
 	} else {
-		astlpc_prerr(astlpc, "Failed to initialise channel\n");
+		astlpc_prerr(astlpc, "Failed to initialise channel");
 	}
 
 	mctp_astlpc_kcs_set_status(astlpc, status);
@@ -782,7 +856,7 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 			     sizeof(len));
 	len = be32toh(len);
 
-	if (len > ASTLPC_BODY_SIZE(astlpc->layout.rx.size)) {
+	if (len > astlpc->proto->body_size(astlpc->layout.rx.size)) {
 		astlpc_prwarn(astlpc, "invalid RX len 0x%x", len);
 		return;
 	}
@@ -826,6 +900,7 @@ static int mctp_astlpc_finalise_channel(struct mctp_binding_astlpc *astlpc)
 		return rc;
 
 	negotiated = be16toh(negotiated);
+	astlpc_prerr(astlpc, "Version negotiation got: %u", negotiated);
 
 	if (negotiated == ASTLPC_VER_BAD || negotiated < ASTLPC_VER_MIN ||
 	    negotiated > ASTLPC_VER_CUR) {
@@ -834,13 +909,14 @@ static int mctp_astlpc_finalise_channel(struct mctp_binding_astlpc *astlpc)
 		return -EINVAL;
 	}
 
-	astlpc->version = negotiated;
+	assert(negotiated < ARRAY_SIZE(astlpc_protocol_version));
+	astlpc->proto = &astlpc_protocol_version[negotiated];
 
 	rc = mctp_astlpc_layout_read(astlpc, &layout);
 	if (rc < 0)
 		return rc;
 
-	if (!mctp_astlpc_layout_validate(&layout)) {
+	if (!mctp_astlpc_layout_validate(astlpc, &layout)) {
 		mctp_prerr("BMC proposed invalid buffer parameters");
 		return -EINVAL;
 	}
@@ -849,7 +925,7 @@ static int mctp_astlpc_finalise_channel(struct mctp_binding_astlpc *astlpc)
 
 	if (negotiated >= 2)
 		astlpc->binding.pkt_size =
-			ASTLPC_BODY_SIZE(astlpc->layout.tx.size);
+			astlpc->proto->body_size(astlpc->layout.tx.size);
 
 	return 0;
 }
@@ -876,7 +952,8 @@ static int mctp_astlpc_update_channel(struct mctp_binding_astlpc *astlpc,
 		}
 	}
 
-	if (astlpc->version == 0 || updated & KCS_STATUS_CHANNEL_ACTIVE) {
+	if (astlpc->proto->version == 0 ||
+			updated & KCS_STATUS_CHANNEL_ACTIVE) {
 		bool enable;
 
 		rc = mctp_astlpc_finalise_channel(astlpc);
@@ -914,7 +991,7 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 
 	astlpc_prdebug(astlpc, "%s: data: 0x%hhx", __func__, data);
 
-	if (!astlpc->version && !(data == 0x0 || data == 0xff)) {
+	if (!astlpc->proto->version && !(data == 0x0 || data == 0xff)) {
 		astlpc_prwarn(astlpc, "Invalid message for binding state: 0x%x",
 			      data);
 		return 0;
