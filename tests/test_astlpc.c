@@ -4,7 +4,7 @@
 #include "config.h"
 #endif
 
-#define ASTLPC_VER_CUR 2
+#define ASTLPC_VER_CUR 3
 #include "astlpc.c"
 
 #ifdef pr_fmt
@@ -718,9 +718,9 @@ static void astlpc_test_undefined_command(void)
 	free(lpc_mem);
 }
 
-#define BUFFER_MIN (MCTP_PACKET_SIZE(MCTP_BTU) + 4)
+#define BUFFER_MIN (MCTP_PACKET_SIZE(MCTP_BTU) + 4 + 4)
 static const struct mctp_binding_astlpc astlpc_layout_ctx = {
-	.proto = &astlpc_protocol_version[2],
+	.proto = &astlpc_protocol_version[3],
 };
 
 static void astlpc_test_buffers_rx_offset_overflow(void)
@@ -1173,6 +1173,111 @@ static void astlpc_test_tx_before_channel_init(void)
 	free(lpc_mem);
 }
 
+static void astlpc_test_corrupt_host_tx(void)
+{
+	struct astlpc_test ctx = { 0 };
+	struct mctp_lpcmap_hdr *hdr;
+	uint8_t msg[MCTP_BTU];
+	uint32_t offset;
+	uint32_t code;
+	uint8_t *tlr;
+	int rc;
+
+	/* Test harness initialisation */
+
+	network_init(&ctx);
+
+	memset(&msg[0], 0xa5, MCTP_BTU);
+
+	ctx.msg = &msg[0];
+	ctx.count = 0;
+	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
+
+	/* Host sends the single-packet message */
+	rc = mctp_message_tx(ctx.host.mctp, 8, msg, sizeof(msg));
+	assert(rc == 0);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
+
+	astlpc_assert_tx_packet(&ctx.host, &msg[0], MCTP_BTU);
+
+	/* Corrupt the CRC-32 in the message trailer */
+	hdr = (struct mctp_lpcmap_hdr *)ctx.lpc_mem;
+	offset = be32toh(hdr->layout.tx_offset);
+	tlr = (uint8_t *)&ctx.lpc_mem[offset] + 4 + sizeof(msg);
+	memcpy(&code, tlr, sizeof(code));
+	code = ~code;
+	memcpy(tlr, &code, sizeof(code));
+
+	/* BMC receives the single-packet message */
+	mctp_astlpc_poll(ctx.bmc.astlpc);
+	assert(ctx.count == 0);
+
+	/* BMC returns Tx area ownership to Host */
+	assert(!(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF));
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x02);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
+
+	/* Host dequeues ownership hand-over */
+	rc = mctp_astlpc_poll(ctx.host.astlpc);
+	assert(rc == 0);
+
+	network_destroy(&ctx);
+}
+
+static void astlpc_test_corrupt_bmc_tx(void)
+{
+	struct astlpc_test ctx = { 0 };
+	struct mctp_lpcmap_hdr *hdr;
+	uint8_t msg[MCTP_BTU];
+	uint32_t offset;
+	uint32_t code;
+	uint8_t *tlr;
+	int rc;
+
+	/* Test harness initialisation */
+
+	network_init(&ctx);
+
+	memset(&msg[0], 0x5a, MCTP_BTU);
+
+	ctx.msg = &msg[0];
+	ctx.count = 0;
+	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
+
+	/* BMC sends the single-packet message */
+	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
+	assert(rc == 0);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
+
+	/* Check that the BMC sent a fully-formed packet */
+	astlpc_assert_tx_packet(&ctx.bmc, &msg[0], MCTP_BTU);
+
+	/* Corrupt the CRC-32 in the message trailer */
+	hdr = (struct mctp_lpcmap_hdr *)ctx.lpc_mem;
+	offset = be32toh(hdr->layout.rx_offset);
+	tlr = (uint8_t *)&ctx.lpc_mem[offset] + 4 + sizeof(msg);
+	memcpy(&code, tlr, sizeof(code));
+	code = ~code;
+	memcpy(tlr, &code, sizeof(code));
+
+	/* Host drops the single-packet message */
+	mctp_astlpc_poll(ctx.host.astlpc);
+	assert(ctx.count == 0);
+
+	/* Host returns Rx area ownership to BMC */
+	assert(!(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF));
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x02);
+	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
+
+	/* BMC dequeues ownership hand-over */
+	rc = mctp_astlpc_poll(ctx.bmc.astlpc);
+	assert(rc == 0);
+
+	network_destroy(&ctx);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -1214,6 +1319,8 @@ static const struct {
 	TEST_CASE(astlpc_test_negotiate_mtu_low_high),
 	TEST_CASE(astlpc_test_send_large_packet),
 	TEST_CASE(astlpc_test_tx_before_channel_init),
+	TEST_CASE(astlpc_test_corrupt_host_tx),
+	TEST_CASE(astlpc_test_corrupt_bmc_tx),
 };
 /* clang-format on */
 
