@@ -12,7 +12,7 @@ include_HEADERS += libmctp-serial.h
 endif
 
 if LIBMCTP_BINDING_astlpc
-libmctp_la_SOURCES += astlpc.c
+libmctp_la_SOURCES += astlpc.c crc32.c
 include_HEADERS += libmctp-astlpc.h
 endif
 
