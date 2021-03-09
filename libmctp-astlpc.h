@@ -20,7 +20,7 @@ enum mctp_binding_astlpc_kcs_reg {
 };
 
 struct mctp_binding_astlpc_ops {
-	int	(*kcs_read)(void *data, enum mctp_binding_astlpc_kcs_reg reg,
+	int (*kcs_read)(void *data, enum mctp_binding_astlpc_kcs_reg reg,
 			uint8_t *val);
 	int (*kcs_write)(void *data, enum mctp_binding_astlpc_kcs_reg reg,
 			 uint8_t val);
