@@ -4,7 +4,7 @@
 #include "config.h"
 #endif
 
-#define ASTLPC_VER_CUR 2
+#define ASTLPC_VER_CUR 3
 #include "astlpc.c"
 
 #ifdef pr_fmt
@@ -718,9 +718,9 @@ static void astlpc_test_undefined_command(void)
 	free(lpc_mem);
 }
 
-#define BUFFER_MIN (MCTP_PACKET_SIZE(MCTP_BTU) + 4)
+#define BUFFER_MIN (MCTP_PACKET_SIZE(MCTP_BTU) + 4 + 4)
 static const struct mctp_binding_astlpc astlpc_layout_ctx = {
-	.proto = &astlpc_protocol_version[2],
+	.proto = &astlpc_protocol_version[3],
 };
 
 static void astlpc_test_buffers_rx_offset_overflow(void)

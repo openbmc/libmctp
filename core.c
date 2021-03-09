@@ -156,6 +156,15 @@ int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, size_t len)
 	return 0;
 }
 
+void *mctp_pktbuf_pop(struct mctp_pktbuf *pkt, size_t len)
+{
+	if (len > mctp_pktbuf_size(pkt))
+		return NULL;
+
+	pkt->end -= len;
+	return pkt->data + pkt->end;
+}
+
 /* Message reassembly */
 static struct mctp_msg_ctx *mctp_msg_ctx_lookup(struct mctp *mctp,
 		uint8_t src, uint8_t dest, uint8_t tag)
