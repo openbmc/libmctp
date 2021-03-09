@@ -18,11 +18,12 @@
 
 #define pr_fmt(x) "astlpc: " x
 
+#include "container_of.h"
+#include "crc32.h"
 #include "libmctp.h"
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
 #include "libmctp-astlpc.h"
-#include "container_of.h"
 #include "range.h"
 
 #ifdef MCTP_HAVE_FILEIO
@@ -53,6 +54,8 @@ struct mctp_astlpc_protocol {
 	uint16_t version;
 	uint32_t (*packet_size)(uint32_t body);
 	uint32_t (*body_size)(uint32_t packet);
+	void (*pktbuf_protect)(struct mctp_pktbuf *pkt);
+	bool (*pktbuf_validate)(struct mctp_pktbuf *pkt);
 };
 
 struct mctp_binding_astlpc {
@@ -103,7 +106,7 @@ struct mctp_binding_astlpc {
 
 /* Support testing of new binding protocols */
 #ifndef ASTLPC_VER_CUR
-#define ASTLPC_VER_CUR	2
+#define ASTLPC_VER_CUR	3
 #endif
 /* clang-format on */
 
@@ -125,21 +128,79 @@ static uint32_t astlpc_body_size_v1(uint32_t packet)
 	return packet - 4;
 }
 
+void astlpc_pktbuf_protect_v1(struct mctp_pktbuf *pkt)
+{
+	(void)pkt;
+}
+
+bool astlpc_pktbuf_validate_v1(struct mctp_pktbuf *pkt)
+{
+	(void)pkt;
+	return true;
+}
+
+static uint32_t astlpc_packet_size_v3(uint32_t body)
+{
+	assert((body + 4 + 4) > body);
+
+	return body + 4 + 4;
+}
+
+static uint32_t astlpc_body_size_v3(uint32_t packet)
+{
+	assert((packet - 4 - 4) < packet);
+
+	return packet - 4 - 4;
+}
+
+void astlpc_pktbuf_protect_v3(struct mctp_pktbuf *pkt)
+{
+	uint32_t code;
+
+	code = htobe32(crc32(mctp_pktbuf_hdr(pkt), mctp_pktbuf_size(pkt)));
+	mctp_prdebug("%s: 0x%" PRIx32, __func__, code);
+	mctp_pktbuf_push(pkt, &code, 4);
+}
+
+bool astlpc_pktbuf_validate_v3(struct mctp_pktbuf *pkt)
+{
+	uint32_t code;
+	void *check;
+
+	code = htobe32(crc32(mctp_pktbuf_hdr(pkt), mctp_pktbuf_size(pkt) - 4));
+	mctp_prdebug("%s: 0x%" PRIx32, __func__, code);
+	check = mctp_pktbuf_pop(pkt, 4);
+	return check && !memcmp(&code, check, 4);
+}
+
 static const struct mctp_astlpc_protocol astlpc_protocol_version[] = {
 	[0] = {
 		.version = 0,
 		.packet_size = NULL,
 		.body_size = NULL,
+		.pktbuf_protect = NULL,
+		.pktbuf_validate = NULL,
 	},
 	[1] = {
 		.version = 1,
 		.packet_size = astlpc_packet_size_v1,
 		.body_size = astlpc_body_size_v1,
+		.pktbuf_protect = astlpc_pktbuf_protect_v1,
+		.pktbuf_validate = astlpc_pktbuf_validate_v1,
 	},
 	[2] = {
 		.version = 2,
 		.packet_size = astlpc_packet_size_v1,
 		.body_size = astlpc_body_size_v1,
+		.pktbuf_protect = astlpc_pktbuf_protect_v1,
+		.pktbuf_validate = astlpc_pktbuf_validate_v1,
+	},
+	[3] = {
+		.version = 3,
+		.packet_size = astlpc_packet_size_v3,
+		.body_size = astlpc_body_size_v3,
+		.pktbuf_protect = astlpc_pktbuf_protect_v3,
+		.pktbuf_validate = astlpc_pktbuf_validate_v3,
 	},
 };
 
@@ -710,18 +771,24 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 		       __func__, len, hdr->src, hdr->dest, hdr->flags_seq_tag);
 
 	if (len > astlpc->proto->body_size(astlpc->layout.tx.size)) {
-		astlpc_prwarn(astlpc, "invalid TX len 0x%x", len);
+		astlpc_prwarn(astlpc, "invalid TX len %" PRIu32 ": %" PRIu32, len,
+				astlpc->proto->body_size(astlpc->layout.tx.size));
 		return -1;
 	}
 
 	len_be = htobe32(len);
 	mctp_astlpc_lpc_write(astlpc, &len_be, astlpc->layout.tx.offset,
 			      sizeof(len_be));
+
+	astlpc->proto->pktbuf_protect(pkt);
+	len = mctp_pktbuf_size(pkt);
+
 	mctp_astlpc_lpc_write(astlpc, hdr, astlpc->layout.tx.offset + 4, len);
 
 	mctp_binding_set_tx_enabled(b, false);
 
 	mctp_astlpc_kcs_send(astlpc, 0x1);
+
 	return 0;
 }
 
@@ -850,32 +917,45 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 {
 	struct mctp_pktbuf *pkt;
-	uint32_t len;
+	uint32_t body, packet;
 
-	mctp_astlpc_lpc_read(astlpc, &len, astlpc->layout.rx.offset,
-			     sizeof(len));
-	len = be32toh(len);
+	mctp_astlpc_lpc_read(astlpc, &body, astlpc->layout.rx.offset,
+			     sizeof(body));
+	body = be32toh(body);
 
-	if (len > astlpc->proto->body_size(astlpc->layout.rx.size)) {
-		astlpc_prwarn(astlpc, "invalid RX len 0x%x", len);
+	if (body > astlpc->proto->body_size(astlpc->layout.rx.size)) {
+		astlpc_prwarn(astlpc, "invalid RX len 0x%x", body);
 		return;
 	}
 
 	assert(astlpc->binding.pkt_size >= 0);
-	if (len > (uint32_t)astlpc->binding.pkt_size) {
-		mctp_prwarn("invalid RX len 0x%x", len);
-		astlpc_prwarn(astlpc, "invalid RX len 0x%x", len);
+	if (body > (uint32_t)astlpc->binding.pkt_size) {
+		astlpc_prwarn(astlpc, "invalid RX len 0x%x", body);
 		return;
 	}
 
-	pkt = mctp_pktbuf_alloc(&astlpc->binding, len);
+	/* Eliminate the medium-specific header that we just read */
+	packet = astlpc->proto->packet_size(body) - 4;
+	pkt = mctp_pktbuf_alloc(&astlpc->binding, packet);
 	if (!pkt)
 		goto out_complete;
 
+	/*
+	 * Read payload and medium-specific trailer from immediately after the
+	 * medium-specific header.
+	 */
 	mctp_astlpc_lpc_read(astlpc, mctp_pktbuf_hdr(pkt),
-			     astlpc->layout.rx.offset + 4, len);
+			     astlpc->layout.rx.offset + 4, packet);
 
-	mctp_bus_rx(&astlpc->binding, pkt);
+	/*
+	 * v3 will validate the CRC32 in the medium-specific trailer and adjust
+	 * the packet size accordingly. On older protocols validation is a no-op
+	 * that always returns true.
+	 */
+	if (astlpc->proto->pktbuf_validate(pkt))
+		mctp_bus_rx(&astlpc->binding, pkt);
+	else
+		astlpc_prdebug(astlpc, "Dropped corrupt packet");
 
 out_complete:
 	mctp_astlpc_kcs_send(astlpc, 0x2);
@@ -1049,8 +1129,8 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(uint8_t mode,
 	astlpc->binding.version = 1;
 	astlpc->binding.pkt_size =
 		MCTP_PACKET_SIZE(mtu > MCTP_BTU ? mtu : MCTP_BTU);
-	astlpc->binding.pkt_hdr = 0;
-	astlpc->binding.pkt_tlr = 0;
+	astlpc->binding.pkt_hdr = 4;
+	astlpc->binding.pkt_tlr = 4;
 	astlpc->binding.tx = mctp_binding_astlpc_tx;
 	if (mode == MCTP_BINDING_ASTLPC_MODE_BMC)
 		astlpc->binding.start = mctp_binding_astlpc_start_bmc;
