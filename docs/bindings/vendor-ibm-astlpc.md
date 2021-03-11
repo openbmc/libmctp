@@ -171,7 +171,7 @@ FW window.
 Full definition of the control area is defined below, and it will be the base
 for all future versions.
 
-```
+```c
 struct mctp_lpcmap_hdr {
    uint32_t magic;
 
@@ -192,7 +192,7 @@ struct mctp_lpcmap_hdr {
 Where the magic value marking the beginning of the control area is the ASCII
 encoding of "MCTP":
 
-```
+```c
 #define LPC_MAGIC 0x4d435450
 ```
 
