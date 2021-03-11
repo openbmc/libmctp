@@ -290,12 +290,12 @@ Firstly, we have rules for modification:
 
 During packet transmission, the follow sequence occurs:
 
-* The Tx side writes the packet to its Tx buffer
-* The Tx side sends a `Tx Begin` message, indicating that the buffer ownership
-  is transferred
-* The Rx side now owns the buffer, and reads the message from its Rx area
-* The Rx side sends a `Rx Complete` once done, indicating that the buffer
-  ownership is transferred back to the Tx side.
+1. The Tx side writes the packet to its Tx buffer
+2. The Tx side sends a `Tx Begin` message, indicating that the buffer ownership
+   is transferred
+3. The Rx side now owns the buffer, and reads the message from its Rx area
+4. The Rx side sends a `Rx Complete` once done, indicating that the buffer
+   ownership is transferred back to the Tx side.
 
 ### LPC Binding Operation
 
