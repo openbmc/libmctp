@@ -189,8 +189,8 @@ struct mctp_lpcmap_hdr {
 } __attribute__((packed));
 ```
 
-Where the magic value marking the beginning of the control area is the ASCII
-encoding of "MCTP":
+The magic value marking the beginning of the control area is the ASCII encoding
+of "MCTP":
 
 ```c
 #define LPC_MAGIC 0x4d435450
