@@ -5,7 +5,7 @@
 This design provides an efficient method to transfer MCTP packets between the
 host and BMC over the LPC bus on ASPEED BMC platforms.
 
-## Normative References
+## References
 
 The following referenced documents are indispensable for the application of
 this document.
@@ -21,7 +21,7 @@ IPMI Consortium, Intelligent Platform Management Interface Specification, v1.5
 Revision 1.1 February 20, 2002,
 http://download.intel.com/design/servers/ipmi/IPMIv1_5rev1_1.pdf
 
-## Terms and Definitions
+## Definitions
 
 ### Baseline Transmission Unit (BTU)
 
