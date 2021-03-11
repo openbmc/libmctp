@@ -196,13 +196,13 @@ encoding of "MCTP":
 #define LPC_MAGIC 0x4d435450
 ```
 
+All control data is in big-endian format. MCTP packet data is transferred
+exactly as is presented, and no data escaping is performed.
+
 The transmit and receive areas contain a length field, followed by the actual
 MCTP packet to be transferred. At version 1, only a single MCTP packet is
 present in the Rx and Tx areas. This may change for future versions of the
 protocol.
-
-All control data is in big-endian format. MCTP packet data is transferred
-exactly as is presented, and no data escaping is performed.
 
 #### Negotiation of the Maximum Transmission Unit
 
