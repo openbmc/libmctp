@@ -115,8 +115,9 @@ On this indication, the remote side will:
 
 1. Read from the KCS status register, which shows that the single-byte KCS data
    buffer is full
-2. Read the MCTP packet from the LPC FW window
-3. Read from the KCS buffer, to clear the 'buffer full' state.
+2. Read the provided command from the KCS data buffer, acknowledging the
+   interrupt
+3. Read the MCTP packet from the LPC FW window
 
 ### Scope
 
