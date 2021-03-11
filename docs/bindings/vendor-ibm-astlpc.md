@@ -28,6 +28,17 @@ http://download.intel.com/design/servers/ipmi/IPMIv1_5rev1_1.pdf
 Defined by the MCTP base specification as the smallest maximum packet size all
 MCTP-compliant endpoints must accept.
 
+**IBF: Input Buffer Full**
+
+A hardware-defined flag bit in a KCS device's Status Register (STR). The IBF
+flag indicates that a value has been written by the host to the corresponding
+Input Data Register (IDR).
+
+**IDR: Input Data Register**
+
+One of the three register interfaces exposed by a KCS device. The IDR is a one
+byte buffer which is written by the host and read by the BMC.
+
 **KCS: Keyboard-Controller-Style**
 
 A set of bit definitions and operation of the registers typically used in
@@ -56,6 +67,25 @@ The largest payload the link will accept for a packet. The Maximum Transmission
 Unit represents a value that is at least as large as the BTU. Negotiation of
 MTU values larger than the BTU may improve throughput for data-intensive
 transfers.
+
+**OBF: Output Buffer Full**
+
+A hardware-defined flag bit in a KCS device's Status Register (STR). The OBF
+flag indicates that a value has been written by the BMC to the corresponding
+Output Data Register (ODR).
+
+**ODR: Output Data Register**
+
+One of the three register interfaces exposed by a KCS device. The ODR is a
+one byte buffer which is written by the BMC and read by the host.
+
+**STR: Status Register**
+
+One of the three register interfaces exposed by a KCS device. STR is a
+BMC-controlled, eight-bit register exposed to both the BMC and the host for
+indication of IBF and OBF events on the input (IDR) and output (ODR) buffers.
+Bits that are not defined by hardware can be software-controlled in a manner
+defined by a platform-specific ABI.
 
 ## Conventions
 
@@ -106,8 +136,8 @@ The KCS hardware consists of two single-byte buffers: the Output Data Register
 (ODR) and the Input Data Register (IDR). The ODR is written by the BMC and read
 by the host. The IDR is the obverse.
 
-The KCS unit also contains a status register, allowing both host and BMC to
-determine if there is data in the ODR or IDR. These are single-bit flags,
+The KCS unit also contains a status register (STR), allowing both host and BMC
+to determine if there is data in the ODR or IDR. These are single-bit flags,
 designated Input/Output Buffer Full (IBF/OBF), and are automatically set by
 hardware when data has been written to the corresponding ODR/IDR buffer (and
 cleared when data has been read).
