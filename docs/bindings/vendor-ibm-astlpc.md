@@ -23,14 +23,14 @@ http://download.intel.com/design/servers/ipmi/IPMIv1_5rev1_1.pdf
 
 ## Definitions
 
-### Baseline Transmission Unit (BTU)
+**BTU: Baseline Transmission Unit**
 
 Defined by the MCTP base specification as the smallest maximum packet size all
 MCTP-compliant endpoints must accept.
 
-### Keyboard Controller Style Interface (KCS)
+**KCS: Keyboard-Controller-Style**
 
-A set of bit definitions, and operation of the registers typically used in
+A set of bit definitions and operation of the registers typically used in
 keyboard microcontrollers and embedded controllers. The term "Keyboard
 Controller Style" reflects that the register definition was originally used as
 the legacy "8742" keyboard controller interface in PC architecture computer
@@ -38,19 +38,19 @@ systems.  This interface is available built-in to several commercially
 available microcontrollers. Data is transferred across the KCS interface using
 a per-byte handshake.
 
-### Low Pin Count (LPC)
+**LPC Bus: Low Pin Count Bus**
 
 A bus specification that implements ISA bus in a reduced physical form while
 extending ISA's capabilities.
 
-### LPC Firmware Cycles (LPC FW)
+**LPC FW: LPC Firmware Cycles**
 
 LPC firmware cycles allow separate boot BIOS firmware memory cycles and
 application memory cycles with respect to the LPC bus. The ASPEED BMCs allow
 remapping of the LPC firmware cycles onto arbitrary regions of the BMC's
 physical address space, including RAM.
 
-### Maximum Transmission Unit (MTU)
+**MTU: Maximum Transmission Unit**
 
 The largest payload the link will accept for a packet. The Maximum Transmission
 Unit represents a value that is at least as large as the BTU. Negotiation of
