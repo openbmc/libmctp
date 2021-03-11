@@ -370,12 +370,12 @@ are set.
 | Step | Description                                                  |
 |------|--------------------------------------------------------------|
 |  1   | The host waits on any previous `Rx Complete` message         |
-|  3   | The host writes the packet to its Tx area (BMC Rx area)      |
-|  4   | The host sends the `Tx Begin` command, transferring ownership of its Tx buffer to the BMC |
-|  5   | The BMC observes the `Tx Begin` command                      |
-|  6   | The BMC reads the packet from the its Rx area (host Tx area) |
-|  7   | The BMC sends the `Rx Complete` command, transferring ownership of its Rx buffer to the host |
-|  8   | The host observes the `Rx Complete` command                  |
+|  2   | The host writes the packet to its Tx area (BMC Rx area)      |
+|  3   | The host sends the `Tx Begin` command, transferring ownership of its Tx buffer to the BMC |
+|  4   | The BMC observes the `Tx Begin` command                      |
+|  5   | The BMC reads the packet from the its Rx area (host Tx area) |
+|  6   | The BMC sends the `Rx Complete` command, transferring ownership of its Rx buffer to the host |
+|  7   | The host observes the `Rx Complete` command                  |
 
 #### BMC Packet Transmission Sequence
 
@@ -384,10 +384,10 @@ are set.
 |  1   | The BMC waits on any previous `Rx Complete` message           |
 |  2   | The BMC writes the packet to its Tx area (host Rx area)       |
 |  3   | The BMC sends the `Tx Begin` command, transferring ownership of its Tx buffer to the host |
-|  8   | The host observes the `Tx Begin` command                      |
-|  9   | The host reads the packet from the host Rx area (BMC Tx area) |
-|  10  | The host sends the `Rx Complete` command, transferring ownership of its Rx buffer to the BMC |
-|  15  | The BMC observes the `Rx Complete` command                    |
+|  4   | The host observes the `Tx Begin` command                      |
+|  5   | The host reads the packet from the host Rx area (BMC Tx area) |
+|  6   | The host sends the `Rx Complete` command, transferring ownership of its Rx buffer to the BMC |
+|  7   | The BMC observes the `Rx Complete` command                    |
 
 ## Implementation Notes
 
