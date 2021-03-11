@@ -64,24 +64,13 @@ versions of the protocol unless marked otherwise.
 
 ## MCTP over LPC Transport
 
-### Binding Background and Evolution
-
-Version 1 of the binding provides a simple specification for duplex exchange of
-a single packet. The motivation for the design was to demonstrate the potential
-of the binding concept while keeping the design simple.
-
-Version 2 of the binding builds on v1, increasing throughput by providing a
-negotiation strategy for the BMC and the host to agree on a maximum
-transmission unit larger than the baseline transmission unit defined by the
-MCTP base specification.
-
 ### Concepts
 
 The basic components used for the transfer are:
 
+* An interrupt mechanism using the IPMI KCS interface
 * A window of the LPC FW address space, where reads and writes are forwarded to
   BMC memory, using the LPC2AHB hardware
-* An interrupt mechanism using the IPMI KCS interface
 
 In order to transfer a packet, either side of the channel (BMC or host) will:
 
@@ -107,7 +96,35 @@ The following issues of protocol ABI are considered out of scope:
 1. The LPC IO address and Serial IRQ parameters of the KCS device
 2. The concrete location of the control region in the LPC FW address space
 
-### LPC FW Window Layout
+### KCS Interface
+
+The KCS hardware on the ASPEED BMCs is used as a method of indicating, to the
+remote side, that a packet is ready to be transferred through the LPC FW
+mapping.
+
+The KCS hardware consists of two single-byte buffers: the Output Data Register
+(ODR) and the Input Data Register (IDR). The ODR is written by the BMC and read
+by the host. The IDR is the obverse.
+
+The KCS unit also contains a status register, allowing both host and BMC to
+determine if there is data in the ODR or IDR. These are single-bit flags,
+designated Input/Output Buffer Full (IBF/OBF), and are automatically set by
+hardware when data has been written to the corresponding ODR/IDR buffer (and
+cleared when data has been read).
+
+While the IBF and OBF flags are managed in hardware, the remaining
+software-defined bits in the status register are used to carry other required
+protocol state. A problematic feature of the KCS status register is described
+in the IPMI specification, which states that an interrupt may be triggered on
+writes to the KCS status register but hardware implementations are not required
+to do so. Comparatively, writes to the data registers must set the
+corresponding buffer-full flag and invoke an interrupt.
+
+To ensure interrupts are generated for status updates, we exploit the OBF
+interrupt to signal a status update by writing a dummy command to ODR after
+updating the status register, as outlined below.
+
+### LPC FW Window
 
 The window of BMC-memory-backed LPC FW address space has a predefined format,
 consisting of:
@@ -191,34 +208,10 @@ and Tx buffers to be considered valid:
 The BMC MAY choose to fail channel initialisation if these properties are
 violated in the negotiation process.
 
-### KCS Control
+### KCS Status and Control Sequences
 
-The KCS hardware on the ASPEED BMCs is used as a method of indicating, to the
-remote side, that a packet is ready to be transferred through the LPC FW
-mapping.
-
-The KCS hardware consists of two single-byte buffers: the Output Data Register
-(ODR) and the Input Data Register (IDR). The ODR is written by the BMC and read
-by the host. The IDR is the obverse.
-
-The KCS unit also contains a status register, allowing both host and BMC to
-determine if there is data in the ODR or IDR. These are single-bit flags,
-designated Input/Output Buffer Full (IBF/OBF), and are automatically set by
-hardware when data has been written to the corresponding ODR/IDR buffer (and
-cleared when data has been read).
-
-While the IBF and OBF flags are managed in hardware, the remaining
-software-defined bits in the status register are used to carry other required
-protocol state. A problematic feature of the KCS status register is described
-in the IPMI specification, which states that an interrupt may be triggered on
-writes to the KCS status register but hardware implementations are not required
-to do so. Comparatively, writes to the data registers must set the
-corresponding buffer-full flag and invoke an interrupt.
-
-To ensure interrupts are generated for status updates, we exploit the OBF
-interrupt to signal a status update by writing a dummy command to ODR after
-updating the status register, as outlined below.
-
+The KCS status flags and command set govern the state of the protocol, defining
+the ability to send and receive packets on the LPC bus.
 
 #### KCS Status Register Layout
 
@@ -241,11 +234,6 @@ updating the status register, as outlined below.
 |  0x01   | Tx Begin    |
 |  0x02   | Rx Complete |
 |  0xff   | Dummy Value |
-
-### KCS Status and Control Sequences
-
-The KCS status flags and command set govern the state of the protocol, defining
-the ability to send and receive packets on the LPC bus.
 
 #### Host Command to BMC Sequence
 
