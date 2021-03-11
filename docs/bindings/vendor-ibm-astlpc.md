@@ -246,16 +246,16 @@ the ability to send and receive packets on the LPC bus.
 
 #### KCS Status Register Layout
 
-| Bit | Managed By | Description |
-|-----|------------|-------------|
-|  7  |  Software  | (MSB) BMC Active  |
-|  6  |  Software  | Channel active, version negotiated |
-|  5  |  Software  | Unused      |
-|  4  |  Software  | Unused      |
-|  3  |  Hardware  | Command / Data |
-|  2  |  Software  | Unused      |
-|  1  |  Hardware  | Input Buffer Full |
-|  0  |  Hardware  | (LSB) Output Buffer Full |
+| Bit      | Managed By | Description |
+|----------|------------|-------------|
+|  7 (MSB) |  Software  | BMC Active  |
+|  6       |  Software  | Channel active, version negotiated |
+|  5       |  Software  | Unused      |
+|  4       |  Software  | Unused      |
+|  3       |  Hardware  | Command / Data |
+|  2       |  Software  | Unused      |
+|  1       |  Hardware  | Input Buffer Full |
+|  0 (LSB) |  Hardware  | Output Buffer Full |
 
 #### KCS Data Register Commands
 
