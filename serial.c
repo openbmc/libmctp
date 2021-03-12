@@ -344,7 +344,8 @@ struct mctp_binding_serial *mctp_serial_init(void)
 	serial->binding.name = "serial";
 	serial->binding.version = 1;
 	serial->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
-	serial->binding.pkt_pad = 0;
+	serial->binding.pkt_hdr = 0;
+	serial->binding.pkt_tlr = 0;
 
 	serial->binding.start = mctp_serial_core_start;
 	serial->binding.tx = mctp_binding_serial_tx;

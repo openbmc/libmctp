@@ -103,7 +103,8 @@ struct mctp_binding {
 	struct mctp_bus *bus;
 	struct mctp *mctp;
 	size_t pkt_size;
-	size_t pkt_pad;
+	size_t pkt_hdr;
+	size_t pkt_tlr;
 	int (*start)(struct mctp_binding *binding);
 	int (*tx)(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
 	mctp_rx_fn control_rx;

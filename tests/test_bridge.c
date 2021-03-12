@@ -70,7 +70,8 @@ static struct mctp_binding_bridge *mctp_binding_bridge_init(void)
 	binding->binding.version = 1;
 	binding->binding.tx = mctp_binding_bridge_tx;
 	binding->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
-	binding->binding.pkt_pad = 0;
+	binding->binding.pkt_hdr = 0;
+	binding->binding.pkt_tlr = 0;
 	return binding;
 }
 
