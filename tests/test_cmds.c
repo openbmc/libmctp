@@ -63,7 +63,8 @@ static void setup_test_binding(struct mctp_binding *test_binding,
 	test_binding->version = 1;
 	test_binding->tx = NULL;
 	test_binding->pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
-	test_binding->pkt_pad = 0;
+	test_binding->pkt_header = 0;
+	test_binding->pkt_trailer = 0;
 	test_binding->control_rx = control_message_transport_callback;
 	test_binding->control_rx_data = callback_ctx;
 

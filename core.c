@@ -90,13 +90,13 @@ struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *binding, size_t len)
 	struct mctp_pktbuf *buf;
 	size_t size;
 
-	size = binding->pkt_size + binding->pkt_pad;
+	size = binding->pkt_size + binding->pkt_header + binding->pkt_trailer;
 
 	/* todo: pools */
 	buf = __mctp_alloc(sizeof(*buf) + size);
 
 	buf->size = size;
-	buf->start = binding->pkt_pad;
+	buf->start = binding->pkt_header;
 	buf->end = buf->start + len;
 	buf->mctp_hdr_off = buf->start;
 	buf->next = NULL;
