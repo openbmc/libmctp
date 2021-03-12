@@ -102,8 +102,8 @@ struct mctp_binding {
 	uint8_t version;
 	struct mctp_bus *bus;
 	struct mctp *mctp;
-	int pkt_size;
-	int pkt_pad;
+	size_t pkt_size;
+	size_t pkt_pad;
 	int (*start)(struct mctp_binding *binding);
 	int (*tx)(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
 	mctp_rx_fn control_rx;
