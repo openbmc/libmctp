@@ -30,7 +30,8 @@ struct mctp_binding_test *mctp_binding_test_init(void)
 	test->binding.version = 1;
 	test->binding.tx = mctp_binding_test_tx;
 	test->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
-	test->binding.pkt_pad = 0;
+	test->binding.pkt_hdr = 0;
+	test->binding.pkt_tlr = 0;
 	return test;
 }
 
