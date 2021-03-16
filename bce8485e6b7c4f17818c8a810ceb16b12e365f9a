@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0ad1bf1f_05ccee76",
+        "filename": "docs/bindings/Makefile",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2021-03-16T22:59:35Z",
+      "side": 1,
+      "message": "I get that we only have a single file here now, but can we not hardcode it and just make it a generic makefile from the start?\n\nSomething like:\n  \n%.html: %.md\n    markdown2 (...)\n  \nhtml: $(patsubst %.md, %.html, $(wildcard *.md))\n  \nall: html\n  \nclean:\n    @rm -f *.html",
+      "range": {
+        "startLine": 1,
+        "startChar": 1,
+        "endLine": 1,
+        "endChar": 44
+      },
+      "revId": "bce8485e6b7c4f17818c8a810ceb16b12e365f9a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
