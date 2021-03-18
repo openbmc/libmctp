@@ -22,6 +22,30 @@
       "revId": "8e1c10cc60b24c8ec3bf7a0f0f6d3975b3d5e8fb",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "77d370a7_19bcc605",
+        "filename": "docs/bindings/vendor-ibm-astlpc.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-03-18T00:34:56Z",
+      "side": 1,
+      "message": "Oh! I wasn\u0027t aware of that syntax. I bet Gerrit complains about trailing whitespace 😄",
+      "parentUuid": "7c6347f8_2989e597",
+      "range": {
+        "startLine": 14,
+        "startChar": 3,
+        "endLine": 14,
+        "endChar": 10
+      },
+      "revId": "8e1c10cc60b24c8ec3bf7a0f0f6d3975b3d5e8fb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
