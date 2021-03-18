@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "700e99df_bb1eee04",
+        "filename": "docs/bindings/vendor-ibm-astlpc.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2021-03-18T00:16:16Z",
+      "side": 1,
+      "message": "s/:/. ?",
+      "range": {
+        "startLine": 222,
+        "startChar": 13,
+        "endLine": 222,
+        "endChar": 14
+      },
+      "revId": "72f9ac0dc64ff9235177fb4bde4460e0184ba0bd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
