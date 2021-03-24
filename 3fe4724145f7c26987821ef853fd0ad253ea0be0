@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f5556820_99cadc9e",
+        "filename": "astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2021-03-24T00:07:35Z",
+      "side": 1,
+      "message": "This is defined multiple time in the library - perhaps we can add it to a common header.",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 6
+      },
+      "revId": "3fe4724145f7c26987821ef853fd0ad253ea0be0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "17f9ff48_00deaea8",
+        "filename": "astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 956,
+      "author": {
+        "id": 1000461
+      },
+      "writtenOn": "2021-03-24T00:07:35Z",
+      "side": 1,
+      "message": "Align to open parenthesis",
+      "range": {
+        "startLine": 956,
+        "startChar": 1,
+        "endLine": 956,
+        "endChar": 3
+      },
+      "revId": "3fe4724145f7c26987821ef853fd0ad253ea0be0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
