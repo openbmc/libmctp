@@ -37,7 +37,7 @@ AS_IF([test "x$with_systemdsystemunitdir" = "xyes" -o "x$with_systemdsystemunitd
      )]
 )
 AS_IF([test "x$with_systemdsystemunitdir" != "xno"],
-      [AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])]
+      [AC_SUBST([systemdsystemunitdir], [$prefix$with_systemdsystemunitdir])]
 )
 AM_CONDITIONAL([HAVE_SYSTEMD], [test "x$with_systemdsystemunitdir" != "xno"])
 
