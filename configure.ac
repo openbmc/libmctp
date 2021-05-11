@@ -23,13 +23,15 @@ PKG_PROG_PKG_CONFIG
 PKG_INSTALLDIR
 PKG_CHECK_MODULES(udev,
                   udev,
-                  [PKG_CHECK_VAR(udevrulesdir, udev, udevdir)],
+                  [PKG_CHECK_VAR(udevdir, udev, udevdir)],
                   [])
+
+AC_SUBST([udevrulesdir], [$udevdir/rules.d])
 
 AC_ARG_ENABLE([astlpc-raw-kcs],
               [AS_HELP_STRING([--enable-astlpc-raw-kcs],
                               [Use udev rules to symlink raw-kcs device nodes for the astlpc binding])])
-AM_CONDITIONAL([LIBMCTP_UDEV_RAW_KCS], [test -n "$udevrulesdir" -a "x$enable_astlpc_raw_kcs" = "xyes"])
+AM_CONDITIONAL([LIBMCTP_UDEV_RAW_KCS], [test -n "$udevdir" -a "x$enable_astlpc_raw_kcs" = "xyes"])
 
 AC_ARG_WITH([systemdsystemunitdir],
      [AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files])],
