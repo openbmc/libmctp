@@ -26,6 +26,11 @@ utils_mctp_demux_daemon_LDADD = libmctp.la
 
 pkgconfig_DATA = libmctp.pc
 
+if LIBMCTP_UDEV_RAW_KCS
+udevrules_DATA = udev/rules.d/mctp0-raw-kcs3.rules \
+		 udev/rules.d/mctp0-raw-kcs4.rules
+endif
+
 if AUTOCONF_CODE_COVERAGE_2019_01_06
 include $(top_srcdir)/aminclude_static.am
 clean-local: code-coverage-clean

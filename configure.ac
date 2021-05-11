@@ -21,6 +21,17 @@ AC_CHECK_HEADERS_ONCE([unistd.h fcntl.h])
 # pkg-config
 PKG_PROG_PKG_CONFIG
 PKG_INSTALLDIR
+PKG_CHECK_MODULES(udev,
+                  udev,
+                  [PKG_CHECK_VAR(udevrulesdir, udev, udevdir,
+                                 [udevrulesdir=$prefix$udevrulesdir])],
+                  [])
+
+AC_ARG_ENABLE([astlpc-raw-kcs],
+              [AS_HELP_STRING([--enable-astlpc-raw-kcs],
+                              [Use udev rules to symlink raw-kcs device nodes for the astlpc binding])])
+AM_CONDITIONAL([LIBMCTP_UDEV_RAW_KCS], [test -n "$udevrulesdir" -a "x$enable_astlpc_raw_kcs" = "xyes"])
+
 AC_ARG_WITH([systemdsystemunitdir],
      [AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files])],
      [],
@@ -143,5 +154,6 @@ m4_ifdef([_AX_CODE_COVERAGE_RULES],
     [AM_CONDITIONAL(AUTOCONF_CODE_COVERAGE_2019_01_06, [false])])
 AX_ADD_AM_MACRO_STATIC([])
 
-AC_CONFIG_FILES([Makefile libmctp.pc])
+AC_CONFIG_FILES([Makefile libmctp.pc udev/rules.d/mctp0-raw-kcs3.rules
+                 udev/rules.d/mctp0-raw-kcs4.rules])
 AC_OUTPUT
