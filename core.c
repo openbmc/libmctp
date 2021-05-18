@@ -224,6 +224,10 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 
 	len = mctp_pktbuf_size(pkt) - sizeof(struct mctp_hdr);
 
+	if (len + ctx->buf_size < ctx->buf_size) {
+		return -1;
+	}
+
 	if (ctx->buf_size + len > ctx->buf_alloc_size) {
 		size_t new_alloc_size;
 		void *lbuf;
