@@ -37,6 +37,10 @@ add_executable (test_cmds tests/test_cmds.c tests/test-utils.c)
 target_link_libraries (test_cmds mctp)
 add_test (NAME control_commands COMMAND test_cmds)
 
+add_executable (test_core tests/test_core.c tests/test-utils.c)
+target_link_libraries (test_core mctp)
+add_test (NAME core COMMAND test_core)
+
 install (TARGETS mctp DESTINATION lib)
 install (FILES libmctp.h DESTINATION include)
 
