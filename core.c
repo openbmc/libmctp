@@ -45,6 +45,7 @@ struct mctp_msg_ctx {
 	void		*buf;
 	size_t		buf_size;
 	size_t		buf_alloc_size;
+	size_t		fragment_size;
 };
 
 struct mctp {
@@ -215,6 +216,7 @@ static void mctp_msg_ctx_drop(struct mctp_msg_ctx *ctx)
 static void mctp_msg_ctx_reset(struct mctp_msg_ctx *ctx)
 {
 	ctx->buf_size = 0;
+	ctx->fragment_size = 0;
 }
 
 static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
@@ -540,6 +542,10 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 					hdr->src, hdr->dest, tag);
 		}
 
+		/* Save the fragment size, subsequent middle fragments
+		 * should of the same size */
+		ctx->fragment_size = mctp_pktbuf_size(pkt);
+
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt, mctp->max_message_size);
 		if (rc) {
 			mctp_msg_ctx_drop(ctx);
@@ -564,6 +570,16 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 			goto out;
 		}
 
+		len = mctp_pktbuf_size(pkt);
+
+		if (len > ctx->fragment_size) {
+			mctp_prdebug("Unexpected fragment size. Expected" \
+				"less than %zu, received = %zu",
+				ctx->fragment_size, len);
+			mctp_msg_ctx_drop(ctx);
+			goto out;
+		}
+
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt, mctp->max_message_size);
 		if (!rc)
 			mctp_rx(mctp, bus, ctx->src, ctx->dest,
@@ -583,6 +599,15 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 			mctp_prdebug(
 				"Sequence number %d does not match expected %d",
 				seq, exp_seq);
+			mctp_msg_ctx_drop(ctx);
+			goto out;
+		}
+
+		len = mctp_pktbuf_size(pkt);
+
+		if (len != ctx->fragment_size) {
+			mctp_prdebug( "Unexpected fragment size. Expected = %zu " \
+				"received = %zu", ctx->fragment_size, len);
 			mctp_msg_ctx_drop(ctx);
 			goto out;
 		}
