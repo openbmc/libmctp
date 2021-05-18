@@ -82,6 +82,8 @@ struct mctp {
 #define MCTP_MAX_MESSAGE_SIZE 65536
 #endif
 
+#define MAX_CTX_BUFFER_SIZE (size_t)-1
+
 static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 				  mctp_eid_t dest, void *msg, size_t msg_len);
 
@@ -223,6 +225,9 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 	size_t len;
 
 	len = mctp_pktbuf_size(pkt) - sizeof(struct mctp_hdr);
+
+        if (len > (MAX_CTX_BUFFER_SIZE - ctx->buf_size))
+            return -1;
 
 	if (ctx->buf_size + len > ctx->buf_alloc_size) {
 		size_t new_alloc_size;
