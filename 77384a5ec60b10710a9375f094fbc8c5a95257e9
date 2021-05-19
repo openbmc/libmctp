@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c67fa03f_6462efbd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-19T01:43:39Z",
+      "side": 1,
+      "message": "As I understand it, this isn\u0027t true because of the MAX(). Unless you have a test case that demonstrates otherwise?\n\nAs such, this seems to be dealing with the specific case of a spec violation where a message is received that has been packetised in such a way that the first packet is smaller than subsequent packets.\n\nWe should definitely guard against such behaviour. But I also think we should be accurate in describing the circumstances.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 63
+      },
+      "revId": "77384a5ec60b10710a9375f094fbc8c5a95257e9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
