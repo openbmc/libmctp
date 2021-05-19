@@ -363,6 +363,8 @@ int mctp_bridge_busses(struct mctp *mctp,
 
 	assert(mctp->n_busses == 0);
 	mctp->busses = __mctp_alloc(2 * sizeof(struct mctp_bus));
+	if (!mctp->busses)
+		return -ENOMEM;
 	memset(mctp->busses, 0, 2 * sizeof(struct mctp_bus));
 	mctp->n_busses = 2;
 	mctp->busses[0].binding = b1;
