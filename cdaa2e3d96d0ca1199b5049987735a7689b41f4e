@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4749d669_f8b0454b",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-19T01:35:10Z",
+      "side": 1,
+      "message": "We can get rid of MAX_CTX_BUFFER_SIZE by using unsigned overflow:\n\n if ((ctx-\u003ebuf_size + len) \u003c ctx-\u003ebuf_size)\n  return -1;",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 3
+      },
+      "revId": "cdaa2e3d96d0ca1199b5049987735a7689b41f4e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
