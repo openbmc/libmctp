@@ -22,6 +22,30 @@
       "revId": "77384a5ec60b10710a9375f094fbc8c5a95257e9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ed5be78b_4ccc7bcb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-20T19:01:19Z",
+      "side": 1,
+      "message": "Ack. Updated commit message.",
+      "parentUuid": "c67fa03f_6462efbd",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 63
+      },
+      "revId": "77384a5ec60b10710a9375f094fbc8c5a95257e9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
