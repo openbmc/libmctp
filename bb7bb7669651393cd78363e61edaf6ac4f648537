@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "85bdf8b3_b4012b41",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-20T06:06:27Z",
+      "side": 1,
+      "message": "The patch fixes mctp_bridge_busses(), which is not quite the same.\n\nmctp_register_bus() is properly protected against this issue with a NULL check after the allocation.\n\nmctp_bridge_busses() is effectively a debug interface that allows us to adapt arbitrary bindings to a serial binding so it can be plumbed out of a qemu chardev.\n\nFor what it\u0027s worth, while we need this patch, I don\u0027t expect to see uses of mctp_bridge_busses() in production.",
+      "range": {
+        "startLine": 7,
+        "startChar": 34,
+        "endLine": 7,
+        "endChar": 53
+      },
+      "revId": "bb7bb7669651393cd78363e61edaf6ac4f648537",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
