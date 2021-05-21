@@ -42,6 +42,30 @@
     },
     {
       "key": {
+        "uuid": "40a1067d_48de8ccd",
+        "filename": "tests/test_core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-21T06:01:29Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c53eaaa4_aa6d45d1",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 6
+      },
+      "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c46dffdd_9bdeb234",
         "filename": "tests/test_core.c",
         "patchSetId": 3
@@ -65,6 +89,30 @@
     },
     {
       "key": {
+        "uuid": "02e20710_d39cd5b7",
+        "filename": "tests/test_core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-21T06:01:29Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c46dffdd_9bdeb234",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 28,
+        "endChar": 23
+      },
+      "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1bd34b1b_4f9779b6",
         "filename": "tests/test_core.c",
         "patchSetId": 3
@@ -76,6 +124,24 @@
       "writtenOn": "2021-05-21T00:27:22Z",
       "side": 1,
       "message": "We shouldn\u0027t need this to be a global. rx_message() has the data pointer parameter.",
+      "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8b2506e2_30cd820c",
+        "filename": "tests/test_core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-21T06:01:29Z",
+      "side": 1,
+      "message": "Agree, modified the rx_message() to consume the data pointer.",
+      "parentUuid": "1bd34b1b_4f9779b6",
       "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -116,6 +182,24 @@
     },
     {
       "key": {
+        "uuid": "e591d3c8_c9474134",
+        "filename": "tests/test_core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-21T06:01:29Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "871f8ff7_59087eb3",
+      "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9c8e1c8e_0a5f80ab",
         "filename": "tests/test_core.c",
         "patchSetId": 3
@@ -127,6 +211,24 @@
       "writtenOn": "2021-05-21T00:27:22Z",
       "side": 1,
       "message": "No doubt we\u0027ll want some other test cases for core eventually. I\u0027d prefer we plan ahead slightly by defining a separate function for the test case, then invoking that from main(). The other test sources give an example of what can be done in this regard.",
+      "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bd76c2da_b8623c7b",
+        "filename": "tests/test_core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-21T06:01:29Z",
+      "side": 1,
+      "message": "I realised that and this was done in next change in the series. I will pull back those into this change.",
+      "parentUuid": "9c8e1c8e_0a5f80ab",
       "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -150,6 +252,24 @@
     },
     {
       "key": {
+        "uuid": "95808360_6f4bf302",
+        "filename": "tests/test_core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-21T06:01:29Z",
+      "side": 1,
+      "message": "Good point. However, the spec\u0027s wording is - implementations \"may\" terminate message assembly if it receives middle packet where the payload size does not match the start packet\u0027s size.\n\nThis means:\n1) We could enforce all fragments (except end packet) to have the same size\n2) Or we could support variable size fragments\n\nFrom my point of view, I agree with you. Fragments need to be of same size. Unless there is a usecase to support variable size fragments, we could terminate message assembly on receiving fragments whose size is not equal than the first packet size.",
+      "parentUuid": "603eef2d_53f0660f",
+      "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0a4683e7_04339a56",
         "filename": "tests/test_core.c",
         "patchSetId": 3
@@ -167,6 +287,24 @@
     },
     {
       "key": {
+        "uuid": "2c3ca335_c8cf324e",
+        "filename": "tests/test_core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-21T06:01:29Z",
+      "side": 1,
+      "message": "Nothing happens, max_size is set to default value. I wanted the test to have maximum possible context buffer size so that buffer size is not a constraint to demonstrate the overflow condition. If it is confusing, I can remove it/add a comment.",
+      "parentUuid": "0a4683e7_04339a56",
+      "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "af197e1a_01f6b21b",
         "filename": "tests/test_core.c",
         "patchSetId": 3
@@ -178,6 +316,24 @@
       "writtenOn": "2021-05-21T00:27:22Z",
       "side": 1,
       "message": "Looks like the indentation switches to spaces here, should consistently use tabs.",
+      "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "804c27d8_3d10a802",
+        "filename": "tests/test_core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-21T06:01:29Z",
+      "side": 1,
+      "message": "Looks like my code editor is doing tricks. Will resolve.",
+      "parentUuid": "af197e1a_01f6b21b",
       "revId": "77825a1182457d7aea79fbdde2f601eaa8482b17",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
