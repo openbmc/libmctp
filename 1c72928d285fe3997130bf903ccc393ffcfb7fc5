@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6b3810d8_034c775e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-21T00:36:03Z",
+      "side": 1,
+      "message": "I think we should drop this to the next line so it\u0027s not awkwardly wrapped.",
+      "range": {
+        "startLine": 9,
+        "startChar": 47,
+        "endLine": 9,
+        "endChar": 75
+      },
+      "revId": "1c72928d285fe3997130bf903ccc393ffcfb7fc5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dd1c375f_5a8c82dd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-21T00:36:03Z",
+      "side": 1,
+      "message": "I think it\u0027s also worth mentioning that this is a spec violation, see DSP0236 8.8 Terminating message assembly/dropped messages, \"Incorrect transmission unit\".\n\nIn fact, we should do what it says there: terminate the assembly and drop the packet.",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 44
+      },
+      "revId": "1c72928d285fe3997130bf903ccc393ffcfb7fc5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
