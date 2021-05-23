@@ -45,6 +45,30 @@
       "revId": "1c72928d285fe3997130bf903ccc393ffcfb7fc5",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "043aed30_5202ce1b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-23T11:30:13Z",
+      "side": 1,
+      "message": "Fragmentation was handled in the parent change and thus this patchset is no longer required. Abandon this change?",
+      "parentUuid": "dd1c375f_5a8c82dd",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 44
+      },
+      "revId": "1c72928d285fe3997130bf903ccc393ffcfb7fc5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
