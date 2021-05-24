@@ -69,6 +69,30 @@
       "revId": "1c72928d285fe3997130bf903ccc393ffcfb7fc5",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "972681d6_74f9d71f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T05:14:25Z",
+      "side": 1,
+      "message": "Yep, I think we can abandon this.",
+      "parentUuid": "043aed30_5202ce1b",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 44
+      },
+      "revId": "1c72928d285fe3997130bf903ccc393ffcfb7fc5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
