@@ -1,0 +1,198 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8852c662_2446ead9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T23:10:15Z",
+      "side": 1,
+      "message": "IMO we don\u0027t need this, it\u0027s obvious what you\u0027ve done from the test cases themselves (which are great). If there weren\u0027t automated tests then it might be useful as a point of discussion.\n\nSo I\u0027d prefer we drop it in this case.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 35
+      },
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "060335d0_b62f6ae1",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T23:10:15Z",
+      "side": 1,
+      "message": "Is there any reason to use this calculation and not just the raw size of the transmission unit (i.e. mctp_pktbuf_size(pkt))?",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0bc815d0_eea388d0",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T23:10:15Z",
+      "side": 1,
+      "message": "I think it would be easier on the eyes to assign this to a variable.",
+      "range": {
+        "startLine": 109,
+        "startChar": 8,
+        "endLine": 111,
+        "endChar": 14
+      },
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8fbff1dd_0eefa482",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T23:10:15Z",
+      "side": 1,
+      "message": "As above.\n\nIn fact, this is an issue in several test cases below as well. Please audit the file and fix all instances.",
+      "range": {
+        "startLine": 114,
+        "startChar": 8,
+        "endLine": 116,
+        "endChar": 12
+      },
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "876848bf_99af2db2",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T23:10:15Z",
+      "side": 1,
+      "message": "Is this necessary given we\u0027re tearing down the stack immediately below?\n\nOther test cases should not be relying on the state of the buffer, they should initialise it to their requirements explicitly.\n\nIt would be more obvious if this buffer were not global.",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "40ad130a_5b3d2d55",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T23:10:15Z",
+      "side": 1,
+      "message": "The test case should be named after the packet properties it provides, not after the behaviour of libmctp. Hopefully we no longer buffer overflow?",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "99bde2f2_1ceba1b6",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T23:10:15Z",
+      "side": 1,
+      "message": "Mixed tabs and spaces here again, with some more below as well :)",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e52fc01c_804cf008",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T23:10:15Z",
+      "side": 1,
+      "message": "At some point we should move this to its own header. And ARRAY_SIZE(). And probably the TEST_CASE() stuff as well. Don\u0027t worry about it in this patch though.",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ba65858b_45748baf",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T23:10:15Z",
+      "side": 1,
+      "message": "I\u0027d prefer this weren\u0027t a global and the test cases set up a buffer themselves. Let\u0027s try to be as explicit and self-contained as possible in each case.",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "87de7bda_e6d54809",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-05-24T23:10:15Z",
+      "side": 1,
+      "message": "I expect we want a \\n here?",
+      "range": {
+        "startLine": 426,
+        "startChar": 30,
+        "endLine": 426,
+        "endChar": 39
+      },
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
