@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "65d93649_37581ac4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-26T03:41:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8852c662_2446ead9",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 35
+      },
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "060335d0_b62f6ae1",
         "filename": "core.c",
         "patchSetId": 5
@@ -36,6 +60,24 @@
       "writtenOn": "2021-05-24T23:10:15Z",
       "side": 1,
       "message": "Is there any reason to use this calculation and not just the raw size of the transmission unit (i.e. mctp_pktbuf_size(pkt))?",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23916c6f_2480ffa2",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-26T03:41:14Z",
+      "side": 1,
+      "message": "The context buffers copy the data only from the actual mctp payload, thus keeping the fragment_size equal to first packet\u0027s mctp payload size.",
+      "parentUuid": "060335d0_b62f6ae1",
       "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -62,6 +104,30 @@
       "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d985179_c596d0aa",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-26T03:41:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0bc815d0_eea388d0",
+      "range": {
+        "startLine": 109,
+        "startChar": 8,
+        "endLine": 111,
+        "endChar": 14
+      },
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -105,6 +171,24 @@
     },
     {
       "key": {
+        "uuid": "b1120a82_f0b72f53",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-26T03:41:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "876848bf_99af2db2",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "40ad130a_5b3d2d55",
         "filename": "tests/test_core.c",
         "patchSetId": 5
@@ -116,6 +200,24 @@
       "writtenOn": "2021-05-24T23:10:15Z",
       "side": 1,
       "message": "The test case should be named after the packet properties it provides, not after the behaviour of libmctp. Hopefully we no longer buffer overflow?",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2d67814c_68dcc2ad",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-26T03:41:14Z",
+      "side": 1,
+      "message": "We no longer overflow, since the fragment size check itself handles this case.",
+      "parentUuid": "40ad130a_5b3d2d55",
       "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -139,6 +241,24 @@
     },
     {
       "key": {
+        "uuid": "5dd46e4d_6ae171c7",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-26T03:41:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "99bde2f2_1ceba1b6",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e52fc01c_804cf008",
         "filename": "tests/test_core.c",
         "patchSetId": 5
@@ -153,6 +273,24 @@
       "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3ae36200_dc953ecd",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-26T03:41:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e52fc01c_804cf008",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -173,6 +311,24 @@
     },
     {
       "key": {
+        "uuid": "5cf94256_e1947f8c",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-26T03:41:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ba65858b_45748baf",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "87de7bda_e6d54809",
         "filename": "tests/test_core.c",
         "patchSetId": 5
@@ -184,6 +340,30 @@
       "writtenOn": "2021-05-24T23:10:15Z",
       "side": 1,
       "message": "I expect we want a \\n here?",
+      "range": {
+        "startLine": 426,
+        "startChar": 30,
+        "endLine": 426,
+        "endChar": 39
+      },
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "69b00dcd_117ebb39",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-26T03:41:14Z",
+      "side": 1,
+      "message": "Not really required here, the \\n after the end: %s makes sure that we have an empty line between the test cases.",
+      "parentUuid": "87de7bda_e6d54809",
       "range": {
         "startLine": 426,
         "startChar": 30,
