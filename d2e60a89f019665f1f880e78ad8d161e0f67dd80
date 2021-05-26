@@ -154,6 +154,30 @@
     },
     {
       "key": {
+        "uuid": "4220a252_48545e42",
+        "filename": "tests/test_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-26T08:53:10Z",
+      "side": 1,
+      "message": "Done. The mix of spaces and tabs appear to be result of clang formatting.",
+      "parentUuid": "8fbff1dd_0eefa482",
+      "range": {
+        "startLine": 114,
+        "startChar": 8,
+        "endLine": 116,
+        "endChar": 12
+      },
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "876848bf_99af2db2",
         "filename": "tests/test_core.c",
         "patchSetId": 5
