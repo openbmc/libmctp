@@ -120,6 +120,24 @@
     },
     {
       "key": {
+        "uuid": "bec6f9b2_dca944d2",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-05-27T04:17:59Z",
+      "side": 1,
+      "message": "Agree that MCTP packet header is a constant addition. However, when I think about it, the *real* fragment size is mctp_pktbuf_size() - sizeof(struct mctp_hdr) isn\u0027t it? If one wants to build on top of the fragment size, suppose to add something like negotiating transmission size / enforce upper limit on fragment size, they would want to do it on the real payload size, no?",
+      "parentUuid": "4f027e4e_6578ec17",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0bc815d0_eea388d0",
         "filename": "tests/test_core.c",
         "patchSetId": 5
