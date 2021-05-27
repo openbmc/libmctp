@@ -102,6 +102,24 @@
     },
     {
       "key": {
+        "uuid": "4f027e4e_6578ec17",
+        "filename": "core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-05-27T02:42:18Z",
+      "side": 1,
+      "message": "To put it another way: you\u0027re subtracting sizeof(struct mctp_hdr) here, *and* again in each of the checks. You could just drop the calculation and use mctp_pktbuf_size() directly.",
+      "parentUuid": "ea14df86_657fb2f2",
+      "revId": "d2e60a89f019665f1f880e78ad8d161e0f67dd80",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0bc815d0_eea388d0",
         "filename": "tests/test_core.c",
         "patchSetId": 5
