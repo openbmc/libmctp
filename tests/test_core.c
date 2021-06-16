@@ -344,6 +344,34 @@ static void mctp_core_test_receive_bigger_end_fragment()
 	mctp_destroy(mctp);
 }
 
+static void mctp_core_test_drop_large_fragments()
+{
+	struct mctp *mctp = NULL;
+	struct mctp_binding_test *binding = NULL;
+	struct test_params test_param;
+	static uint8_t test_payload[MAX_PAYLOAD_SIZE];
+	struct pktbuf pktbuf;
+
+	test_param.seen = false;
+	test_param.message_size = 0;
+	mctp_test_stack_init(&mctp, &binding, TEST_DEST_EID);
+	mctp_set_rx_all(mctp, rx_message, &test_param);
+	memset(&pktbuf, 0, sizeof(pktbuf));
+	pktbuf.hdr.dest = TEST_DEST_EID;
+	pktbuf.hdr.src = TEST_SRC_EID;
+
+	/* Receive a large payload - first fragment with MCTP_BTU bytes,
+	* 2nd fragment of SIZE_MAX */
+
+	receive_two_fragment_message(binding, test_payload, MCTP_BTU,
+		SIZE_MAX - sizeof(struct mctp_hdr), &pktbuf);
+
+	assert(!test_param.seen);
+
+	mctp_binding_test_destroy(binding);
+	mctp_destroy(mctp);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -356,6 +384,7 @@ static const struct {
 	TEST_CASE(mctp_core_test_receive_unexpected_bigger_middle_fragment),
 	TEST_CASE(mctp_core_test_receive_smaller_end_fragment),
 	TEST_CASE(mctp_core_test_receive_bigger_end_fragment),
+	TEST_CASE(mctp_core_test_drop_large_fragments),
 };
 /* clang-format on */
 
