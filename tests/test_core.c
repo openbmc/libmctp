@@ -388,6 +388,60 @@ static void mctp_core_test_drop_large_fragments()
 	mctp_destroy(mctp);
 }
 
+static void mctp_core_test_exhaust_context_buffers()
+{
+	struct mctp *mctp = NULL;
+	struct mctp_binding_test *binding = NULL;
+	struct test_params test_param;
+	static uint8_t test_payload[MAX_PAYLOAD_SIZE];
+	uint8_t tag = MCTP_HDR_FLAG_TO | get_tag();
+	uint8_t i = 0;
+	const uint8_t max_context_buffers = 16;
+	struct pktbuf pktbuf;
+	uint8_t flags_seq_tag;
+
+	memset(test_payload, 0, sizeof(test_payload));
+	test_param.seen = false;
+	test_param.message_size = 0;
+	mctp_test_stack_init(&mctp, &binding, TEST_DEST_EID);
+	mctp_set_rx_all(mctp, rx_message, &test_param);
+	memset(&pktbuf, 0, sizeof(pktbuf));
+	pktbuf.hdr.dest = TEST_DEST_EID;
+	pktbuf.hdr.src = TEST_SRC_EID;
+
+	/* Exhaust all 16 context buffers*/
+	for (i = 0; i < max_context_buffers; i++) {
+		flags_seq_tag = MCTP_HDR_FLAG_SOM |
+				(get_sequence() << MCTP_HDR_SEQ_SHIFT) | tag;
+		receive_one_fragment(binding, test_payload, MCTP_BTU,
+				flags_seq_tag, &pktbuf);
+
+		/* Change source EID so that different contexts are created */
+		pktbuf.hdr.src++;
+	}
+
+	/* Send a full message from a different EID */
+	pktbuf.hdr.src++;
+	receive_two_fragment_message(binding, test_payload, MCTP_BTU, MCTP_BTU,
+			&pktbuf);
+
+	/* Message assembly should fail */
+	assert(!test_param.seen);
+
+	/* Complete message assembly for one of the messages */
+	pktbuf.hdr.src -= max_context_buffers;
+	flags_seq_tag = MCTP_HDR_FLAG_EOM |
+			(get_sequence() << MCTP_HDR_SEQ_SHIFT) | tag;
+	receive_one_fragment(binding, test_payload, MCTP_BTU,
+			flags_seq_tag, &pktbuf);
+
+	assert(test_param.seen);
+	assert(test_param.message_size == (2 * MCTP_BTU));
+
+	mctp_binding_test_destroy(binding);
+	mctp_destroy(mctp);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -401,6 +455,7 @@ static const struct {
 	TEST_CASE(mctp_core_test_receive_smaller_end_fragment),
 	TEST_CASE(mctp_core_test_receive_bigger_end_fragment),
 	TEST_CASE(mctp_core_test_drop_large_fragments),
+	TEST_CASE(mctp_core_test_exhaust_context_buffers),
 };
 /* clang-format on */
 

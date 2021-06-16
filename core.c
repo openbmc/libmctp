@@ -544,6 +544,12 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		} else {
 			ctx = mctp_msg_ctx_create(mctp,
 					hdr->src, hdr->dest, tag);
+			/* If context creation fails due to exhaution of contexts we
+			* can support, drop the packet */
+			if (!ctx) {
+				mctp_prdebug("Context buffers exhausted.");
+				goto out;
+			}
 		}
 
 		/* Save the fragment size, subsequent middle fragments
