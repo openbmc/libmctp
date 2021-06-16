@@ -1,5 +1,7 @@
 [Unit]
 Description=MCTP demultiplexer daemon
+Wants=pldmd.service
+Before=pldmd.service
 
 [Service]
 Restart=always
