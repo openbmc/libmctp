@@ -1,0 +1,9 @@
+[Unit]
+Description="Unix domain socket for the MCTP demux daemon"
+
+[Socket]
+ListenSequentialPacket=@mctp-mux
+Accept=no
+
+[Install]
+WantedBy=sockets.target

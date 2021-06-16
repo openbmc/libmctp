@@ -9,6 +9,3 @@ Environment=DEMUX_BINDING_OPTS=null
 EnvironmentFile=-/etc/default/mctp
 ExecStart=/usr/bin/mctp-demux-daemon $DEMUX_BINDING_OPTS
 SyslogIdentifier=mctp-demux
-
-[Install]
-WantedBy=multi-user.target
