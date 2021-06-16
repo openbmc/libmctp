@@ -48,6 +48,12 @@ AS_IF([test "x$with_systemdsystemunitdir" = "xyes" -o "x$with_systemdsystemunitd
            [with_systemdsystemunitdir="$def_systemdsystemunitdir"]
      )]
 )
+
+AC_CHECK_HEADER([systemd/sd-daemon.h],
+                [AC_DEFINE([HAVE_SYSTEMD_SD_DAEMON_H], [1],
+                           [Define to 1 if you have <systemd/sd-daemon.h>.])],
+                [])
+AC_CHECK_LIB([systemd], [sd_listen_fds])
 AS_IF([test "x$with_systemdsystemunitdir" != "xno"],
       [AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])]
 )

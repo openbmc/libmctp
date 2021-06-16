@@ -2,6 +2,8 @@
 
 #define _GNU_SOURCE
 
+#include "config.h"
+
 #include <assert.h>
 #include <err.h>
 #include <errno.h>
@@ -16,6 +18,18 @@
 
 #include <sys/socket.h>
 #include <sys/un.h>
+
+#if HAVE_SYSTEMD_SD_DAEMON_H
+#include <systemd/sd-daemon.h>
+#else
+static inline int sd_listen_fds(int i)
+{
+	(void)i;
+	return -1;
+}
+#endif
+
+#define SD_LISTEN_FDS_START 3
 
 #include "libmctp.h"
 #include "libmctp-serial.h"
@@ -551,9 +565,14 @@ int main(int argc, char * const *argv)
 	if (rc)
 		return EXIT_FAILURE;
 
-	rc = socket_init(ctx);
-	if (rc)
-		return EXIT_FAILURE;
+	rc = sd_listen_fds(true);
+	if (rc <= 0) {
+		rc = socket_init(ctx);
+		if (rc)
+			return EXIT_FAILURE;
+	} else {
+		ctx->sock = SD_LISTEN_FDS_START;
+	}
 
 	rc = run_daemon(ctx);
 
