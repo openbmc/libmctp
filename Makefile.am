@@ -18,7 +18,7 @@ endif
 
 if HAVE_SYSTEMD
 systemdsystemunit_DATA = \
-	mctp-demux.service
+	systemd/system/mctp-demux.service
 endif
 
 bin_PROGRAMS = utils/mctp-demux-daemon
