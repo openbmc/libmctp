@@ -2,6 +2,8 @@
 
 #define _GNU_SOURCE
 
+#include "config.h"
+
 #include <assert.h>
 #include <err.h>
 #include <errno.h>
@@ -17,12 +19,23 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
+#define SD_LISTEN_FDS_START 3
+
 #include "libmctp.h"
 #include "libmctp-serial.h"
 #include "libmctp-astlpc.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define __unused __attribute__((unused))
+
+#if HAVE_SYSTEMD_SD_DAEMON_H
+#include <systemd/sd-daemon.h>
+#else
+static inline int sd_listen_fds(int i __unused)
+{
+	return -1;
+}
+#endif
 
 static const mctp_eid_t local_eid_default = 8;
 static char sockname[] = "\0mctp-mux";
@@ -551,9 +564,14 @@ int main(int argc, char * const *argv)
 	if (rc)
 		return EXIT_FAILURE;
 
-	rc = socket_init(ctx);
-	if (rc)
-		return EXIT_FAILURE;
+	rc = sd_listen_fds(true);
+	if (rc <= 0) {
+		rc = socket_init(ctx);
+		if (rc)
+			return EXIT_FAILURE;
+	} else {
+		ctx->sock = SD_LISTEN_FDS_START;
+	}
 
 	rc = run_daemon(ctx);
 
