@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d463c8c9_6d8f6ee5",
+        "filename": "core.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-06-17T03:21:44Z",
+      "side": 1,
+      "message": "You probably want a space between \"Expected\" and \"less\".",
+      "revId": "b1b914178b2c45a2d60d32606a765f387240d08e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "143306b8_e3c1bb16",
+        "filename": "core.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 609,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-06-17T03:21:44Z",
+      "side": 1,
+      "message": "Super minor, but no space after the opening bracket.",
+      "revId": "b1b914178b2c45a2d60d32606a765f387240d08e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
