@@ -1,5 +1,22 @@
 cmake_minimum_required (VERSION 3.5 FATAL_ERROR)
 
+option(DEV "Option for developer testing" OFF)
+
+if(DEV)
+	set(CMAKE_C_FLAGS
+	"${CMAKE_C_FLAGS} \
+	-Werror \
+	-Wall \
+	-Wextra \
+	-Wnull-dereference \
+	-Wformat-security \
+	-Wno-type-limits \
+	-fsanitize=address,leak,undefined \
+	-ggdb \
+	")
+endif()
+
+
 add_definitions (-DMCTP_LOG_STDERR)
 add_definitions (-DMCTP_HAVE_FILEIO)
 add_definitions (-DMCTP_HAVE_STDIO)
