@@ -10,12 +10,14 @@
 #include <getopt.h>
 #include <limits.h>
 #include <poll.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
+#include <sys/signalfd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 
@@ -417,12 +419,14 @@ static int binding_init(struct ctx *ctx, const char *name,
 enum {
 	FD_BINDING = 0,
 	FD_SOCKET,
+	FD_SIGNAL,
 	FD_NR,
 };
 
 static int run_daemon(struct ctx *ctx)
 {
 	bool clients_changed = false;
+	sigset_t mask;
 	int rc, i;
 
 	ctx->pollfds = malloc(FD_NR * sizeof(struct pollfd));
@@ -435,6 +439,19 @@ static int run_daemon(struct ctx *ctx)
 		ctx->pollfds[FD_BINDING].fd = -1;
 		ctx->pollfds[FD_BINDING].events = 0;
 	}
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGQUIT);
+
+	if ((rc = sigprocmask(SIG_BLOCK, &mask, NULL)) == -1) {
+		warn("sigprocmask");
+		return rc;
+	}
+
+	ctx->pollfds[FD_SIGNAL].fd = signalfd(-1, &mask, 0);
+	ctx->pollfds[FD_SIGNAL].events = POLLIN;
 
 	ctx->pollfds[FD_SOCKET].fd = ctx->sock;
 	ctx->pollfds[FD_SOCKET].events = POLLIN;
@@ -466,6 +483,25 @@ static int run_daemon(struct ctx *ctx)
 		if (!rc)
 			continue;
 
+		if (ctx->pollfds[FD_SIGNAL].revents) {
+			struct signalfd_siginfo si;
+			ssize_t got;
+
+			got = read(ctx->pollfds[FD_SIGNAL].fd, &si, sizeof(si));
+			if (got == sizeof(si)) {
+				warnx("Received %s, quitting",
+				      strsignal(si.ssi_signo));
+				rc = 0;
+				break;
+			} else {
+				warnx("Unexpected read result for signalfd: %d",
+				      rc);
+				warnx("Quitting on the basis that signalfd became ready");
+				rc = -1;
+				break;
+			}
+		}
+
 		if (ctx->pollfds[FD_BINDING].revents) {
 			rc = 0;
 			if (ctx->binding->process)
@@ -492,7 +528,6 @@ static int run_daemon(struct ctx *ctx)
 
 		if (clients_changed)
 			client_remove_inactive(ctx);
-
 	}
 
 
