@@ -372,6 +372,14 @@ int mctp_register_bus(struct mctp *mctp,
 	return rc;
 }
 
+void mctp_unregister_bus(struct mctp *mctp, struct mctp_binding *binding)
+{
+	mctp->n_busses = 0;
+	binding->mctp = NULL;
+	binding->bus = NULL;
+	free(mctp->busses);
+}
+
 int mctp_bridge_busses(struct mctp *mctp,
 		struct mctp_binding *b1, struct mctp_binding *b2)
 {

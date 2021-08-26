@@ -82,6 +82,8 @@ int mctp_register_bus(struct mctp *mctp,
 		struct mctp_binding *binding,
 		mctp_eid_t eid);
 
+void mctp_unregister_bus(struct mctp *mctp, struct mctp_binding *binding);
+
 /* Create a simple bidirectional bridge between busses.
  *
  * In this mode, the MCTP stack is initialised as a bridge. There is no EID
