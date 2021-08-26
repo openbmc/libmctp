@@ -662,7 +662,8 @@ int main(int argc, char * const *argv)
 		rc = socket_init(ctx);
 		if (rc) {
 			fprintf(stderr, "Failed to initialse socket: %d\n", rc);
-			return EXIT_FAILURE;
+			rc = EXIT_FAILURE;
+			goto cleanup_pcap_socket;
 		}
 	} else {
 		ctx->sock = SD_LISTEN_FDS_START;
