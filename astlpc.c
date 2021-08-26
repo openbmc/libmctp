@@ -1189,7 +1189,7 @@ void mctp_astlpc_destroy(struct mctp_binding_astlpc *astlpc)
 {
 	/* Clear channel-active and bmc-ready */
 	if (astlpc->mode == MCTP_BINDING_ASTLPC_MODE_BMC)
-		mctp_astlpc_kcs_set_status(astlpc, KCS_STATUS_OBF);
+		mctp_astlpc_kcs_set_status(astlpc, 0);
 	__mctp_free(astlpc);
 }
 
