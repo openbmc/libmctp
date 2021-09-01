@@ -937,8 +937,10 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	/* Eliminate the medium-specific header that we just read */
 	packet = astlpc->proto->packet_size(body) - 4;
 	pkt = mctp_pktbuf_alloc(&astlpc->binding, packet);
-	if (!pkt)
-		goto out_complete;
+	if (!pkt) {
+		astlpc_prwarn(astlpc, "unable to allocate pktbuf len 0x%x", packet);
+		return;
+	}
 
 	/*
 	 * Read payload and medium-specific trailer from immediately after the
@@ -946,6 +948,11 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	 */
 	mctp_astlpc_lpc_read(astlpc, mctp_pktbuf_hdr(pkt),
 			     astlpc->layout.rx.offset + 4, packet);
+
+	/* Inform the other side of the MCTP interface that we have read
+	 * the packet off the bus before handling the contents of the packet.
+	 */
+	mctp_astlpc_kcs_send(astlpc, 0x2);
 
 	/*
 	 * v3 will validate the CRC32 in the medium-specific trailer and adjust
@@ -959,9 +966,6 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 		mctp_pktbuf_free(pkt);
 		astlpc_prdebug(astlpc, "Dropped corrupt packet");
 	}
-
-out_complete:
-	mctp_astlpc_kcs_send(astlpc, 0x2);
 }
 
 static void mctp_astlpc_tx_complete(struct mctp_binding_astlpc *astlpc)
