@@ -595,6 +595,7 @@ int main(int argc, char * const *argv)
 	ctx->verbose = false;
 	ctx->pcap.binding.path = NULL;
 	ctx->pcap.socket.path = NULL;
+	ctx->pcap.socket.linktype = -1;
 
 	for (;;) {
 		rc = getopt_long(argc, argv, "b:es::v", options, NULL);
@@ -630,6 +631,12 @@ int main(int argc, char * const *argv)
 		usage(argv[0]);
 		return EXIT_FAILURE;
 	}
+
+        if (ctx->pcap.socket.linktype < 0 && ctx->pcap.socket.path) {
+		fprintf(stderr, "missing socket-linktype argument\n");
+		usage(argv[0]);
+		return EXIT_FAILURE;
+        }
 
 	/* setup initial buffer */
 	ctx->buf_size = 4096;
