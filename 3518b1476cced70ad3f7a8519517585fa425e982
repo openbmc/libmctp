@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "42295a2d_62fd0e1d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-10-20T17:32:07Z",
+      "side": 1,
+      "message": "nit: wrap?",
+      "range": {
+        "startLine": 9,
+        "startChar": 33,
+        "endLine": 9,
+        "endChar": 39
+      },
+      "revId": "3518b1476cced70ad3f7a8519517585fa425e982",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7670f22a_d98486fb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-10-20T17:32:07Z",
+      "side": 1,
+      "message": "nit: will",
+      "range": {
+        "startLine": 10,
+        "startChar": 25,
+        "endLine": 10,
+        "endChar": 29
+      },
+      "revId": "3518b1476cced70ad3f7a8519517585fa425e982",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "41f6724a_0e3e4b57",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-10-20T17:32:07Z",
+      "side": 1,
+      "message": "nit: is",
+      "range": {
+        "startLine": 11,
+        "startChar": 16,
+        "endLine": 11,
+        "endChar": 18
+      },
+      "revId": "3518b1476cced70ad3f7a8519517585fa425e982",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "64b5e2fe_1799b58d",
+        "filename": "range.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-10-20T17:32:07Z",
+      "side": 1,
+      "message": "nit: what happened here?",
+      "range": {
+        "startLine": 6,
+        "startChar": 65,
+        "endLine": 6,
+        "endChar": 69
+      },
+      "revId": "3518b1476cced70ad3f7a8519517585fa425e982",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
