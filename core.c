@@ -95,14 +95,14 @@ struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *binding, size_t len)
 	struct mctp_pktbuf *buf;
 	size_t size;
 
-	size = binding->pkt_size + binding->pkt_header + binding->pkt_trailer;
+	size = len + binding->pkt_header + binding->pkt_trailer;
 
 	/* todo: pools */
 	buf = __mctp_alloc(sizeof(*buf) + size);
 
 	buf->size = size;
 	buf->start = binding->pkt_header;
-	buf->end = buf->start + len;
+	buf->end = buf->start;
 	buf->mctp_hdr_off = buf->start;
 	buf->next = NULL;
 
@@ -129,14 +129,14 @@ size_t mctp_pktbuf_size(struct mctp_pktbuf *pkt)
 	return pkt->end - pkt->start;
 }
 
-void *mctp_pktbuf_alloc_start(struct mctp_pktbuf *pkt, size_t size)
+void *mctp_pktbuf_decrement_start(struct mctp_pktbuf *pkt, size_t size)
 {
 	assert(size <= pkt->start);
 	pkt->start -= size;
 	return pkt->data + pkt->start;
 }
 
-void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, size_t size)
+void *mctp_pktbuf_increment_end(struct mctp_pktbuf *pkt, size_t size)
 {
 	void *buf;
 
@@ -773,16 +773,15 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 		hdr->src = src;
 		hdr->flags_seq_tag = MCTP_HDR_FLAG_TO |
 			(0 << MCTP_HDR_TAG_SHIFT);
-
+		/* hdr has been filled in so increment end */
+		mctp_pktbuf_increment_end(pkt, sizeof(struct mctp_hdr));
 		if (i == 0)
 			hdr->flags_seq_tag |= MCTP_HDR_FLAG_SOM;
 		if (p + payload_len >= msg_len)
 			hdr->flags_seq_tag |= MCTP_HDR_FLAG_EOM;
 		hdr->flags_seq_tag |=
 			(i & MCTP_HDR_SEQ_MASK) << MCTP_HDR_SEQ_SHIFT;
-
-		memcpy(mctp_pktbuf_data(pkt), msg + p, payload_len);
-
+		mctp_pktbuf_push(pkt, msg + p, payload_len); 
 		/* add to tx queue */
 		if (bus->tx_queue_tail)
 			bus->tx_queue_tail->next = pkt;

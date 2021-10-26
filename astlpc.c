@@ -156,7 +156,6 @@ static uint32_t astlpc_body_size_v3(uint32_t packet)
 void astlpc_pktbuf_protect_v3(struct mctp_pktbuf *pkt)
 {
 	uint32_t code;
-
 	code = htobe32(crc32(mctp_pktbuf_hdr(pkt), mctp_pktbuf_size(pkt)));
 	mctp_prdebug("%s: 0x%" PRIx32, __func__, code);
 	mctp_pktbuf_push(pkt, &code, 4);
@@ -169,7 +168,7 @@ bool astlpc_pktbuf_validate_v3(struct mctp_pktbuf *pkt)
 
 	code = be32toh(crc32(mctp_pktbuf_hdr(pkt), mctp_pktbuf_size(pkt) - 4));
 	mctp_prdebug("%s: 0x%" PRIx32, __func__, code);
-	check = mctp_pktbuf_pop(pkt, 4);
+	check = mctp_pktbuf_pop(pkt, 4); 
 	return check && !memcmp(&code, check, 4);
 }
 
@@ -783,7 +782,9 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 	astlpc->proto->pktbuf_protect(pkt);
 	len = mctp_pktbuf_size(pkt);
 
-	mctp_astlpc_lpc_write(astlpc, hdr, astlpc->layout.tx.offset + 4, len);
+	mctp_astlpc_lpc_write(astlpc, hdr,
+			      astlpc->layout.tx.offset + astlpc->binding.pkt_header,
+			      len + astlpc->binding.pkt_trailer);
 
 	mctp_binding_set_tx_enabled(b, false);
 
@@ -917,7 +918,7 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 {
 	struct mctp_pktbuf *pkt;
-	uint32_t body, packet;
+	uint32_t body;
 
 	mctp_astlpc_lpc_read(astlpc, &body, astlpc->layout.rx.offset,
 			     sizeof(body));
@@ -934,11 +935,9 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 		return;
 	}
 
-	/* Eliminate the medium-specific header that we just read */
-	packet = astlpc->proto->packet_size(body) - 4;
-	pkt = mctp_pktbuf_alloc(&astlpc->binding, packet);
+	pkt = mctp_pktbuf_alloc(&astlpc->binding, body);
 	if (!pkt) {
-		astlpc_prwarn(astlpc, "unable to allocate pktbuf len 0x%x", packet);
+		astlpc_prwarn(astlpc, "unable to allocate pktbuf len 0x%x", body);
 		return;
 	}
 
@@ -947,7 +946,9 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	 * medium-specific header.
 	 */
 	mctp_astlpc_lpc_read(astlpc, mctp_pktbuf_hdr(pkt),
-			     astlpc->layout.rx.offset + 4, packet);
+			     astlpc->layout.rx.offset + astlpc->binding.pkt_header,
+			     body + astlpc->binding.pkt_trailer);
+	mctp_pktbuf_increment_end(pkt, body + astlpc->binding.pkt_trailer);
 
 	/* Inform the other side of the MCTP interface that we have read
 	 * the packet off the bus before handling the contents of the packet.
