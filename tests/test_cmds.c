@@ -48,6 +48,7 @@ static void rcv_ctrl_msg(struct mctp_binding *b, const void *buf, size_t len)
 {
 	struct mctp_pktbuf *pkt = mctp_pktbuf_alloc(b, len);
 	memcpy(mctp_pktbuf_hdr(pkt), buf, len);
+	mctp_pktbuf_alloc_end(pkt, len);
 	mctp_bus_rx(b, pkt);
 }
 

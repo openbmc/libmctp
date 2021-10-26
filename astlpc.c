@@ -157,7 +157,7 @@ void astlpc_pktbuf_protect_v3(struct mctp_pktbuf *pkt)
 {
 	uint32_t code;
 
-	code = htobe32(crc32(mctp_pktbuf_hdr(pkt), mctp_pktbuf_size(pkt)));
+	code = htobe32(crc32(mctp_pktbuf_hdr(pkt), mctp_pktbuf_capacity(pkt)));
 	mctp_prdebug("%s: 0x%" PRIx32, __func__, code);
 	mctp_pktbuf_push(pkt, &code, 4);
 }
@@ -167,7 +167,7 @@ bool astlpc_pktbuf_validate_v3(struct mctp_pktbuf *pkt)
 	uint32_t code;
 	void *check;
 
-	code = be32toh(crc32(mctp_pktbuf_hdr(pkt), mctp_pktbuf_size(pkt) - 4));
+	code = be32toh(crc32(mctp_pktbuf_hdr(pkt), mctp_pktbuf_capacity(pkt)));
 	mctp_prdebug("%s: 0x%" PRIx32, __func__, code);
 	check = mctp_pktbuf_pop(pkt, 4);
 	return check && !memcmp(&code, check, 4);
@@ -917,28 +917,26 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 {
 	struct mctp_pktbuf *pkt;
-	uint32_t body, packet;
+	uint32_t body_size;
 
-	mctp_astlpc_lpc_read(astlpc, &body, astlpc->layout.rx.offset,
-			     sizeof(body));
-	body = be32toh(body);
+	mctp_astlpc_lpc_read(astlpc, &body_size, astlpc->layout.rx.offset,
+			     sizeof(body_size));
+	body_size = be32toh(body_size);
 
-	if (body > astlpc->proto->body_size(astlpc->layout.rx.size)) {
-		astlpc_prwarn(astlpc, "invalid RX len 0x%x", body);
+	if (body_size > astlpc->proto->body_size(astlpc->layout.rx.size)) {
+		astlpc_prwarn(astlpc, "invalid RX len 0x%x", body_size);
 		return;
 	}
 
 	assert(astlpc->binding.pkt_size >= 0);
-	if (body > (uint32_t)astlpc->binding.pkt_size) {
-		astlpc_prwarn(astlpc, "invalid RX len 0x%x", body);
+	if (body_size > (uint32_t)astlpc->binding.pkt_size) {
+		astlpc_prwarn(astlpc, "invalid RX len 0x%x", body_size);
 		return;
 	}
 
-	/* Eliminate the medium-specific header that we just read */
-	packet = astlpc->proto->packet_size(body) - 4;
-	pkt = mctp_pktbuf_alloc(&astlpc->binding, packet);
+	pkt = mctp_pktbuf_alloc(&astlpc->binding, body_size);
 	if (!pkt) {
-		astlpc_prwarn(astlpc, "unable to allocate pktbuf len 0x%x", packet);
+		astlpc_prwarn(astlpc, "unable to allocate pktbuf len 0x%x", body_size);
 		return;
 	}
 
@@ -947,7 +945,9 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	 * medium-specific header.
 	 */
 	mctp_astlpc_lpc_read(astlpc, mctp_pktbuf_hdr(pkt),
-			     astlpc->layout.rx.offset + 4, packet);
+			     astlpc->layout.rx.offset + astlpc->binding.pkt_header,
+			     body_size + astlpc->binding.pkt_trailer);
+ 	mctp_pktbuf_alloc_end(pkt, body_size + astlpc->binding.pkt_trailer);
 
 	/* Inform the other side of the MCTP interface that we have read
 	 * the packet off the bus before handling the contents of the packet.

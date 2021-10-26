@@ -57,6 +57,7 @@ static void mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 	*buf = key;
 
 	binding->rx_count++;
+	mctp_pktbuf_alloc_end(pkt, sizeof(struct mctp_hdr) + 1);
 	mctp_bus_rx(&binding->binding, pkt);
 }
 

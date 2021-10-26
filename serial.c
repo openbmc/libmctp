@@ -93,8 +93,7 @@ static size_t mctp_serial_pkt_escape(struct mctp_pktbuf *pkt, uint8_t *buf)
 	uint8_t *p;
 	int i, j;
 
-	total_len = pkt->end - pkt->mctp_hdr_off;
-
+	total_len = mctp_pktbuf_capacity(pkt);
 	p = (void *)mctp_pktbuf_hdr(pkt);
 
 	for (i = 0, j = 0; i < total_len; i++, j++) {
@@ -209,7 +208,7 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial,
 			mctp_prdebug("invalid size %d", c);
 			serial->rx_state = STATE_WAIT_SYNC_START;
 		} else {
-			mctp_serial_start_packet(serial, 0);
+			mctp_serial_start_packet(serial, c);
 			pkt = serial->rx_pkt;
 			serial->rx_exp_len = c;
 			serial->rx_state = STATE_DATA;
@@ -345,7 +344,7 @@ struct mctp_binding_serial *mctp_serial_init(void)
 	serial->binding.version = 1;
 	serial->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
 	serial->binding.pkt_header = 0;
-	serial->binding.pkt_header = 0;
+	serial->binding.pkt_trailer = 0;
 
 	serial->binding.start = mctp_serial_core_start;
 	serial->binding.tx = mctp_binding_serial_tx;

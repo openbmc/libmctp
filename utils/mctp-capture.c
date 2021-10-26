@@ -58,7 +58,7 @@ void capture_binding(struct mctp_pktbuf *pkt, void *user)
 		return;
 
 	hdr.caplen = mctp_pktbuf_size(pkt);
-	hdr.len = mctp_pktbuf_size(pkt);
+	hdr.len = mctp_pktbuf_capacity(pkt);
 
 	pcap_dump((u_char *)dumper, &hdr, (const u_char *)mctp_pktbuf_hdr(pkt));
 }
