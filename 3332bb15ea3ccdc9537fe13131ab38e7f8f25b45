@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb51f610_a5ebdb72",
+        "filename": "utils/mctp-demux-daemon.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-10-29T01:48:21Z",
+      "side": 1,
+      "message": "can you do this for the binding linktype also?",
+      "revId": "3332bb15ea3ccdc9537fe13131ab38e7f8f25b45",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
