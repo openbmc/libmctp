@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "a2f3c551_345db1fd",
+        "filename": "astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-11-03T05:42:33Z",
+      "side": 1,
+      "message": "Now I\u0027m confused; you\u0027ve changed this to be the capacity (ie, allocated payload size) of the packet, rather than the size of the data.\n\nSince we\u0027re checksumming the data here, shouldn\u0027t it be the latter?",
+      "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "142d0785_a95a7bd8",
         "filename": "core.c",
         "patchSetId": 3
@@ -13,6 +30,23 @@
       "writtenOn": "2021-11-03T05:04:55Z",
       "side": 1,
       "message": "The indent on this line should be a tab.",
+      "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "610b1c96_44e8b3e7",
+        "filename": "libmctp.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-11-03T05:42:33Z",
+      "side": 1,
+      "message": "Some \"naming-things\" discussion here:\n\nGiven we now have two similarly-named functions (_capacity and _size), it  might be worth adding comments about the difference.\n\nWe also need to make a call on (and document) whether this includes the mctp packet header, and/or binding specific header and trailer. I see that your capacity value represents the size of the header+payload, without the binding data. This seems a bit of an odd value to need though. The places where you\u0027ve introduced calls to mctp_pktbuf_capacity() would more seem to care about the amount of data, rather than the size of the allocation.\n\nAlso: now that the packet is allocated to its final size in mctp_pktbuf_alloc, we may want to change the names of mctp_pktbuf_alloc_{end,start}, as they\u0027re not really allocating out of the (oversized) original pktbuf.",
       "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -47,6 +81,24 @@
       "writtenOn": "2021-11-03T05:02:13Z",
       "side": 1,
       "message": "I was pretty uncertain about this change. I am not familiar with how this pcap_pkthdr works.",
+      "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eda49dd2_c7e9cb0e",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-11-03T05:42:33Z",
+      "side": 1,
+      "message": "We want these to be the same; they only need to vary if the packet is truncated in the capture. You should be fine to drop this change.",
+      "parentUuid": "fc1f2626_e1ac7a2c",
       "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
