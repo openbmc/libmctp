@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc1f2626_e1ac7a2c",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-03T05:02:13Z",
+      "side": 1,
+      "message": "I was pretty uncertain about this change. I am not familiar with how this pcap_pkthdr works.",
+      "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
