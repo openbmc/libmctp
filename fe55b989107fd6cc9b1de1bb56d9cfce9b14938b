@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f578d6f1_b4dab9f9",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-11-04T04:19:18Z",
+      "side": 1,
+      "message": "You don\u0027t need this cast, mctp_pktbuf_trailer already returns a void *.",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "541090d2_c701b4e1",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 790,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-11-04T04:19:18Z",
+      "side": 1,
+      "message": "I am going to assume that this updated calculation is correct (len + 4 now?), but I\u0027ll defer to Andrew on this.",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d7022427_6645ea13",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-11-04T04:19:18Z",
+      "side": 1,
+      "message": "These names are much better, thanks! I\u0027d prefer to keep the prefixes consistent though - everything with mctp_, and since these are pktbuf operations: mctp_ptkbuf_{...}\n\n(essentially, just changing \u0027alloc\u0027 to \u0027increment\u0027/\u0027decrement\u0027)",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
