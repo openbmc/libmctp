@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "657e1241_667fcaa3",
+        "filename": "astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-04T02:57:00Z",
+      "side": 1,
+      "message": "Yeah I think I was not quite understanding how mctp_pktbuf_pop was working , which has changed now that the value of -\u003eend is different.\n\nI have added a new function that will return a ptr to the binding specific trailer I will push in the next patchset and see what you think.",
+      "parentUuid": "a2f3c551_345db1fd",
+      "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "142d0785_a95a7bd8",
         "filename": "core.c",
         "patchSetId": 3
@@ -33,6 +51,24 @@
       "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cd1a9362_ec0fe350",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-04T02:57:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "142d0785_a95a7bd8",
+      "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "07eb9ca5_19e39d55",
+        "filename": "libmctp.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-04T02:57:00Z",
+      "side": 1,
+      "message": "The more I think about it I think we can drop this function all together. I was using it all over but then I realized that I really wanted to just be setting -\u003eend with the mctp_pktbuf_alloc_end function.\n\nI updated the names to something I thought might be more accurate let me know if you think they are better.",
+      "parentUuid": "610b1c96_44e8b3e7",
+      "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dc754b3b_58a4ed89",
         "filename": "tests/test_seq.c",
         "patchSetId": 3
@@ -67,6 +121,24 @@
       "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "41876e8c_3539232f",
+        "filename": "tests/test_seq.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-04T02:57:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc754b3b_58a4ed89",
+      "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -102,6 +174,24 @@
       "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a06cd77b_18979da8",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-04T02:57:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eda49dd2_c7e9cb0e",
+      "revId": "8f5b79de3dad78d3e974f216e5478f8836782e82",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
