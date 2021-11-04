@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "d75ad844_1003befb",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-11-04T06:03:51Z",
+      "side": 1,
+      "message": "There\u0027s no guarantee that trailer is appropriately aligned. This should be memcpy()ed.",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "541090d2_c701b4e1",
         "filename": "astlpc.c",
         "patchSetId": 4
@@ -36,6 +53,58 @@
     },
     {
       "key": {
+        "uuid": "9f871317_26df6542",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 790,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-11-04T06:03:51Z",
+      "side": 1,
+      "message": "Following where the trailer size value gets propagated is a bit of a maze, but this seems okay.",
+      "parentUuid": "541090d2_c701b4e1",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad150ddd_02594a35",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 924,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-11-04T06:03:51Z",
+      "side": 1,
+      "message": "This rename is bit of an editorial change. Can you please separate it out? I think it distracts from the rest of what\u0027s going on here.",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "581a33f0_aa167c29",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-11-04T06:03:51Z",
+      "side": 1,
+      "message": "Given we have `hdr` can we use `tlr` for some consistency?",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d7022427_6645ea13",
         "filename": "libmctp.h",
         "patchSetId": 4
@@ -47,6 +116,58 @@
       "writtenOn": "2021-11-04T04:19:18Z",
       "side": 1,
       "message": "These names are much better, thanks! I\u0027d prefer to keep the prefixes consistent though - everything with mctp_, and since these are pktbuf operations: mctp_ptkbuf_{...}\n\n(essentially, just changing \u0027alloc\u0027 to \u0027increment\u0027/\u0027decrement\u0027)",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "413469ff_d2ac857f",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-11-04T06:03:51Z",
+      "side": 1,
+      "message": "Second this; C doesn\u0027t have namespaces so we use symbol prefixes as a convention instead.",
+      "parentUuid": "d7022427_6645ea13",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89784b1a_1b671bea",
+        "filename": "serial.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-11-04T06:03:51Z",
+      "side": 1,
+      "message": "This is a separate bug fix",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fca663d8_4d98b176",
+        "filename": "tests/test_bridge.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-11-04T06:03:51Z",
+      "side": 1,
+      "message": "This seems error-prone / easily forgotten. It\u0027s not so much a comment about this invocation, but the API requirement.",
       "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
