@@ -18,6 +18,7 @@ depcomp
 *.in
 install-sh
 *.la
+!libmctp.pc.in
 libtool
 *.lo
 *.log
