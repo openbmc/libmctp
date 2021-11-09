@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "95ccfa30_eba016d5",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-09T05:22:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f578d6f1_b4dab9f9",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d75ad844_1003befb",
         "filename": "astlpc.c",
         "patchSetId": 4
@@ -33,6 +51,24 @@
       "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1a841cb5_5cce5b92",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-09T05:22:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d75ad844_1003befb",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "f89c2a7b_c2807545",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 790,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-09T05:22:57Z",
+      "side": 1,
+      "message": "If you guys prefer the hard coded values I will use those instead.",
+      "parentUuid": "9f871317_26df6542",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ad150ddd_02594a35",
         "filename": "astlpc.c",
         "patchSetId": 4
@@ -88,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "209c1ead_d97aa1dd",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 924,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-09T05:22:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad150ddd_02594a35",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "581a33f0_aa167c29",
         "filename": "libmctp.h",
         "patchSetId": 4
@@ -102,6 +174,24 @@
       "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7a2f0bfb_8c9f8558",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-09T05:22:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "581a33f0_aa167c29",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -140,6 +230,24 @@
     },
     {
       "key": {
+        "uuid": "1bbb1bdb_0f09aa07",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-09T05:22:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "413469ff_d2ac857f",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89784b1a_1b671bea",
         "filename": "serial.c",
         "patchSetId": 4
@@ -157,6 +265,24 @@
     },
     {
       "key": {
+        "uuid": "ea61c745_c8419417",
+        "filename": "serial.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-09T05:22:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89784b1a_1b671bea",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fca663d8_4d98b176",
         "filename": "tests/test_bridge.c",
         "patchSetId": 4
@@ -168,6 +294,24 @@
       "writtenOn": "2021-11-04T06:03:51Z",
       "side": 1,
       "message": "This seems error-prone / easily forgotten. It\u0027s not so much a comment about this invocation, but the API requirement.",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dd2b5001_34ed769f",
+        "filename": "tests/test_bridge.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1000392
+      },
+      "writtenOn": "2021-11-09T05:22:57Z",
+      "side": 1,
+      "message": "The alternative that I can think of is to force all of the bindings to use mctp_pktbuf_push to fill in pktbuf. This works find in a lot of cases but in some cases is causes extra memory to be used.\n\nFor example it\u0027s handy to grab ptr to the pktbuf_hdr and fill in the hdr information. However as soon as you do, the -\u003eend() member should be incremented by the size of the header. \n\nIf we force mctp_pktbuf_push() to be used, then we have to allocate a local hdr struct to fill out then memcpy which is inefficient. \n\nIt gets worse in functions like mctp_astlpc_rx_start where we read directly from the lpc bus into a data ptr in the pktbuf. \n\nGot any better ideas on a way to track the \"end\" value ?",
+      "parentUuid": "fca663d8_4d98b176",
       "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
