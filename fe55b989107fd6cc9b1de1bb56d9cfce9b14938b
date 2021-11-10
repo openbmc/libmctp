@@ -125,6 +125,24 @@
     },
     {
       "key": {
+        "uuid": "a2789832_5d1074b8",
+        "filename": "astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 790,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-11-10T03:30:10Z",
+      "side": 1,
+      "message": "Nah, this is fine.",
+      "parentUuid": "f89c2a7b_c2807545",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ad150ddd_02594a35",
         "filename": "astlpc.c",
         "patchSetId": 4
@@ -312,6 +330,24 @@
       "side": 1,
       "message": "The alternative that I can think of is to force all of the bindings to use mctp_pktbuf_push to fill in pktbuf. This works find in a lot of cases but in some cases is causes extra memory to be used.\n\nFor example it\u0027s handy to grab ptr to the pktbuf_hdr and fill in the hdr information. However as soon as you do, the -\u003eend() member should be incremented by the size of the header. \n\nIf we force mctp_pktbuf_push() to be used, then we have to allocate a local hdr struct to fill out then memcpy which is inefficient. \n\nIt gets worse in functions like mctp_astlpc_rx_start where we read directly from the lpc bus into a data ptr in the pktbuf. \n\nGot any better ideas on a way to track the \"end\" value ?",
       "parentUuid": "fca663d8_4d98b176",
+      "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "76232cf9_9169f733",
+        "filename": "tests/test_bridge.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2021-11-10T03:30:10Z",
+      "side": 1,
+      "message": "\u003e Got any better ideas on a way to track the \"end\" value ?\n\nNot immediately, but let me think about it.",
+      "parentUuid": "dd2b5001_34ed769f",
       "revId": "fe55b989107fd6cc9b1de1bb56d9cfce9b14938b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
