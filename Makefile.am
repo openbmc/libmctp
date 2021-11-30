@@ -22,7 +22,7 @@ systemdsystemunit_DATA = \
 	systemd/system/mctp-demux.socket
 endif
 
-bin_PROGRAMS = utils/mctp-demux-daemon
+bin_PROGRAMS = utils/mctp-demux-daemon utils/mctp-in utils/mctp-pipe
 utils_mctp_demux_daemon_SOURCES = utils/mctp-demux-daemon.c
 if HAVE_PCAP
 utils_mctp_demux_daemon_SOURCES += utils/mctp-capture.c
