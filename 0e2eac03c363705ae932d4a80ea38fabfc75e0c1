@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f1c6692_1bfc1875",
+        "filename": "Makefile.am",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2021-12-02T03:05:44Z",
+      "side": 1,
+      "message": "Can we do these as noinst? Or do we need them installed by default?",
+      "revId": "0e2eac03c363705ae932d4a80ea38fabfc75e0c1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
