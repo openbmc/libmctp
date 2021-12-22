@@ -305,6 +305,30 @@ void mctp_serial_open_fd(struct mctp_binding_serial *serial, int fd)
 {
 	serial->fd = fd;
 }
+#else
+int mctp_serial_read(struct mctp_binding_serial *serial)
+{
+	mctp_prerr("can't read from serial device: %m");
+	return -1;
+}
+
+int mctp_serial_get_fd(struct mctp_binding_serial *serial)
+{
+	mctp_prerr("can't read from serial device: %m");
+	return -1;
+}
+
+int mctp_serial_open_path(struct mctp_binding_serial *serial,
+		const char *device)
+{
+	mctp_prerr("can't read from serial device: %m");
+	return -1;
+}
+
+void mctp_serial_open_fd(struct mctp_binding_serial *serial, int fd)
+{
+	mctp_prerr("can't read from serial device: %m");
+}
 #endif
 
 void mctp_serial_set_tx_fn(struct mctp_binding_serial *serial,
