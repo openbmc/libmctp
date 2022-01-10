@@ -84,7 +84,7 @@ static void tx_message(struct ctx *ctx, mctp_eid_t eid, void *msg, size_t len)
 {
 	int rc;
 
-	rc = mctp_message_tx(ctx->mctp, eid, msg, len);
+	rc = mctp_message_tx(ctx->mctp, eid, 0, MCTP_MESSAGE_TO_SRC, msg, len);
 	if (rc)
 		warnx("Failed to send message: %d", rc);
 }
@@ -107,7 +107,8 @@ static void client_remove_inactive(struct ctx *ctx)
 	}
 }
 
-static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
+static void rx_message(uint8_t eid, uint8_t msg_tag, bool tag_owner,
+		void *data, void *msg, size_t len)
 {
 	struct ctx *ctx = data;
 	struct iovec iov[2];
@@ -410,7 +411,7 @@ static int client_process_recv(struct ctx *ctx, int idx)
 
 
 	if (eid == ctx->local_eid)
-		rx_message(eid, ctx, ctx->buf + 1, rc - 1);
+		rx_message(eid, 0, false, ctx, ctx->buf + 1, rc - 1);
 	else
 		tx_message(ctx, eid, ctx->buf + 1, rc - 1);
 

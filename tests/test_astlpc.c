@@ -151,8 +151,8 @@ static const struct mctp_binding_astlpc_ops astlpc_indirect_mmio_ops = {
 
 #define __unused __attribute__((unused))
 
-static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
-		       size_t len)
+static void rx_message(uint8_t eid __unused, uint8_t msg_tag __unused, bool tag_owner __unused,
+	void *data __unused, void *msg, size_t len)
 {
 	struct astlpc_test *test = data;
 
@@ -258,7 +258,7 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
 
 	/* BMC sends a message */
-	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.bmc.mctp, 9, 0, MCTP_MESSAGE_TO_SRC, msg, sizeof(msg));
 	assert(rc == 0);
 
 	/* Host receives the first packet */
@@ -298,7 +298,7 @@ static void astlpc_test_simple_message_host_to_bmc(void)
 	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
 
 	/* Host sends the single-packet message */
-	rc = mctp_message_tx(ctx.host.mctp, 8, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.host.mctp, 8, 0, MCTP_MESSAGE_TO_DST, msg, sizeof(msg));
 	assert(rc == 0);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
@@ -338,7 +338,7 @@ static void astlpc_test_simple_message_bmc_to_host(void)
 	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
 
 	/* BMC sends the single-packet message */
-	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.bmc.mctp, 9, 0, MCTP_MESSAGE_TO_SRC, msg, sizeof(msg));
 	assert(rc == 0);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
@@ -595,7 +595,7 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
 
 	/* BMC sends the single-packet message */
-	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.bmc.mctp, 9, 0, MCTP_MESSAGE_TO_SRC, msg, sizeof(msg));
 	assert(rc == 0);
 
 	/* Host receives the single-packet message */
@@ -635,7 +635,7 @@ static void astlpc_test_host_tx_bmc_gone(void)
 	mctp_astlpc_poll(ctx.host.astlpc);
 
 	/* Host attempts to send the single-packet message, but is prevented */
-	rc = mctp_message_tx(ctx.host.mctp, 8, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.host.mctp, 8, 0, MCTP_MESSAGE_TO_DST, msg, sizeof(msg));
 	assert(rc == 0);
 	assert(!(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF));
 	astlpc_assert_tx_packet(&ctx.host, &unwritten[0], MCTP_BTU);
@@ -1118,7 +1118,7 @@ static void astlpc_test_send_large_packet(void)
 
 	memset(ctx.msg, 0x5a, 2 * MCTP_BODY_SIZE(8192));
 
-	rc = mctp_message_tx(host->mctp, 8, ctx.msg, 2 * MCTP_BODY_SIZE(8192));
+	rc = mctp_message_tx(host->mctp, 8, 0, MCTP_MESSAGE_TO_DST, ctx.msg, 2 * MCTP_BODY_SIZE(8192));
 	assert(rc == 0);
 	rc = mctp_astlpc_poll(bmc->astlpc);
 	assert(rc == 0);
@@ -1166,7 +1166,7 @@ static void astlpc_test_tx_before_channel_init(void)
 	 * terminating after a period long enough to packetise the message.
 	 */
 	alarm(1);
-	mctp_message_tx(bmc->mctp, 9, msg, sizeof(msg));
+	mctp_message_tx(bmc->mctp, 9, 0, MCTP_MESSAGE_TO_SRC, msg, sizeof(msg));
 	alarm(0);
 
 	endpoint_destroy(bmc);
@@ -1194,7 +1194,7 @@ static void astlpc_test_corrupt_host_tx(void)
 	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
 
 	/* Host sends the single-packet message */
-	rc = mctp_message_tx(ctx.host.mctp, 8, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.host.mctp, 8, 0, MCTP_MESSAGE_TO_DST, msg, sizeof(msg));
 	assert(rc == 0);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_IBF);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
@@ -1246,7 +1246,7 @@ static void astlpc_test_corrupt_bmc_tx(void)
 	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
 
 	/* BMC sends the single-packet message */
-	rc = mctp_message_tx(ctx.bmc.mctp, 9, msg, sizeof(msg));
+	rc = mctp_message_tx(ctx.bmc.mctp, 9, 0, MCTP_MESSAGE_TO_SRC, msg, sizeof(msg));
 	assert(rc == 0);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_STATUS] & KCS_STATUS_OBF);
 	assert(ctx.kcs[MCTP_ASTLPC_KCS_REG_DATA] == 0x01);
