@@ -12,11 +12,11 @@
 #include <sys/poll.h>
 #include <sys/socket.h>
 
-static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
+static void
+rx_message(uint8_t eid __unused, bool tag_owner __unused,
+	   uint8_t msg_tag __unused, void *data __unused, void *msg, size_t len)
 {
 	ssize_t rc;
-	(void)eid;
-	(void)data;
 
 	rc = write(STDOUT_FILENO, msg, len);
 	if (rc < 0)
@@ -91,7 +91,9 @@ int main(void)
 			} else if (rc < 0) {
 				err(EXIT_FAILURE, "read");
 			} else {
-				mctp_message_tx(mctp[0], eids[1], buf, rc);
+				mctp_message_tx(mctp[0], eids[1],
+						MCTP_MESSAGE_TO_SRC, 0, buf,
+						rc);
 			}
 		}
 

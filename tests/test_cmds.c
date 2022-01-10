@@ -32,6 +32,8 @@ struct callback_data {
 };
 
 static void control_message_transport_callback(mctp_eid_t src __unused,
+					       bool tag_owner __unused,
+					       uint8_t msg_tag __unused,
 					       void *data, void *buf,
 					       size_t len __unused)
 {
