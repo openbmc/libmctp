@@ -107,7 +107,8 @@ static void client_remove_inactive(struct ctx *ctx)
 	}
 }
 
-static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
+static void rx_message(uint8_t eid, uint8_t msg_tag, bool tag_owner,
+		void *data, void *msg, size_t len)
 {
 	struct ctx *ctx = data;
 	struct iovec iov[2];
