@@ -30,6 +30,8 @@ struct mctp_hdr {
 #define MCTP_HDR_FLAG_SOM	(1<<7)
 #define MCTP_HDR_FLAG_EOM	(1<<6)
 #define MCTP_HDR_FLAG_TO	(1<<3)
+#define MCTP_HDR_TO_SHIFT	(3)
+#define MCTP_HDR_TO_MASK	(1)
 #define MCTP_HDR_SEQ_SHIFT	(4)
 #define MCTP_HDR_SEQ_MASK	(0x3)
 #define MCTP_HDR_TAG_SHIFT	(0)
@@ -96,8 +98,14 @@ int mctp_bridge_busses(struct mctp *mctp,
 typedef void (*mctp_rx_fn)(uint8_t src_eid, void *data,
 		void *msg, size_t len);
 
+typedef void (*mctp_rx_fn_with_tag)(uint8_t src_eid, uint8_t msg_tag,
+		bool tag_owner, void *data, void *msg, size_t len);
+
 int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data);
 
+int mctp_set_rx_with_tag(struct mctp *mctp, mctp_rx_fn_with_tag fn, void *data);
+
+/* TODO: Introduce API to transmit mctp tags */
 int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
 		void *msg, size_t msg_len);
 

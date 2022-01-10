@@ -53,8 +53,9 @@ struct mctp {
 	struct mctp_bus		*busses;
 
 	/* Message RX callback */
-	mctp_rx_fn		message_rx;
-	void			*message_rx_data;
+	mctp_rx_fn			message_rx;
+	mctp_rx_fn_with_tag message_rx_with_tag;
+	void				*message_rx_data;
 
 	/* Packet capture callback */
 	mctp_capture_fn		capture;
@@ -324,7 +325,24 @@ void mctp_destroy(struct mctp *mctp)
 
 int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data)
 {
+	if (mctp->message_rx_with_tag)
+	{
+		mctp_prerr("Cannot register callbacks without tags. Already callback with tags registered");
+		return -1;
+	}
 	mctp->message_rx = fn;
+	mctp->message_rx_data = data;
+	return 0;
+}
+
+int mctp_set_rx_with_tag(struct mctp *mctp, mctp_rx_fn_with_tag fn, void *data)
+{
+	if (mctp->message_rx)
+	{
+		mctp_prerr("Cannot register callbacks with tags. Already callback without tags registered");
+		return -1;
+	}
+	mctp->message_rx_with_tag = fn;
 	mctp->message_rx_data = data;
 	return 0;
 }
@@ -482,7 +500,7 @@ static inline bool mctp_ctrl_cmd_is_request(struct mctp_ctrl_msg_hdr *hdr)
  *     'buf' is not NULL.
  */
 static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus, mctp_eid_t src,
-		    mctp_eid_t dest, void *buf, size_t len)
+		    mctp_eid_t dest, void *buf, size_t len, uint8_t msg_tag, bool tag_owner)
 {
 	assert(buf != NULL);
 
@@ -498,13 +516,18 @@ static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus, mctp_eid_t src,
 			 */
 			if (mctp_ctrl_cmd_is_request(msg_hdr)) {
 				bool handled;
+				/* TODO: Handle message tags for control messages */
 				handled = mctp_ctrl_handle_msg(bus, src, buf,
 							       len);
 				if (handled)
 					return;
 			}
 		}
-		if (mctp->message_rx)
+		if (mctp->message_rx_with_tag) {
+			mctp->message_rx_with_tag(src, msg_tag, tag_owner, mctp->message_rx_data, buf, len);
+		}
+
+		else if (mctp->message_rx)
 			mctp->message_rx(src, mctp->message_rx_data, buf, len);
 	}
 
@@ -529,6 +552,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 	uint8_t flags, exp_seq, seq, tag;
 	struct mctp_msg_ctx *ctx;
 	struct mctp_hdr *hdr;
+	bool tag_owner;
 	size_t len;
 	void *p;
 	int rc;
@@ -552,6 +576,8 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 	flags = hdr->flags_seq_tag & (MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM);
 	tag = (hdr->flags_seq_tag >> MCTP_HDR_TAG_SHIFT) & MCTP_HDR_TAG_MASK;
 	seq = (hdr->flags_seq_tag >> MCTP_HDR_SEQ_SHIFT) & MCTP_HDR_SEQ_MASK;
+	tag_owner =
+		(hdr->flags_seq_tag >> MCTP_HDR_TO_SHIFT) & MCTP_HDR_TO_MASK;
 
 	switch (flags) {
 	case MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM:
@@ -559,7 +585,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		 * no need to create a message context */
 		len = pkt->end - pkt->mctp_hdr_off - sizeof(struct mctp_hdr);
 		p = pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr);
-		mctp_rx(mctp, bus, hdr->src, hdr->dest, p, len);
+		mctp_rx(mctp, bus, hdr->src, hdr->dest, p, len, tag, tag_owner);
 		break;
 
 	case MCTP_HDR_FLAG_SOM:
@@ -621,7 +647,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt, mctp->max_message_size);
 		if (!rc)
 			mctp_rx(mctp, bus, ctx->src, ctx->dest,
-					ctx->buf, ctx->buf_size);
+					ctx->buf, ctx->buf_size, tag, tag_owner);
 
 		mctp_msg_ctx_drop(ctx);
 		break;
