@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8b5ad26_bbfcc733",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-01-10T09:56:56Z",
+      "side": 1,
+      "message": "Looks good to me, just a couple of minor things inline.\n\nI suspect the tx side might be the tricky bit though - do you want to merge those two changes as one? Or is it useful to have just the RX side included?",
+      "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2b156fe_e0906ab5",
@@ -20,6 +37,40 @@
         "endLine": 57,
         "endChar": 40
       },
+      "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98739ba7_42496cd3",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-01-10T09:56:56Z",
+      "side": 1,
+      "message": "Please use consistent formatting here (and on the next hunk): opening brace on the same line as the condition.",
+      "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48e87144_5522f2c8",
+        "filename": "libmctp.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-01-10T09:56:56Z",
+      "side": 1,
+      "message": "Just to keep this consistent with the _fn suffix (and maybe a bit shorter), can we call this mctp_rx_tag_fn ?",
       "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
