@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2b156fe_e0906ab5",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-10T07:17:39Z",
+      "side": 1,
+      "message": "will correct this in next patchset.",
+      "range": {
+        "startLine": 57,
+        "startChar": 21,
+        "endLine": 57,
+        "endChar": 40
+      },
+      "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
