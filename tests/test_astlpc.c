@@ -151,8 +151,8 @@ static const struct mctp_binding_astlpc_ops astlpc_indirect_mmio_ops = {
 
 #define __unused __attribute__((unused))
 
-static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
-		       size_t len)
+static void rx_message(uint8_t eid __unused, uint8_t msg_tag __unused, bool tag_owner __unused,
+	void *data __unused, void *msg, size_t len)
 {
 	struct astlpc_test *test = data;
 
