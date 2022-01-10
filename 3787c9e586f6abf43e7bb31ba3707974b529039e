@@ -18,6 +18,23 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f734da7_5abae3cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-01-10T22:19:06Z",
+      "side": 1,
+      "message": "I\u0027m wondering whether we just tag a new version then break the API of the current callback so we don\u0027t have two. For downstream projects consuming the source it will yield a compilation failure so it\u0027s obvious that something is broken at the point of integration. Anyone using the current callback can just ignore the additional parameters and carry on. On OpenBMC it\u0027s only the tools in this repo that link against it to the best of my knowledge, so despite the fact that there\u0027s also an ABI break everything should be coherent.",
+      "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2b156fe_e0906ab5",
