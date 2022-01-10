@@ -11,7 +11,7 @@
 #include "libmctp.h"
 #include "libmctp-serial.h"
 
-static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
+static void rx_message(uint8_t eid, bool tag_owner, uint8_t msg_tag, void *data, void *msg, size_t len)
 {
 	(void)eid;
 	(void)data;
@@ -84,7 +84,7 @@ int main(void)
 			} else if (rc < 0) {
 				err(EXIT_FAILURE, "read");
 			} else {
-				mctp_message_tx(mctp[0], eids[1], buf, rc);
+				mctp_message_tx(mctp[0], eids[1], MCTP_MESSAGE_TO_SRC, 0, buf, rc);
 			}
 		}
 

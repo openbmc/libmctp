@@ -19,7 +19,8 @@ struct test_ctx {
 	size_t				rx_len;
 };
 
-static void test_rx(uint8_t eid, void *data, void *msg, size_t len)
+static void test_rx(uint8_t eid, bool tag_owner, uint8_t msg_tag,
+		void *data, void *msg, size_t len)
 {
 	struct test_ctx *ctx = data;
 
