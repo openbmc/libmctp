@@ -32,7 +32,8 @@ static void tx_message(struct ctx *ctx, mctp_eid_t eid, void *msg, size_t len)
 	mctp_message_tx(ctx->mctp, eid, msg, len);
 }
 
-static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
+static void rx_message(uint8_t eid, uint8_t msg_tag, bool tag_owner,
+		void *data, void *msg, size_t len)
 {
 	struct ctx *ctx = data;
 	uint8_t type;
