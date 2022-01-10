@@ -33,8 +33,8 @@ struct callback_data {
 #define __unused __attribute__((unused))
 
 static void control_message_transport_callback(mctp_eid_t src __unused,
-					       void *data, void *buf,
-					       size_t len __unused)
+		uint8_t msg_tag __unused, bool tag_owner __unused,
+		void *data, void *buf, size_t len __unused)
 {
 	struct callback_data *ctx = data;
 	struct mctp_ctrl_msg_hdr *msg_hdr = buf;
