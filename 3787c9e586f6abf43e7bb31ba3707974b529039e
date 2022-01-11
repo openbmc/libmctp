@@ -53,6 +53,42 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08d5aab4_a84dac77",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-11T07:17:19Z",
+      "side": 1,
+      "message": "I plan to submit a separate patch for the TX path",
+      "parentUuid": "d8b5ad26_bbfcc733",
+      "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4aedd5e9_36af79b7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-11T07:17:19Z",
+      "side": 1,
+      "message": "Made changes, there is only one API now and it is going to be incompatible with previous builds.",
+      "parentUuid": "1f6916f3_fa8f2d1a",
+      "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2b156fe_e0906ab5",
@@ -95,6 +131,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6857b15b_2689ed7c",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-11T07:17:19Z",
+      "side": 1,
+      "message": "Comment is no longer applicable - removed this hunk altogether.",
+      "parentUuid": "98739ba7_42496cd3",
+      "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "48e87144_5522f2c8",
         "filename": "libmctp.h",
         "patchSetId": 1
@@ -106,6 +160,24 @@
       "writtenOn": "2022-01-10T09:56:56Z",
       "side": 1,
       "message": "Just to keep this consistent with the _fn suffix (and maybe a bit shorter), can we call this mctp_rx_tag_fn ?",
+      "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "961f29ca_aed84cbb",
+        "filename": "libmctp.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-11T07:17:19Z",
+      "side": 1,
+      "message": "Comment no longer applicable, extended the old API.",
+      "parentUuid": "48e87144_5522f2c8",
       "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
