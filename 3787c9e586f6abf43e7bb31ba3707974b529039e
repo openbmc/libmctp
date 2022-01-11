@@ -35,6 +35,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f6916f3_fa8f2d1a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-01-11T01:17:08Z",
+      "side": 1,
+      "message": "Yep, I\u0027d be OK with this approach too, and it avoids potential for strange semantics when a user attempts to set both callbacks.",
+      "parentUuid": "2f734da7_5abae3cc",
+      "revId": "3787c9e586f6abf43e7bb31ba3707974b529039e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2b156fe_e0906ab5",
