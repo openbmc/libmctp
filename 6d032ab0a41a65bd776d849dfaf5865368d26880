@@ -16,6 +16,80 @@
       "message": "CI fails due to changes not applied in applications in utils. Need help in testing the change since I don\u0027t have a hardware where I can test mctp-astlpc-daemon.c / mctp-demux-daemon.c.",
       "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6812fc58_0f4ab26e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-01-12T23:59:12Z",
+      "side": 1,
+      "message": "Thanks Sumanth. My main concern is with the error checking.",
+      "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "544cb100_486dc519",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 781,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-01-12T23:59:12Z",
+      "side": 1,
+      "message": "I think we should do the tag sanity check here where we pack it into the message. That closes the gap of potential mangling between the public API and here.",
+      "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee77ff77_7d01e312",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 814,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-01-12T23:59:12Z",
+      "side": 1,
+      "message": "This is unnecessary? Bit of a nit-pick, but I think I\u0027d rather\n\n if ((msg_tag \u0026 MCTP_HDR_TAG_MASK) !\u003d msg_tag)",
+      "range": {
+        "startLine": 814,
+        "startChar": 16,
+        "endLine": 814,
+        "endChar": 23
+      },
+      "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02244aff_5304d346",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 816,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-01-12T23:59:12Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we return an error here? Sending a message with the wrong tag isn\u0027t going to do the right thing.",
+      "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
