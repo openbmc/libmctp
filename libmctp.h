@@ -37,6 +37,9 @@ struct mctp_hdr {
 #define MCTP_HDR_TAG_SHIFT	(0)
 #define MCTP_HDR_TAG_MASK	(0x7)
 
+#define MCTP_MESSAGE_TO_SRC	true
+#define MCTP_MESSAGE_TO_DST	false
+
 /* Baseline Transmission Unit and packet size */
 #define MCTP_BTU		64
 #define MCTP_PACKET_SIZE(unit)	((unit) + sizeof(struct mctp_hdr))
@@ -100,9 +103,8 @@ typedef void (*mctp_rx_fn)(uint8_t src_eid, uint8_t msg_tag, bool tag_owner,
 
 int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data);
 
-/* TODO: Introduce API to transmit mctp tags */
-int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
-		void *msg, size_t msg_len);
+int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid, uint8_t msg_tag,
+	bool tag_owner,	void *msg, size_t msg_len);
 
 /* hardware bindings */
 struct mctp_binding {
