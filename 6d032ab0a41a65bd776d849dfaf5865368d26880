@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b807b55_d01159db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-12T10:24:07Z",
+      "side": 1,
+      "message": "CI fails due to changes not applied in applications in utils. Need help in testing the change since I don\u0027t have a hardware where I can test mctp-astlpc-daemon.c / mctp-demux-daemon.c.",
+      "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
