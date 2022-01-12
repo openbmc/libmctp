@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "13d7ec83_1e308395",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-12T11:06:23Z",
+      "side": 1,
+      "message": "Since upstream PLDM does not consume message tag \u0026 tag owner yet, we could just modify the TX and RX APIs in PLDM to the new extended API, and msg_tag and tag_owner will be unused parameters in PLDM. This can be done when this is close to the merge. Usage of these parameters can be done subsequently.\n\nMy first proposal was to have 2 different APIs (check patchset 1) which will give a \"deprecation\" time for other repos to adopt to new API. \n\nI am okay with either approach, but with the breaking API, we will have to merge PLDM and MCTP together.",
+      "parentUuid": "d22aae1c_af162417",
+      "revId": "00e212f5996e08133fb7445abbf5416e7fa94c52",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "76e44a4a_a2826373",
         "filename": "libmctp.h",
         "patchSetId": 5
