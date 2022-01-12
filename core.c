@@ -88,7 +88,8 @@ struct mctp {
 #endif
 
 static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
-				  mctp_eid_t dest, void *msg, size_t msg_len);
+	mctp_eid_t dest, uint8_t msg_tag,
+	bool tag_owner, void *msg, size_t msg_len);
 
 struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *binding, size_t len)
 {
@@ -517,7 +518,8 @@ static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus, mctp_eid_t src,
 			if (dest_bus == bus)
 				continue;
 
-			mctp_message_tx_on_bus(dest_bus, src, dest, buf, len);
+			mctp_message_tx_on_bus(dest_bus, src, dest,
+					       msg_tag, tag_owner, buf, len);
 		}
 
 	}
@@ -739,7 +741,8 @@ void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
 }
 
 static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
-				  mctp_eid_t dest, void *msg, size_t msg_len)
+				  mctp_eid_t dest, uint8_t msg_tag,
+				  bool tag_owner, void *msg, size_t msg_len)
 {
 	size_t max_payload_len, payload_len, p;
 	struct mctp_pktbuf *pkt;
@@ -748,6 +751,10 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 
 	if (bus->state == mctp_bus_state_constructed)
 		return -ENXIO;
+
+	if ((msg_tag & MCTP_HDR_TAG_MASK) != msg_tag) {
+		return -EINVAL;
+	}
 
 	max_payload_len = MCTP_BODY_SIZE(bus->binding->pkt_size);
 
@@ -771,12 +778,11 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 				payload_len + sizeof(*hdr));
 		hdr = mctp_pktbuf_hdr(pkt);
 
-		/* todo: tags */
 		hdr->ver = bus->binding->version & 0xf;
 		hdr->dest = dest;
 		hdr->src = src;
-		hdr->flags_seq_tag = MCTP_HDR_FLAG_TO |
-			(0 << MCTP_HDR_TAG_SHIFT);
+		hdr->flags_seq_tag = (tag_owner << MCTP_HDR_TO_SHIFT) |
+			((msg_tag & MCTP_HDR_TAG_MASK) << MCTP_HDR_TAG_SHIFT) ;
 
 		if (i == 0)
 			hdr->flags_seq_tag |= MCTP_HDR_FLAG_SOM;
@@ -804,14 +810,22 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 	return 0;
 }
 
-int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
-		void *msg, size_t msg_len)
+int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid, uint8_t msg_tag,
+			bool tag_owner,	void *msg, size_t msg_len)
 {
 	struct mctp_bus *bus;
+
+	/* TODO: Protect against same tag being used across
+	 * different callers */
+	if ((msg_tag & MCTP_HDR_TAG_MASK) != msg_tag) {
+		mctp_prerr(
+			"Incorrect message tag %u passed.", msg_tag);
+		return -EINVAL;
+	}
 
 	bus = find_bus_for_eid(mctp, eid);
 	if (!bus)
 		return 0;
 
-	return mctp_message_tx_on_bus(bus, bus->eid, eid, msg, msg_len);
+	return mctp_message_tx_on_bus(bus, bus->eid, eid, msg_tag, tag_owner, msg, msg_len);
 }
