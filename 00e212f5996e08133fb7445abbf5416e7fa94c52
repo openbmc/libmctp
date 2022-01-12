@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d22aae1c_af162417",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1000056
+      },
+      "writtenOn": "2022-01-12T10:33:10Z",
+      "side": 1,
+      "message": "Since this will break upstream PLDM API calls into libmctp, what is the plan for PLDM fixups? That would have to be done once this is close to merge?",
+      "revId": "00e212f5996e08133fb7445abbf5416e7fa94c52",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "76e44a4a_a2826373",
         "filename": "libmctp.h",
         "patchSetId": 5
