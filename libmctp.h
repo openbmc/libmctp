@@ -100,9 +100,8 @@ typedef void (*mctp_rx_fn)(uint8_t src_eid, uint8_t msg_tag, bool tag_owner,
 
 int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data);
 
-/* TODO: Introduce API to transmit mctp tags */
-int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid,
-		void *msg, size_t msg_len);
+int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid, uint8_t msg_tag,
+	bool tag_owner,	void *msg, size_t msg_len);
 
 /* hardware bindings */
 struct mctp_binding {
