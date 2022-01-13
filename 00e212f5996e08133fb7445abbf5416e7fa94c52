@@ -92,6 +92,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4bfc611e_379cff6b",
+        "filename": "libmctp.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1000056
+      },
+      "writtenOn": "2022-01-13T06:15:05Z",
+      "side": 1,
+      "message": "Andrew, Sumanth - what I meant was: once we make this API change and say PLDM doesn\u0027t provide tag information through the socket, would that break something?",
+      "parentUuid": "86f3f14b_5475202e",
+      "revId": "00e212f5996e08133fb7445abbf5416e7fa94c52",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "76e44a4a_a2826373",
         "filename": "libmctp.h",
         "patchSetId": 5
