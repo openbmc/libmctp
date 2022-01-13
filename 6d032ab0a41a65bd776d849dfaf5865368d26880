@@ -52,6 +52,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7233c6c0_21e6bd8d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-13T04:57:54Z",
+      "side": 1,
+      "message": "Yeah, I captured a TODO here. We would need something similar to tag_expiry here to track and clear a used tag.",
+      "parentUuid": "01a4082f_abb58dac",
+      "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "544cb100_486dc519",
@@ -65,6 +83,24 @@
       "writtenOn": "2022-01-12T23:59:12Z",
       "side": 1,
       "message": "I think we should do the tag sanity check here where we pack it into the message. That closes the gap of potential mangling between the public API and here.",
+      "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ece74c58_b0bb8f3d",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 781,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-13T04:57:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "544cb100_486dc519",
       "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -92,6 +128,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5116e4f_983ec32e",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 814,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-13T04:57:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee77ff77_7d01e312",
+      "range": {
+        "startLine": 814,
+        "startChar": 16,
+        "endLine": 814,
+        "endChar": 23
+      },
+      "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02244aff_5304d346",
@@ -105,6 +165,24 @@
       "writtenOn": "2022-01-12T23:59:12Z",
       "side": 1,
       "message": "Shouldn\u0027t we return an error here? Sending a message with the wrong tag isn\u0027t going to do the right thing.",
+      "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e65a47aa_d4dcf159",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 816,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-13T04:57:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02244aff_5304d346",
       "revId": "6d032ab0a41a65bd776d849dfaf5865368d26880",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
