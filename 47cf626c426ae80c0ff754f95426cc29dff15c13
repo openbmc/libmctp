@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecd8451c_0809c447",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-01-14T01:35:47Z",
+      "side": 1,
+      "message": "I\u0027d like to see the following added for use with this parameter (bikeshed ahead):\n\n #define MCTP_MESSAGE_TO_SRC true\n #define MCTP_MESSAGE_TO_DST false\n\nAnd then we can call this like the following when issuing requests:\n\n mctp_message_tx(mctp, eid, tag, MCTP_MESSAGE_TO_SRC, msg, len);\n\nand when responding to requests:\n\n mctp_message_tx(mctp, eid, tag, MCTP_MESSAGE_TO_DST, msg, len);",
+      "range": {
+        "startLine": 104,
+        "startChar": 1,
+        "endLine": 104,
+        "endChar": 15
+      },
+      "revId": "47cf626c426ae80c0ff754f95426cc29dff15c13",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46cce561_3d61a3a3",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-01-14T01:35:47Z",
+      "side": 1,
+      "message": "With the comments in the header file these unadorned bools go away and we get something more semantically relevant.",
+      "range": {
+        "startLine": 261,
+        "startChar": 42,
+        "endLine": 261,
+        "endChar": 47
+      },
+      "revId": "47cf626c426ae80c0ff754f95426cc29dff15c13",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
