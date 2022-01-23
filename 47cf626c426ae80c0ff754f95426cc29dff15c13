@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2075f2f2_3101765c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-01-23T23:09:57Z",
+      "side": 1,
+      "message": "No worries, hope you\u0027re feeling better 😊\n\nThere was a small bit of discussion in Discord about merging these two patches together, are you happy to do that?",
+      "parentUuid": "3e40dfdf_1b166b4e",
+      "revId": "47cf626c426ae80c0ff754f95426cc29dff15c13",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ecd8451c_0809c447",
