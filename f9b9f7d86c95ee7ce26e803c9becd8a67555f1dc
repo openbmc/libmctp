@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0746de0b_ed0ab3a4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-01-24T17:28:42Z",
+      "side": 1,
+      "message": "Squashed changes in https://gerrit.openbmc-project.xyz/c/openbmc/libmctp/+/50237/13. Abandoning this",
+      "revId": "f9b9f7d86c95ee7ce26e803c9becd8a67555f1dc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
