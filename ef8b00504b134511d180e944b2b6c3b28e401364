@@ -1,0 +1,176 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d6af4b3_38cf20e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-02-15T12:38:22Z",
+      "side": 1,
+      "message": "Thanks Sumanth. Sorry it\u0027s taken a while to take a look but I\u0027ve finally got there. Mostly a bunch of nitpicks.",
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f90ab3c_7acdce6f",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 486,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-02-15T12:38:22Z",
+      "side": 1,
+      "message": "I\u0027d prefer we put msg_tag and tag_owner after dest and before buf. This way it at least vaguely represents the MCTP header.\n\nI\u0027d also put tag_owner before msg_tag as this way it reads the same left-to-right as the header bit ordering in the spec. If nothing else just for pedantic consistency :)",
+      "range": {
+        "startLine": 486,
+        "startChar": 46,
+        "endLine": 486,
+        "endChar": 77
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d9a5c4d_82b6972e",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-02-15T12:38:22Z",
+      "side": 1,
+      "message": "The parameter order is different here to mctp_rx(), though is more aligned with what I was advocating above.",
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fcc8a85_cf4e903a",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 757,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-02-15T12:38:22Z",
+      "side": 1,
+      "message": "We\u0027re using kernel-style C here, so single-line conditional bodies don\u0027t use curly braces.",
+      "range": {
+        "startLine": 755,
+        "startChar": 1,
+        "endLine": 757,
+        "endChar": 2
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e3f3177_c42b1dd5",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 785,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-02-15T12:38:22Z",
+      "side": 1,
+      "message": "We already know it conforms to the mask here by line 755 above.",
+      "range": {
+        "startLine": 785,
+        "startChar": 4,
+        "endLine": 785,
+        "endChar": 33
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "627e635b_fea4c2f3",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 824,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-02-15T12:38:22Z",
+      "side": 1,
+      "message": "We\u0027re checking this in mctp_message_tx_on_bus(), so we should remove the check here.",
+      "range": {
+        "startLine": 818,
+        "startChar": 1,
+        "endLine": 824,
+        "endChar": 2
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4a16b2e_d0defc1d",
+        "filename": "tests/test_core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-02-15T12:38:22Z",
+      "side": 1,
+      "message": "bit of a nit, but can we swap these two around? Again in the other test below where necessary.",
+      "range": {
+        "startLine": 473,
+        "startChar": 42,
+        "endLine": 473,
+        "endChar": 72
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d10cae7f_02e0e3e2",
+        "filename": "utils/mctp-demux-daemon.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-02-15T12:38:22Z",
+      "side": 1,
+      "message": "This should be using one of the TO macros.",
+      "range": {
+        "startLine": 414,
+        "startChar": 21,
+        "endLine": 414,
+        "endChar": 26
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
