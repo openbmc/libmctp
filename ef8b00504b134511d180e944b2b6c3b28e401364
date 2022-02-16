@@ -41,6 +41,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "51572d09_18bfcc11",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 486,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-02-16T18:15:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f90ab3c_7acdce6f",
+      "range": {
+        "startLine": 486,
+        "startChar": 46,
+        "endLine": 486,
+        "endChar": 77
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d9a5c4d_82b6972e",
@@ -54,6 +78,24 @@
       "writtenOn": "2022-02-15T12:38:22Z",
       "side": 1,
       "message": "The parameter order is different here to mctp_rx(), though is more aligned with what I was advocating above.",
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cba58c8_f060b7dc",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-02-16T18:15:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d9a5c4d_82b6972e",
       "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -81,6 +123,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2d8ccfb_d5866f93",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 757,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-02-16T18:15:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7fcc8a85_cf4e903a",
+      "range": {
+        "startLine": 755,
+        "startChar": 1,
+        "endLine": 757,
+        "endChar": 2
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e3f3177_c42b1dd5",
@@ -94,6 +160,30 @@
       "writtenOn": "2022-02-15T12:38:22Z",
       "side": 1,
       "message": "We already know it conforms to the mask here by line 755 above.",
+      "range": {
+        "startLine": 785,
+        "startChar": 4,
+        "endLine": 785,
+        "endChar": 33
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5663f05f_8ad02f48",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 785,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-02-16T18:15:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e3f3177_c42b1dd5",
       "range": {
         "startLine": 785,
         "startChar": 4,
@@ -129,6 +219,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1b1af158_662ff3f9",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 824,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-02-16T18:15:17Z",
+      "side": 1,
+      "message": "I think we get the advantage of returning early if we do it here (without doing a find_bus_for_eid). A redundant check in mctp_message_tx_on_bus() is required since it can be invoked from mctp_rx (if ROUTE_BRIDGE policy is enabled)",
+      "parentUuid": "627e635b_fea4c2f3",
+      "range": {
+        "startLine": 818,
+        "startChar": 1,
+        "endLine": 824,
+        "endChar": 2
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b4a16b2e_d0defc1d",
         "filename": "tests/test_core.c",
         "patchSetId": 13
@@ -140,6 +254,30 @@
       "writtenOn": "2022-02-15T12:38:22Z",
       "side": 1,
       "message": "bit of a nit, but can we swap these two around? Again in the other test below where necessary.",
+      "range": {
+        "startLine": 473,
+        "startChar": 42,
+        "endLine": 473,
+        "endChar": 72
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af141f27_12e0cca9",
+        "filename": "tests/test_core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2022-02-16T18:15:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4a16b2e_d0defc1d",
       "range": {
         "startLine": 473,
         "startChar": 42,
