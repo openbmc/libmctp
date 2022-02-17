@@ -3,6 +3,13 @@
 #define _GNU_SOURCE
 
 #include "config.h"
+
+#define SD_LISTEN_FDS_START 3
+
+#include "compiler.h"
+#include "libmctp.h"
+#include "libmctp-serial.h"
+#include "libmctp-astlpc.h"
 #include "utils/mctp-capture.h"
 
 #include <assert.h>
@@ -22,14 +29,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#define SD_LISTEN_FDS_START 3
-
-#include "libmctp.h"
-#include "libmctp-serial.h"
-#include "libmctp-astlpc.h"
-
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
-#define __unused __attribute__((unused))
 
 #if HAVE_SYSTEMD_SD_DAEMON_H
 #include <systemd/sd-daemon.h>

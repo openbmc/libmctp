@@ -12,9 +12,10 @@
 #define pr_fmt(x) "test: " x
 #endif
 
+#include "compiler.h"
+#include "container_of.h"
 #include "libmctp-astlpc.h"
 #include "libmctp-log.h"
-#include "container_of.h"
 
 #ifdef NDEBUG
 #undef NDEBUG
@@ -148,8 +149,6 @@ static const struct mctp_binding_astlpc_ops astlpc_indirect_mmio_ops = {
 	.lpc_read = mctp_astlpc_mmio_lpc_read,
 	.lpc_write = mctp_astlpc_mmio_lpc_write,
 };
-
-#define __unused __attribute__((unused))
 
 static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
 		       size_t len)

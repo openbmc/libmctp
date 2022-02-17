@@ -6,6 +6,7 @@
 #include "config.h"
 #endif
 
+#include "compiler.h"
 #include "libmctp-log.h"
 #include "libmctp-serial.h"
 
@@ -42,8 +43,6 @@ static int mctp_binding_serial_pipe_tx(void *data, void *buf, size_t len)
 uint8_t mctp_msg_src[2 * MCTP_BTU];
 
 static bool seen;
-
-#define __unused __attribute__((unused))
 
 static void rx_message(uint8_t eid __unused, void *data __unused, void *msg,
 		       size_t len)

@@ -19,6 +19,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "compiler.h"
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
 #include "range.h"
@@ -30,8 +31,6 @@
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif
-
-#define __unused __attribute__((unused))
 
 #define MAX_PAYLOAD_SIZE 50000
 

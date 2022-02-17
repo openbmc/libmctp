@@ -2,13 +2,14 @@
 
 #include "test-utils.h"
 
+#include "compiler.h"
+#include "libmctp.h"
+#include "libmctp-alloc.h"
+#include "libmctp-cmds.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-
-#include <libmctp.h>
-#include <libmctp-alloc.h>
-#include <libmctp-cmds.h>
 
 #ifdef NDEBUG
 #undef NDEBUG
@@ -29,8 +30,6 @@ struct callback_data {
 		uint8_t completion_code;
 	};
 };
-
-#define __unused __attribute__((unused))
 
 static void control_message_transport_callback(mctp_eid_t src __unused,
 					       void *data, void *buf,

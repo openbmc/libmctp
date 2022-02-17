@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <libmctp.h>
-
+#include "compiler.h"
+#include "libmctp.h"
 #include "test-utils.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))

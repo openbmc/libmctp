@@ -1,5 +1,9 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
+#include "compiler.h"
+#include "libmctp.h"
+#include "libmctp-serial.h"
+
 #include <assert.h>
 #include <err.h>
 #include <stdio.h>
@@ -7,9 +11,6 @@
 #include <unistd.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
-
-#include "libmctp.h"
-#include "libmctp-serial.h"
 
 static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
 {
