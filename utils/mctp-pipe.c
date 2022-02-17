@@ -13,9 +13,15 @@
 
 static void rx_message(uint8_t eid, void *data, void *msg, size_t len)
 {
+	ssize_t rc;
 	(void)eid;
 	(void)data;
-	write(STDOUT_FILENO, msg, len);
+
+	rc = write(STDOUT_FILENO, msg, len);
+	if (rc < 0)
+		warn("Write failed");
+	else if ((size_t)rc < len)
+		warnx("Short write of length %zd, requested %zd", rc, len);
 }
 
 int main(void)
