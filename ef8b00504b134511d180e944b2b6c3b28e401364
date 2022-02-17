@@ -241,6 +241,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "911a3570_22ad8b9e",
+        "filename": "core.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 824,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-02-17T06:39:57Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1b1af158_662ff3f9",
+      "range": {
+        "startLine": 818,
+        "startChar": 1,
+        "endLine": 824,
+        "endChar": 2
+      },
+      "revId": "ef8b00504b134511d180e944b2b6c3b28e401364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4a16b2e_d0defc1d",
