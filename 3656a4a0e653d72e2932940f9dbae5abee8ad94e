@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "32e7ed0f_d2a56497",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1001030
+      },
+      "writtenOn": "2022-06-29T03:32:22Z",
+      "side": 1,
+      "message": "Done, I thought the same thing picking up the change and forgot to actually do it.",
+      "parentUuid": "d2e73cf9_be091314",
+      "revId": "3656a4a0e653d72e2932940f9dbae5abee8ad94e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b5e54982_1d8767ba",
         "filename": "core.c",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2022-06-29T03:24:38Z",
       "side": 1,
       "message": "In this case, we don\u0027t really need this cast",
+      "revId": "3656a4a0e653d72e2932940f9dbae5abee8ad94e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70db18c8_775db338",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1001030
+      },
+      "writtenOn": "2022-06-29T03:32:22Z",
+      "side": 1,
+      "message": "Yeah, removing the cast is better.",
+      "parentUuid": "b5e54982_1d8767ba",
       "revId": "3656a4a0e653d72e2932940f9dbae5abee8ad94e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
