@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59811906_e3452f84",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-06-29T03:24:38Z",
+      "side": 1,
+      "message": "LGTM, but a few things to consider, commented inline.\n\nIf you end up reworking those, could you also fix the other `-Wpointer-arith` warnings?\n\nI see others in:\n\nutils/mctp-demux-daemon.c:415 and 418\nserial.c:267\nastlpc.c:1270",
+      "revId": "3656a4a0e653d72e2932940f9dbae5abee8ad94e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2e73cf9_be091314",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-06-29T03:24:38Z",
+      "side": 1,
+      "message": "We could cast directly to `struct mctp_hdr *`, rather than through `void *`, maybe?",
+      "revId": "3656a4a0e653d72e2932940f9dbae5abee8ad94e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5e54982_1d8767ba",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-06-29T03:24:38Z",
+      "side": 1,
+      "message": "In this case, we don\u0027t really need this cast",
+      "revId": "3656a4a0e653d72e2932940f9dbae5abee8ad94e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
