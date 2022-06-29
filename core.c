@@ -117,12 +117,12 @@ void mctp_pktbuf_free(struct mctp_pktbuf *pkt)
 
 struct mctp_hdr *mctp_pktbuf_hdr(struct mctp_pktbuf *pkt)
 {
-	return (void *)pkt->data + pkt->mctp_hdr_off;
+	return (void *)(pkt->data + pkt->mctp_hdr_off);
 }
 
 void *mctp_pktbuf_data(struct mctp_pktbuf *pkt)
 {
-	return (void *)pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr);
+	return (void *)(pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr));
 }
 
 size_t mctp_pktbuf_size(struct mctp_pktbuf *pkt)
@@ -261,7 +261,7 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 		}
 	}
 
-	memcpy(ctx->buf + ctx->buf_size, mctp_pktbuf_data(pkt), len);
+	memcpy((uint8_t *)ctx->buf + ctx->buf_size, mctp_pktbuf_data(pkt), len);
 	ctx->buf_size += len;
 
 	return 0;
@@ -793,7 +793,7 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 		hdr->flags_seq_tag |=
 			(i & MCTP_HDR_SEQ_MASK) << MCTP_HDR_SEQ_SHIFT;
 
-		memcpy(mctp_pktbuf_data(pkt), msg + p, payload_len);
+		memcpy(mctp_pktbuf_data(pkt), (uint8_t *)msg + p, payload_len);
 
 		/* add to tx queue */
 		if (bus->tx_queue_tail)
