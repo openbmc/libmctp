@@ -16,6 +16,24 @@
       "message": "LGTM.\n\nJust out of curiosity, what toolchain are you hitting these with?",
       "revId": "99d8f12677e9f3a19d87f132795778c2a4e6de4d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3127738c_b280c25c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001527
+      },
+      "writtenOn": "2022-07-06T17:24:23Z",
+      "side": 1,
+      "message": "Hi Jeremy, sorry for late response. I am using GNU ARM Embedded 11.2 toolchain.",
+      "parentUuid": "909fef7d_36aacf24",
+      "revId": "99d8f12677e9f3a19d87f132795778c2a4e6de4d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
