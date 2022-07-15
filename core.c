@@ -287,7 +287,8 @@ void mctp_set_max_message_size(struct mctp *mctp, size_t message_size)
 	mctp->max_message_size = message_size;
 }
 
-void mctp_set_capture_handler(struct mctp_binding *binding, mctp_capture_fn fn, void *user)
+void mctp_set_capture_handler(struct mctp_binding *binding, mctp_capture_fn fn,
+			      void *user)
 {
 	binding->capture = fn;
 	binding->capture_data = user;
@@ -545,7 +546,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 	if (binding->capture)
 		binding->capture(pkt, MCTP_MESSAGE_CAPTURE_INCOMING,
-			      binding->capture_data);
+				 binding->capture_data);
 
 	hdr = mctp_pktbuf_hdr(pkt);
 
@@ -680,7 +681,7 @@ static int mctp_packet_tx(struct mctp_bus *bus, struct mctp_pktbuf *pkt)
 
 	if (binding->capture)
 		binding->capture(pkt, MCTP_MESSAGE_CAPTURE_OUTGOING,
-			      binding->capture_data);
+				 binding->capture_data);
 
 	return bus->binding->tx(bus->binding, pkt);
 }
