@@ -1348,17 +1348,15 @@ struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 	return astlpc;
 }
 #else
-struct mctp_binding_astlpc * __attribute__((const))
-	mctp_astlpc_init_fileio(void)
+struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 {
-	astlpc_prerr(astlpc, "Missing support for file IO");
+	mctp_prlog(MCTP_LOG_ERR, "%s: Missing support for file IO", __func__);
 	return NULL;
 }
 
-int __attribute__((const)) mctp_astlpc_get_fd(
-		struct mctp_binding_astlpc *astlpc __attribute__((unused)))
+int mctp_astlpc_get_fd(struct mctp_binding_astlpc *astlpc __unused)
 {
-	astlpc_prerr(astlpc, "Missing support for file IO");
+	mctp_prlog(MCTP_LOG_ERR, "%s: Missing support for file IO", __func__);
 	return -1;
 }
 #endif
