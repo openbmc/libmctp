@@ -287,11 +287,6 @@ int mctp_serial_read(struct mctp_binding_serial *serial)
 	return 0;
 }
 
-int mctp_serial_get_fd(struct mctp_binding_serial *serial)
-{
-	return serial->fd;
-}
-
 int mctp_serial_init_pollfd(struct mctp_binding_serial *serial,
 			    struct pollfd *pollfd)
 {

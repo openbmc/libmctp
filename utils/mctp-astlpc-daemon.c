@@ -77,8 +77,7 @@ int main(void)
 		pollfds[0].fd = STDIN_FILENO;
 		pollfds[0].events = POLLIN;
 
-		pollfds[1].fd = mctp_astlpc_get_fd(astlpc);
-		pollfds[1].events = POLLIN;
+		mctp_astlpc_init_pollfd(astlpc, &pollfds[1]);
 
 		rc = poll(pollfds, 2, -1);
 		if (rc < 0)
