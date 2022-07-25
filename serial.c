@@ -10,8 +10,9 @@
 #endif
 
 #ifdef MCTP_HAVE_FILEIO
-#include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
+#include <unistd.h>
 #else
 static const size_t write(int fd, void *buf, size_t len)
 {
@@ -41,9 +42,9 @@ static const size_t write(int fd, void *buf, size_t len)
 #include "container_of.h"
 
 struct mctp_binding_serial {
-	struct mctp_binding	binding;
-	int			fd;
-	unsigned long		bus_id;
+	struct mctp_binding binding;
+	int fd;
+	unsigned long bus_id;
 
 	mctp_serial_tx_fn	tx_fn;
 	void			*tx_fn_data;
@@ -289,6 +290,15 @@ int mctp_serial_read(struct mctp_binding_serial *serial)
 int mctp_serial_get_fd(struct mctp_binding_serial *serial)
 {
 	return serial->fd;
+}
+
+int mctp_serial_init_pollfd(struct mctp_binding_serial *serial,
+			    struct pollfd *pollfd)
+{
+	pollfd->fd = serial->fd;
+	pollfd->events = POLLIN;
+
+	return 0;
 }
 
 int mctp_serial_open_path(struct mctp_binding_serial *serial,
