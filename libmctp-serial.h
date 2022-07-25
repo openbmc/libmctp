@@ -18,6 +18,11 @@ struct mctp_binding *mctp_binding_serial_core(struct mctp_binding_serial *b);
 
 /* file-based IO */
 int mctp_serial_get_fd(struct mctp_binding_serial *serial);
+
+struct pollfd;
+int mctp_serial_init_pollfd(struct mctp_binding_serial *serial,
+			    struct pollfd *pollfd);
+
 int mctp_serial_read(struct mctp_binding_serial *serial);
 int mctp_serial_open_path(struct mctp_binding_serial *serial,
 		const char *path);
