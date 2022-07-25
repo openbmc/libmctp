@@ -44,14 +44,13 @@ static const mctp_eid_t local_eid_default = 8;
 static char sockname[] = "\0mctp-mux";
 
 struct binding {
-	const char	*name;
-	int		(*init)(struct mctp *mctp, struct binding *binding,
-				mctp_eid_t eid, int n_params,
-				char * const * params);
-	void		(*destroy)(struct mctp *mctp, struct binding *binding);
-	int		(*get_fd)(struct binding *binding);
-	int		(*process)(struct binding *binding);
-	void		*data;
+	const char *name;
+	int (*init)(struct mctp *mctp, struct binding *binding, mctp_eid_t eid,
+		    int n_params, char *const *params);
+	void (*destroy)(struct mctp *mctp, struct binding *binding);
+	int (*init_pollfd)(struct binding *binding, struct pollfd *pollfd);
+	int (*process)(struct binding *binding);
+	void *data;
 };
 
 struct client {
@@ -196,9 +195,10 @@ static int binding_serial_init(struct mctp *mctp, struct binding *binding,
 	return 0;
 }
 
-static int binding_serial_get_fd(struct binding *binding)
+static int binding_serial_init_pollfd(struct binding *binding,
+				      struct pollfd *pollfd)
 {
-	return mctp_serial_get_fd(binding->data);
+	return mctp_serial_init_pollfd(binding->data, pollfd);
 }
 
 static int binding_serial_process(struct binding *binding)
@@ -238,9 +238,10 @@ static void binding_astlpc_destroy(struct mctp *mctp, struct binding *binding)
 	mctp_astlpc_destroy(astlpc);
 }
 
-static int binding_astlpc_get_fd(struct binding *binding)
+static int binding_astlpc_init_pollfd(struct binding *binding,
+				      struct pollfd *pollfd)
 {
-	return mctp_astlpc_get_fd(binding->data);
+	return mctp_astlpc_init_pollfd(binding->data, pollfd);
 }
 
 static int binding_astlpc_process(struct binding *binding)
@@ -257,14 +258,14 @@ struct binding bindings[] = {
 		.name = "serial",
 		.init = binding_serial_init,
 		.destroy = NULL,
-		.get_fd = binding_serial_get_fd,
+		.init_pollfd = binding_serial_init_pollfd,
 		.process = binding_serial_process,
 	},
 	{
 		.name = "astlpc",
 		.init = binding_astlpc_init,
 		.destroy = binding_astlpc_destroy,
-		.get_fd = binding_astlpc_get_fd,
+		.init_pollfd = binding_astlpc_init_pollfd,
 		.process = binding_astlpc_process,
 	}
 };
@@ -461,11 +462,7 @@ static int run_daemon(struct ctx *ctx)
 
 	ctx->pollfds = malloc(FD_NR * sizeof(struct pollfd));
 
-	if (ctx->binding->get_fd) {
-		ctx->pollfds[FD_BINDING].fd =
-			ctx->binding->get_fd(ctx->binding);
-		ctx->pollfds[FD_BINDING].events = POLLIN;
-	} else {
+	if (!ctx->binding->init_pollfd) {
 		ctx->pollfds[FD_BINDING].fd = -1;
 		ctx->pollfds[FD_BINDING].events = 0;
 	}
@@ -504,6 +501,9 @@ static int run_daemon(struct ctx *ctx)
 			clients_changed = false;
 		}
 
+		if (ctx->binding->init_pollfd)
+			ctx->binding->init_pollfd(ctx->binding,
+						  &ctx->pollfds[FD_BINDING]);
 		rc = poll(ctx->pollfds, ctx->n_clients + FD_NR, -1);
 		if (rc < 0) {
 			warn("poll failed");
