@@ -30,6 +30,7 @@
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <linux/aspeed-lpc-ctrl.h>
@@ -1311,6 +1312,15 @@ int mctp_astlpc_get_fd(struct mctp_binding_astlpc *astlpc)
 	return astlpc->kcs_fd;
 }
 
+int mctp_astlpc_init_pollfd(struct mctp_binding_astlpc *astlpc,
+			    struct pollfd *pollfd)
+{
+	pollfd->fd = astlpc->kcs_fd;
+	pollfd->events = POLLIN;
+
+	return 0;
+}
+
 struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 {
 	struct mctp_binding_astlpc *astlpc;
@@ -1355,6 +1365,13 @@ struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 }
 
 int mctp_astlpc_get_fd(struct mctp_binding_astlpc *astlpc __unused)
+{
+	mctp_prlog(MCTP_LOG_ERR, "%s: Missing support for file IO", __func__);
+	return -1;
+}
+
+int mctp_astlpc_init_pollfd(struct mctp_binding_astlpc *astlpc __unused,
+			    struct pollfd *pollfd __unused)
 {
 	mctp_prlog(MCTP_LOG_ERR, "%s: Missing support for file IO", __func__);
 	return -1;
