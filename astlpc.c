@@ -76,8 +76,6 @@ struct mctp_binding_astlpc {
 	/* fileio ops data */
 	int kcs_fd;
 	uint8_t kcs_status;
-
-	bool			running;
 };
 
 #define binding_to_astlpc(b) \
