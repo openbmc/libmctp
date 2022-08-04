@@ -479,56 +479,12 @@ static inline bool mctp_ctrl_cmd_is_request(struct mctp_ctrl_msg_hdr *hdr)
 }
 
 /*
- * Receive the complete MCTP message and route it.
+ * Assembles complete MCTP message and routes it
+ *
  * Asserts:
- *     'buf' is not NULL.
+ *     'bus' is not NULL.
  */
-static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus, mctp_eid_t src,
-		    mctp_eid_t dest, bool tag_owner, uint8_t msg_tag, void *buf,
-		    size_t len)
-{
-	assert(buf != NULL);
-
-	if (mctp->route_policy == ROUTE_ENDPOINT &&
-	    mctp_rx_dest_is_local(bus, dest)) {
-		/* Handle MCTP Control Messages: */
-		if (len >= sizeof(struct mctp_ctrl_msg_hdr)) {
-			struct mctp_ctrl_msg_hdr *msg_hdr = buf;
-
-			/*
-			 * Identify if this is a control request message.
-			 * See DSP0236 v1.3.0 sec. 11.5.
-			 */
-			if (mctp_ctrl_cmd_is_request(msg_hdr)) {
-				bool handled;
-				handled = mctp_ctrl_handle_msg(
-					bus, src, msg_tag, tag_owner, buf, len);
-				if (handled)
-					return;
-			}
-		}
-
-		if (mctp->message_rx)
-			mctp->message_rx(src, tag_owner, msg_tag,
-					 mctp->message_rx_data, buf, len);
-	}
-
-	if (mctp->route_policy == ROUTE_BRIDGE) {
-		int i;
-
-		for (i = 0; i < mctp->n_busses; i++) {
-			struct mctp_bus *dest_bus = &mctp->busses[i];
-			if (dest_bus == bus)
-				continue;
-
-			mctp_message_tx_on_bus(dest_bus, src, dest, tag_owner,
-					       msg_tag, buf, len);
-		}
-
-	}
-}
-
-void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
+static void mctp_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 {
 	struct mctp_bus *bus = binding->bus;
 	struct mctp *mctp = binding->mctp;
@@ -536,26 +492,14 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 	struct mctp_msg_ctx *ctx;
 	struct mctp_hdr *hdr;
 	bool tag_owner;
-	size_t len;
-	void *p;
+	size_t len = 0;
+	void *buf = NULL;
 	int rc;
+	mctp_eid_t src = -1, dest = -1;
 
 	assert(bus);
 
-	/* Drop packet if it was smaller than mctp hdr size */
-	if (mctp_pktbuf_size(pkt) <= sizeof(struct mctp_hdr))
-		goto out;
-
-	if (mctp->capture)
-		mctp->capture(pkt, mctp->capture_data);
-
 	hdr = mctp_pktbuf_hdr(pkt);
-
-	/* small optimisation: don't bother reassembly if we're going to
-	 * drop the packet in mctp_rx anyway */
-	if (mctp->route_policy == ROUTE_ENDPOINT && hdr->dest != bus->eid)
-		goto out;
-
 	flags = hdr->flags_seq_tag & (MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM);
 	tag = (hdr->flags_seq_tag >> MCTP_HDR_TAG_SHIFT) & MCTP_HDR_TAG_MASK;
 	seq = (hdr->flags_seq_tag >> MCTP_HDR_SEQ_SHIFT) & MCTP_HDR_SEQ_MASK;
@@ -567,8 +511,9 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		/* single-packet message - send straight up to rx function,
 		 * no need to create a message context */
 		len = pkt->end - pkt->mctp_hdr_off - sizeof(struct mctp_hdr);
-		p = pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr);
-		mctp_rx(mctp, bus, hdr->src, hdr->dest, tag_owner, tag, p, len);
+		buf = pkt->data + pkt->mctp_hdr_off + sizeof(struct mctp_hdr);
+		src = hdr->src;
+		dest = hdr->dest;
 		break;
 
 	case MCTP_HDR_FLAG_SOM:
@@ -600,7 +545,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 			ctx->last_seq = seq;
 		}
 
-		break;
+		goto out;
 
 	case MCTP_HDR_FLAG_EOM:
 		ctx = mctp_msg_ctx_lookup(mctp, hdr->src, hdr->dest, tag);
@@ -628,9 +573,12 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		}
 
 		rc = mctp_msg_ctx_add_pkt(ctx, pkt, mctp->max_message_size);
-		if (!rc)
-			mctp_rx(mctp, bus, ctx->src, ctx->dest, tag_owner, tag,
-				ctx->buf, ctx->buf_size);
+		if (!rc) {
+			src = ctx->src;
+			dest = ctx->dest;
+			buf = ctx->buf;
+			len = ctx->buf_size;
+		}
 
 		mctp_msg_ctx_drop(ctx);
 		break;
@@ -666,10 +614,75 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		}
 		ctx->last_seq = seq;
 
-		break;
+		goto out;
 	}
+
+	if (!buf) {
+                mctp_prdebug("Buffer is null \n");
+		goto out;
+        }
+
+	if (src == -1 || dest == -1 || len <= 0) {
+                mctp_prdebug("Unexpected value: src = %u, dest = %u, len = %zu " \
+			"\n", src, dest, len);
+		goto out;
+        }
+
+	if (mctp->route_policy == ROUTE_ENDPOINT &&
+	    mctp_rx_dest_is_local(bus, dest)) {
+		/* Handle MCTP Control Messages: */
+		if (len >= sizeof(struct mctp_ctrl_msg_hdr)) {
+			struct mctp_ctrl_msg_hdr *msg_hdr = buf;
+
+			/*
+			 * Identify if this is a control request message.
+			 * See DSP0236 v1.3.0 sec. 11.5.
+			 */
+			if (mctp_ctrl_cmd_is_request(msg_hdr)) {
+				bool handled;
+				handled = mctp_ctrl_handle_msg(
+					bus, src, tag, tag_owner, buf, len);
+				if (handled)
+					goto out;
+			}
+		}
+
+		if (mctp->message_rx)
+			mctp->message_rx(src, tag_owner, tag,
+					 mctp->message_rx_data, buf, len);
+	}
+        if (mctp->route_policy == ROUTE_BRIDGE) {
+                   int i;
+
+                   for (i = 0; i < mctp->n_busses; i++) {
+                           struct mctp_bus *dest_bus = &mctp->busses[i];
+                           if (dest_bus == bus)
+                                   continue;
+
+                           mctp_message_tx_on_bus(dest_bus, src, dest, tag_owner,
+                                                  tag, buf, len);
+                   }
+
+               }
+
 out:
 	mctp_pktbuf_free(pkt);
+}
+
+void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
+{
+	struct mctp *mctp = binding->mctp;
+
+	/* Drop packet if it was smaller than mctp hdr size */
+	if (mctp_pktbuf_size(pkt) <= sizeof(struct mctp_hdr)) {
+	        mctp_pktbuf_free(pkt);
+		return;
+        }
+
+	if (mctp->capture)
+		mctp->capture(pkt, mctp->capture_data);
+
+	mctp_rx(binding, pkt);
 }
 
 static int mctp_packet_tx(struct mctp_bus *bus,
