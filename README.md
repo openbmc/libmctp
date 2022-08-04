@@ -51,8 +51,6 @@ when the file-descriptor for the serial device has data available.
 ### Bridging
 
 libmctp implements basic support for bridging between two hardware bindings.
-In this mode, bindings may have different MTUs, so packets are reassembled into
-their messages, then the messages are re-packetised for the outgoing binding.
 
 For bridging between two endpoints, use the `mctp_bridge_busses()` function:
 

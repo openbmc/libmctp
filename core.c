@@ -87,9 +87,11 @@ struct mctp {
 #define MCTP_MAX_MESSAGE_SIZE 65536
 #endif
 
+static void mctp_send_tx_queue(struct mctp_bus *bus);
 static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 				  mctp_eid_t dest, bool tag_owner,
 				  uint8_t msg_tag, void *msg, size_t msg_len);
+
 
 struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *binding, size_t len)
 {
@@ -478,8 +480,17 @@ static inline bool mctp_ctrl_cmd_is_request(struct mctp_ctrl_msg_hdr *hdr)
 	       hdr->rq_dgram_inst & MCTP_CTRL_HDR_FLAG_REQUEST;
 }
 
+static void add_packet_to_tx_queue(struct mctp_bus *bus,  struct mctp_pktbuf *pkt)
+{
+		if (bus->tx_queue_tail)
+			bus->tx_queue_tail->next = pkt;
+		else
+			bus->tx_queue_head = pkt;
+		bus->tx_queue_tail = pkt;
+}
+
 /*
- * Assembles complete MCTP message and routes it
+ * Routes packets for a bridge or assembles a complete MCTP message and routes it
  *
  * Asserts:
  *     'bus' is not NULL.
@@ -505,6 +516,23 @@ static void mctp_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 	seq = (hdr->flags_seq_tag >> MCTP_HDR_SEQ_SHIFT) & MCTP_HDR_SEQ_MASK;
 	tag_owner =
 		(hdr->flags_seq_tag >> MCTP_HDR_TO_SHIFT) & MCTP_HDR_TO_MASK;
+
+
+	/* Don't perform packet assembly */
+	if (mctp->route_policy == ROUTE_BRIDGE) {
+		int i;
+
+		for (i = 0; i < mctp->n_busses; i++) {
+			struct mctp_bus *dest_bus = &mctp->busses[i];
+			if (dest_bus == bus)
+				continue;
+
+			add_packet_to_tx_queue(dest_bus, pkt);
+			mctp_send_tx_queue(dest_bus);
+			return;
+		}
+		return;
+	}
 
 	switch (flags) {
 	case MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM:
@@ -651,20 +679,6 @@ static void mctp_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 			mctp->message_rx(src, tag_owner, tag,
 					 mctp->message_rx_data, buf, len);
 	}
-        if (mctp->route_policy == ROUTE_BRIDGE) {
-                   int i;
-
-                   for (i = 0; i < mctp->n_busses; i++) {
-                           struct mctp_bus *dest_bus = &mctp->busses[i];
-                           if (dest_bus == bus)
-                                   continue;
-
-                           mctp_message_tx_on_bus(dest_bus, src, dest, tag_owner,
-                                                  tag, buf, len);
-                   }
-
-               }
-
 out:
 	mctp_pktbuf_free(pkt);
 }
@@ -808,12 +822,7 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 
 		memcpy(mctp_pktbuf_data(pkt), (uint8_t *)msg + p, payload_len);
 
-		/* add to tx queue */
-		if (bus->tx_queue_tail)
-			bus->tx_queue_tail->next = pkt;
-		else
-			bus->tx_queue_head = pkt;
-		bus->tx_queue_tail = pkt;
+		add_packet_to_tx_queue(bus, pkt);
 
 		p += payload_len;
 	}
