@@ -1295,6 +1295,68 @@ static void astlpc_test_corrupt_bmc_tx(void)
 	network_destroy(&ctx);
 }
 
+static void astlpc_test_async_exchange(void)
+{
+	struct astlpc_test ctx = { 0 };
+	uint8_t msg[MCTP_BTU];
+	struct pollfd pollfd;
+	uint8_t tag = 0;
+
+	network_init(&ctx);
+
+	memset(&msg[0], 0x5a, MCTP_BTU);
+
+	/* (1)
+	 * Fill the KCS transmit buffer by sending a message from the BMC to the host without
+	 * dequeuing it on the host side
+	 */
+	mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_SRC, tag, msg,
+			sizeof(msg));
+
+	/* (2)
+	 * Assert that we're still listening for in-bound messages on the BMC
+	 */
+	mctp_astlpc_init_pollfd(ctx.bmc.astlpc, &pollfd);
+	assert(pollfd.events & POLLIN);
+	assert(!(pollfd.events & POLLOUT));
+
+	/* (3)
+	 * Send a message from the host to the BMC and dequeue the message on the BMC, triggering a
+	 * buffer ownership transfer command back to the host
+	 */
+	mctp_message_tx(ctx.host.mctp, 8, MCTP_MESSAGE_TO_SRC, tag, msg,
+			sizeof(msg));
+	mctp_astlpc_poll(ctx.bmc.astlpc);
+
+	/* (4)
+	 * Assert that the BMC has to wait for the host to dequeue the ownership transfer command
+	 * from (1) before further transfers take place.
+	 */
+	mctp_astlpc_init_pollfd(ctx.bmc.astlpc, &pollfd);
+	assert(!(pollfd.events & POLLIN));
+	assert(pollfd.events & POLLOUT);
+
+	/* (5)
+	 * Dequeue the message from (1) on the host side, allowing transmisson of the outstanding
+	 * ownership transfer command from (3)
+	 */
+	mctp_astlpc_poll(ctx.host.astlpc);
+
+	/* (6)
+	 * Emulate a POLLOUT event on the BMC side
+	 */
+	mctp_astlpc_poll(ctx.bmc.astlpc);
+
+	/* (7)
+	 * Assert that we're again listening for in-bound messages on the BMC.
+	 */
+	mctp_astlpc_init_pollfd(ctx.bmc.astlpc, &pollfd);
+	assert(pollfd.events & POLLIN);
+	assert(!(pollfd.events & POLLOUT));
+
+	network_destroy(&ctx);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -1338,6 +1400,7 @@ static const struct {
 	TEST_CASE(astlpc_test_tx_before_channel_init),
 	TEST_CASE(astlpc_test_corrupt_host_tx),
 	TEST_CASE(astlpc_test_corrupt_bmc_tx),
+	TEST_CASE(astlpc_test_async_exchange),
 };
 /* clang-format on */
 

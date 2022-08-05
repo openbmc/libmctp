@@ -41,9 +41,62 @@ static const char *lpc_path = "/dev/aspeed-lpc-ctrl";
 
 #endif
 
+enum mctp_astlpc_buffer_state {
+	/*
+	 * Prior to "Channel Ready" we mark the buffers as "idle" to catch illegal accesses. In this
+	 * state neither side is considered the owner of the buffer.
+	 *
+	 * Upon "Channel Ready", each side transitions the buffers from the initial "idle" state
+	 * to the following target states:
+	 *
+	 * Tx buffer: "acquired"
+	 * Rx buffer: "released"
+	 */
+	buffer_state_idle,
+
+	/*
+	 * Beyond initialisation by "Channel Ready", buffers are in the "acquired" state once:
+	 *
+	 * 1. We dequeue a control command transferring the buffer to our ownership out of the KCS
+	 *    interface, and
+	 * 2. We are yet to complete all of our required accesses to the buffer
+	 *
+	 * * The Tx buffer enters the "acquired" state when we dequeue the "Rx Complete" command
+	 * * The Rx buffer enters the "acquired" state when we dequeue the "Tx Begin" command
+	 *
+	 * It is a failure of implementation if it's possible for both sides to simultaneously
+	 * consider a buffer as "acquired".
+	 */
+	buffer_state_acquired,
+
+	/*
+	 * Buffers are in the "prepared" state when:
+	 *
+	 * 1. We have completed all of our required accesses (read or write) for the buffer, and
+	 * 2. We have not yet successfully enqueued the control command to hand off ownership
+	 */
+	buffer_state_prepared,
+
+	/*
+	 * Beyond initialisation by "Channel Ready", buffers are in the "released" state once:
+	 *
+	 * 1. We successfully enqueue the control command transferring ownership to the remote
+	 *    side in to the KCS interface
+	 *
+	 * * The Tx buffer enters the "released" state when we enqueue the "Tx Begin" command
+	 * * The Rx buffer enters the "released" state when we enqueue the "Rx Complete" command
+	 *
+	 * It may be the case that both sides simultaneously consider a buffer to be in the
+	 * "released" state. However, if this is true, it must also be true that a buffer ownership
+	 * transfer command has been enqueued in the KCS interface and is yet to be dequeued.
+	 */
+	buffer_state_released,
+};
+
 struct mctp_astlpc_buffer {
 	uint32_t offset;
 	uint32_t size;
+	enum mctp_astlpc_buffer_state state;
 };
 
 struct mctp_astlpc_layout {
@@ -733,22 +786,19 @@ static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
 	uint8_t status;
 	int rc;
 
-	for (;;) {
-		rc = mctp_astlpc_kcs_read(astlpc, MCTP_ASTLPC_KCS_REG_STATUS,
-					  &status);
-		if (rc) {
-			astlpc_prwarn(astlpc, "KCS status read failed");
-			return -1;
-		}
-		if (mctp_astlpc_kcs_write_ready(astlpc, status))
-			break;
-		/* todo: timeout */
+	rc = mctp_astlpc_kcs_read(astlpc, MCTP_ASTLPC_KCS_REG_STATUS,
+			&status);
+	if (rc) {
+		astlpc_prwarn(astlpc, "KCS status read failed");
+		return -EIO;
 	}
+	if (!mctp_astlpc_kcs_write_ready(astlpc, status))
+		return -EBUSY;
 
 	rc = mctp_astlpc_kcs_write(astlpc, MCTP_ASTLPC_KCS_REG_DATA, data);
 	if (rc) {
 		astlpc_prwarn(astlpc, "KCS data write failed");
-		return -1;
+		return -EIO;
 	}
 
 	return 0;
@@ -760,6 +810,7 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 	struct mctp_binding_astlpc *astlpc = binding_to_astlpc(b);
 	uint32_t len, len_be;
 	struct mctp_hdr *hdr;
+	int rc;
 
 	hdr = mctp_pktbuf_hdr(pkt);
 	len = mctp_pktbuf_size(pkt);
@@ -775,6 +826,8 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 		return -1;
 	}
 
+	mctp_binding_set_tx_enabled(b, false);
+
 	len_be = htobe32(len);
 	mctp_astlpc_lpc_write(astlpc, &len_be, astlpc->layout.tx.offset,
 			      sizeof(len_be));
@@ -784,11 +837,13 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 
 	mctp_astlpc_lpc_write(astlpc, hdr, astlpc->layout.tx.offset + 4, len);
 
-	mctp_binding_set_tx_enabled(b, false);
+	astlpc->layout.tx.state = buffer_state_prepared;
 
-	mctp_astlpc_kcs_send(astlpc, 0x1);
+	rc = mctp_astlpc_kcs_send(astlpc, 0x1);
+	if (!rc)
+		astlpc->layout.tx.state = buffer_state_released;
 
-	return 0;
+	return rc == -EBUSY ? 0 : rc;
 }
 
 static uint32_t mctp_astlpc_calculate_mtu(struct mctp_binding_astlpc *astlpc,
@@ -897,6 +952,10 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 			      offsetof(struct mctp_lpcmap_hdr, negotiated_ver),
 			      sizeof(negotiated_be));
 
+	/* Track buffer ownership */
+	astlpc->layout.tx.state = buffer_state_acquired;
+	astlpc->layout.rx.state = buffer_state_released;
+
 	/* Finalise the configuration */
 	status = KCS_STATUS_BMC_READY | KCS_STATUS_OBF;
 	if (negotiated > 0) {
@@ -948,10 +1007,13 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	mctp_astlpc_lpc_read(astlpc, mctp_pktbuf_hdr(pkt),
 			     astlpc->layout.rx.offset + 4, packet);
 
+	astlpc->layout.rx.state = buffer_state_prepared;
+
 	/* Inform the other side of the MCTP interface that we have read
 	 * the packet off the bus before handling the contents of the packet.
 	 */
-	mctp_astlpc_kcs_send(astlpc, 0x2);
+	if (!mctp_astlpc_kcs_send(astlpc, 0x2))
+		astlpc->layout.rx.state = buffer_state_released;
 
 	/*
 	 * v3 will validate the CRC32 in the medium-specific trailer and adjust
@@ -969,6 +1031,7 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 
 static void mctp_astlpc_tx_complete(struct mctp_binding_astlpc *astlpc)
 {
+	astlpc->layout.tx.state = buffer_state_acquired;
 	mctp_binding_set_tx_enabled(&astlpc->binding, true);
 }
 
@@ -1013,6 +1076,10 @@ static int mctp_astlpc_finalise_channel(struct mctp_binding_astlpc *astlpc)
 		astlpc->binding.pkt_size =
 			astlpc->proto->body_size(astlpc->layout.tx.size);
 
+	/* Track buffer ownership */
+	astlpc->layout.tx.state = buffer_state_acquired;
+	astlpc->layout.rx.state = buffer_state_released;
+
 	return 0;
 }
 
@@ -1034,6 +1101,9 @@ static int mctp_astlpc_update_channel(struct mctp_binding_astlpc *astlpc,
 			astlpc->kcs_status = status;
 			return astlpc->binding.start(&astlpc->binding);
 		} else {
+			/* Shut down the channel */
+			astlpc->layout.rx.state = buffer_state_idle;
+			astlpc->layout.tx.state = buffer_state_idle;
 			mctp_binding_set_tx_enabled(&astlpc->binding, false);
 		}
 	}
@@ -1042,9 +1112,10 @@ static int mctp_astlpc_update_channel(struct mctp_binding_astlpc *astlpc,
 			updated & KCS_STATUS_CHANNEL_ACTIVE) {
 		bool enable;
 
+		astlpc->layout.rx.state = buffer_state_idle;
+		astlpc->layout.tx.state = buffer_state_idle;
 		rc = mctp_astlpc_finalise_channel(astlpc);
 		enable = (status & KCS_STATUS_CHANNEL_ACTIVE) && rc == 0;
-
 		mctp_binding_set_tx_enabled(&astlpc->binding, enable);
 	}
 
@@ -1057,6 +1128,14 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 {
 	uint8_t status, data;
 	int rc;
+
+	if (astlpc->layout.rx.state == buffer_state_prepared)
+		if (!mctp_astlpc_kcs_send(astlpc, 0x2))
+			astlpc->layout.rx.state = buffer_state_released;
+
+	if (astlpc->layout.tx.state == buffer_state_prepared)
+		if (!mctp_astlpc_kcs_send(astlpc, 0x1))
+			astlpc->layout.tx.state = buffer_state_released;
 
 	rc = mctp_astlpc_kcs_read(astlpc, MCTP_ASTLPC_KCS_REG_STATUS, &status);
 	if (rc) {
@@ -1088,9 +1167,21 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 		mctp_astlpc_init_channel(astlpc);
 		break;
 	case 0x1:
+		if (astlpc->layout.rx.state != buffer_state_released) {
+			astlpc_prerr(astlpc,
+				     "Protocol error: Invalid Rx buffer state for event %d: %d\n",
+				     data, astlpc->layout.rx.state);
+			return 0;
+		}
 		mctp_astlpc_rx_start(astlpc);
 		break;
 	case 0x2:
+		if (astlpc->layout.tx.state != buffer_state_released) {
+			astlpc_prerr(astlpc,
+				     "Protocol error: Invalid Tx buffer state for event %d: %d\n",
+				     data, astlpc->layout.tx.state);
+			return 0;
+		}
 		mctp_astlpc_tx_complete(astlpc);
 		break;
 	case 0xff:
@@ -1130,6 +1221,8 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(uint8_t mode,
 	memset(astlpc, 0, sizeof(*astlpc));
 	astlpc->mode = mode;
 	astlpc->lpc_map = NULL;
+	astlpc->layout.rx.state = buffer_state_idle;
+	astlpc->layout.tx.state = buffer_state_idle;
 	astlpc->requested_mtu = mtu;
 	astlpc->binding.name = "astlpc";
 	astlpc->binding.version = 1;
@@ -1310,8 +1403,15 @@ static int __mctp_astlpc_fileio_kcs_write(void *arg,
 int mctp_astlpc_init_pollfd(struct mctp_binding_astlpc *astlpc,
 			    struct pollfd *pollfd)
 {
+	bool release;
+
 	pollfd->fd = astlpc->kcs_fd;
-	pollfd->events = POLLIN;
+	pollfd->events = 0;
+
+	release = astlpc->layout.rx.state == buffer_state_prepared ||
+			astlpc->layout.tx.state == buffer_state_prepared;
+
+	pollfd->events = release ? POLLOUT : POLLIN;
 
 	return 0;
 }
