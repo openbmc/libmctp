@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02bc448d_55b8ef60",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-08-08T00:17:01Z",
+      "side": 1,
+      "message": "If you update mctp-astlpc-daemon.c too, we can get rid of all of the get_fd() implementations as well...",
+      "revId": "43c0f6ad7680f8f4eef2514adb43a883538c307a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
