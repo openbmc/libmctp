@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5ac57bb_c91da8e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-08-08T00:45:39Z",
+      "side": 1,
+      "message": "LGTM, just a few things inline though.",
+      "revId": "88fdc1593c7fdbe8e5450d3577823a8a3127c148",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a91be9a_7798a478",
+        "filename": "astlpc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-08-08T00:45:39Z",
+      "side": 1,
+      "message": "Can we have some comments on the interpretation of these states? Prepared just means we\u0027re waiting on the release to complete, is that correct?",
+      "revId": "88fdc1593c7fdbe8e5450d3577823a8a3127c148",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56d082ac_c1dec324",
+        "filename": "astlpc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1094,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-08-08T00:45:39Z",
+      "side": 1,
+      "message": "Any thoughts on passing the poll revents to _poll(), so we can only attempt the send() if a POLLOUT has occurred?\n\n(that will make the API somewhat fileio-specific though, so not sure whether that\u0027s a good idea...)",
+      "revId": "88fdc1593c7fdbe8e5450d3577823a8a3127c148",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3af1c0d3_48d1e1a3",
+        "filename": "astlpc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1374,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-08-08T00:45:39Z",
+      "side": 1,
+      "message": "this just looks like:\n\n     pollfd-\u003eevents \u003d ([state check]) ? POLLOUT : POLLIN\n\nwith extra steps",
+      "revId": "88fdc1593c7fdbe8e5450d3577823a8a3127c148",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
