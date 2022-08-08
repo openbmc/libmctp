@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "932a2f3c_b0a5f3d4",
+        "filename": "astlpc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-08-08T02:20:26Z",
+      "side": 1,
+      "message": "\u003e Can we have some comments on the interpretation of these states?\n\nAck.\n\n\u003e Prepared just means we\u0027re waiting on the release to complete, is that correct?\n\nPrepared means that the buffer is ready to be accessed by the other side, just we\u0027re yet to successfully inform them of that.",
+      "parentUuid": "3a91be9a_7798a478",
+      "revId": "88fdc1593c7fdbe8e5450d3577823a8a3127c148",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "56d082ac_c1dec324",
         "filename": "astlpc.c",
         "patchSetId": 1
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f2c34e40_f5b7dff4",
+        "filename": "astlpc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1094,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-08-08T02:20:26Z",
+      "side": 1,
+      "message": "Aside from the issue with making the function fileio specific, I did consider that but it felt more complex than was necessary given we know what the event should have been given the buffer states?",
+      "parentUuid": "56d082ac_c1dec324",
+      "revId": "88fdc1593c7fdbe8e5450d3577823a8a3127c148",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3af1c0d3_48d1e1a3",
         "filename": "astlpc.c",
         "patchSetId": 1
@@ -65,6 +101,24 @@
       "writtenOn": "2022-08-08T00:45:39Z",
       "side": 1,
       "message": "this just looks like:\n\n     pollfd-\u003eevents \u003d ([state check]) ? POLLOUT : POLLIN\n\nwith extra steps",
+      "revId": "88fdc1593c7fdbe8e5450d3577823a8a3127c148",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59b2c6cd_fda45d24",
+        "filename": "astlpc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1374,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-08-08T02:20:26Z",
+      "side": 1,
+      "message": "Sure, I can tidy that up, though I was toying with whether I could always keep POLLIN enabled. The practical answer looked to be no from the resulting boot failures, but I haven\u0027t pinned down exactly what\u0027s going on there. I suspect it\u0027s something to do with strict message sequencing assumptions in hostboot given we only recently grew support for message tags :S",
+      "parentUuid": "3af1c0d3_48d1e1a3",
       "revId": "88fdc1593c7fdbe8e5450d3577823a8a3127c148",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
