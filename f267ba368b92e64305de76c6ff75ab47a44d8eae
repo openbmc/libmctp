@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83fbbc4c_208dfdda",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-08-08T04:04:48Z",
+      "side": 1,
+      "message": "All looks good to me! +1 just because I have no way to test on HW.",
+      "revId": "f267ba368b92e64305de76c6ff75ab47a44d8eae",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
