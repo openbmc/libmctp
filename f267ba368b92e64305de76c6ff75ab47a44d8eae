@@ -16,6 +16,23 @@
       "message": "All looks good to me! +1 just because I have no way to test on HW.",
       "revId": "f267ba368b92e64305de76c6ff75ab47a44d8eae",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb6a505a_41664a3e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-08-08T06:57:59Z",
+      "side": 1,
+      "message": "🛳",
+      "revId": "f267ba368b92e64305de76c6ff75ab47a44d8eae",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
