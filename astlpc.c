@@ -41,6 +41,13 @@ static const char *lpc_path = "/dev/aspeed-lpc-ctrl";
 
 #endif
 
+enum mctp_astlpc_kcs_cmd {
+	KCS_DATA_INITIALISE,
+	KCS_DATA_TX_BEGIN,
+	KCS_DATA_RX_COMPLETE,
+	KCS_DATA_DUMMY_VALUE = 0xff,
+};
+
 enum mctp_astlpc_buffer_state {
 	/*
 	 * Prior to "Channel Ready" we mark the buffers as "idle" to catch illegal accesses. In this
@@ -353,7 +360,7 @@ static int mctp_astlpc_kcs_set_status(struct mctp_binding_astlpc *astlpc,
 	 * So, write a dummy value of 0xff to ODR, which will ensure that an
 	 * interrupt is triggered, and can be ignored by the host.
 	 */
-	data = 0xff;
+	data = KCS_DATA_DUMMY_VALUE;
 
 	rc = mctp_astlpc_kcs_write(astlpc, MCTP_ASTLPC_KCS_REG_STATUS, status);
 	if (rc) {
@@ -781,7 +788,7 @@ mctp_astlpc_kcs_write_ready(struct mctp_binding_astlpc *astlpc, uint8_t status)
 }
 
 static int mctp_astlpc_kcs_send(struct mctp_binding_astlpc *astlpc,
-		uint8_t data)
+		enum mctp_astlpc_kcs_cmd data)
 {
 	uint8_t status;
 	int rc;
@@ -839,7 +846,7 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 
 	astlpc->layout.tx.state = buffer_state_prepared;
 
-	rc = mctp_astlpc_kcs_send(astlpc, 0x1);
+	rc = mctp_astlpc_kcs_send(astlpc, KCS_DATA_TX_BEGIN);
 	if (!rc)
 		astlpc->layout.tx.state = buffer_state_released;
 
@@ -1012,7 +1019,7 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	/* Inform the other side of the MCTP interface that we have read
 	 * the packet off the bus before handling the contents of the packet.
 	 */
-	if (!mctp_astlpc_kcs_send(astlpc, 0x2))
+	if (!mctp_astlpc_kcs_send(astlpc, KCS_DATA_RX_COMPLETE))
 		astlpc->layout.rx.state = buffer_state_released;
 
 	/*
@@ -1130,11 +1137,11 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 	int rc;
 
 	if (astlpc->layout.rx.state == buffer_state_prepared)
-		if (!mctp_astlpc_kcs_send(astlpc, 0x2))
+		if (!mctp_astlpc_kcs_send(astlpc, KCS_DATA_RX_COMPLETE))
 			astlpc->layout.rx.state = buffer_state_released;
 
 	if (astlpc->layout.tx.state == buffer_state_prepared)
-		if (!mctp_astlpc_kcs_send(astlpc, 0x1))
+		if (!mctp_astlpc_kcs_send(astlpc, KCS_DATA_TX_BEGIN))
 			astlpc->layout.tx.state = buffer_state_released;
 
 	rc = mctp_astlpc_kcs_read(astlpc, MCTP_ASTLPC_KCS_REG_STATUS, &status);
@@ -1156,17 +1163,17 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 
 	astlpc_prdebug(astlpc, "%s: data: 0x%hhx", __func__, data);
 
-	if (!astlpc->proto->version && !(data == 0x0 || data == 0xff)) {
+	if (!astlpc->proto->version && !(data == KCS_DATA_INITIALISE || data == KCS_DATA_DUMMY_VALUE)) {
 		astlpc_prwarn(astlpc, "Invalid message for binding state: 0x%x",
 			      data);
 		return 0;
 	}
 
 	switch (data) {
-	case 0x0:
+	case KCS_DATA_INITIALISE:
 		mctp_astlpc_init_channel(astlpc);
 		break;
-	case 0x1:
+	case KCS_DATA_TX_BEGIN:
 		if (astlpc->layout.rx.state != buffer_state_released) {
 			astlpc_prerr(astlpc,
 				     "Protocol error: Invalid Rx buffer state for event %d: %d\n",
@@ -1175,7 +1182,7 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 		}
 		mctp_astlpc_rx_start(astlpc);
 		break;
-	case 0x2:
+	case KCS_DATA_RX_COMPLETE:
 		if (astlpc->layout.tx.state != buffer_state_released) {
 			astlpc_prerr(astlpc,
 				     "Protocol error: Invalid Tx buffer state for event %d: %d\n",
@@ -1184,7 +1191,7 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 		}
 		mctp_astlpc_tx_complete(astlpc);
 		break;
-	case 0xff:
+	case KCS_DATA_DUMMY_VALUE:
 		/* No responsibilities for the BMC on 0xff */
 		if (astlpc->mode == MCTP_BINDING_ASTLPC_MODE_HOST) {
 			rc = mctp_astlpc_update_channel(astlpc, status);
@@ -1198,7 +1205,7 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 
 	/* Handle silent loss of bmc-ready */
 	if (astlpc->mode == MCTP_BINDING_ASTLPC_MODE_HOST) {
-		if (!(status & KCS_STATUS_BMC_READY && data == 0xff))
+		if (!(status & KCS_STATUS_BMC_READY && data == KCS_DATA_DUMMY_VALUE))
 			return mctp_astlpc_update_channel(astlpc, status);
 	}
 
