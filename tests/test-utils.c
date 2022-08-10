@@ -1,5 +1,9 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
 #include <string.h>
 #include <assert.h>
 
@@ -23,7 +27,6 @@ static int mctp_binding_test_tx(struct mctp_binding *b __attribute__((unused)),
 struct mctp_binding_test *mctp_binding_test_init(void)
 {
 	struct mctp_binding_test *test;
-
 	test = __mctp_alloc(sizeof(*test));
 	memset(test, '\0', sizeof(*test));
 	test->binding.name = "test";
