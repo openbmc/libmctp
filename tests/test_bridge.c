@@ -1,5 +1,9 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -77,7 +81,6 @@ static struct mctp_binding_bridge *mctp_binding_bridge_init(void)
 int main(void)
 {
 	struct test_ctx _ctx, *ctx = &_ctx;
-
 	ctx->mctp = mctp_init();
 	ctx->bindings[0] = mctp_binding_bridge_init();
 	ctx->bindings[1] = mctp_binding_bridge_init();
