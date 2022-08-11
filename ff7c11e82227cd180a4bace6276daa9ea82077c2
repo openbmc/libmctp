@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01713bf6_8eb250d8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-08-11T01:29:15Z",
+      "side": 1,
+      "message": "Thanks, this is a cleanup that\u0027s been too long coming. A couple of thoughts.",
+      "revId": "ff7c11e82227cd180a4bace6276daa9ea82077c2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93c4b3d1_7a6aac7b",
+        "filename": "astlpc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-08-11T01:29:15Z",
+      "side": 1,
+      "message": "The enum is called *_kcs_cmd but the members are called KCS_DATA, which seems confusing. Further, commands can only be sent via KCS, so I think that\u0027s an implementation detail we could remove from the type, e.g. call the type \u0027enum mctp_astlpc_cmd\u0027. If we go down this path, I\u0027d drop the KCS_* prefix from the member names as well.\n\nFurther, it\u0027s probably good to have some case consistency with the `enum mctp_astlpc_buffer_state` members. Lower case looks less shouty. But maybe we\u0027re already inconsistent with this?",
+      "revId": "ff7c11e82227cd180a4bace6276daa9ea82077c2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab14e38d_535309a2",
+        "filename": "astlpc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-08-11T01:29:15Z",
+      "side": 1,
+      "message": "I don\u0027t like leaving the values implicit. These are specified as part of the protocol and both sides *must* agree on the value semantics. Better to be explicit in this case.",
+      "revId": "ff7c11e82227cd180a4bace6276daa9ea82077c2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
