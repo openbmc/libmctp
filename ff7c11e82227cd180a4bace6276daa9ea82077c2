@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d2371868_b4cf3aab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-08-11T06:09:01Z",
+      "side": 1,
+      "message": "Do you mean test that we don\u0027t accept incorrect commands (like what `astlpc_test_undefined_command` does)? Or something else?",
+      "parentUuid": "eef698a8_186d9bd1",
+      "revId": "ff7c11e82227cd180a4bace6276daa9ea82077c2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "93c4b3d1_7a6aac7b",
         "filename": "astlpc.c",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2022-08-11T01:29:15Z",
       "side": 1,
       "message": "The enum is called *_kcs_cmd but the members are called KCS_DATA, which seems confusing. Further, commands can only be sent via KCS, so I think that\u0027s an implementation detail we could remove from the type, e.g. call the type \u0027enum mctp_astlpc_cmd\u0027. If we go down this path, I\u0027d drop the KCS_* prefix from the member names as well.\n\nFurther, it\u0027s probably good to have some case consistency with the `enum mctp_astlpc_buffer_state` members. Lower case looks less shouty. But maybe we\u0027re already inconsistent with this?",
+      "revId": "ff7c11e82227cd180a4bace6276daa9ea82077c2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87bd004c_fdfa35d7",
+        "filename": "astlpc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-08-11T06:09:01Z",
+      "side": 1,
+      "message": "Good point about the inconsistency in the naming. \n\nI went with upper case because of the uppercase in mctp_binding_astlpc_kcs_reg in libmctp-astlpc.h, but happy to be less shouty :)",
+      "parentUuid": "93c4b3d1_7a6aac7b",
       "revId": "ff7c11e82227cd180a4bace6276daa9ea82077c2",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -65,6 +101,24 @@
       "writtenOn": "2022-08-11T01:29:15Z",
       "side": 1,
       "message": "I don\u0027t like leaving the values implicit. These are specified as part of the protocol and both sides *must* agree on the value semantics. Better to be explicit in this case.",
+      "revId": "ff7c11e82227cd180a4bace6276daa9ea82077c2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bba972f4_52b47435",
+        "filename": "astlpc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-08-11T06:09:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ab14e38d_535309a2",
       "revId": "ff7c11e82227cd180a4bace6276daa9ea82077c2",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
