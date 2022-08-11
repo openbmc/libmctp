@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "721934bb_57f8fd7c",
+        "filename": "tests/test_bridge.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-08-11T06:46:35Z",
+      "side": 1,
+      "message": "I\u0027m surprised we didn\u0027t see some complaints about `const char *` vs `char *`. I think it\u0027s best to go with the former.",
+      "range": {
+        "startLine": 67,
+        "startChar": 60,
+        "endLine": 67,
+        "endChar": 70
+      },
+      "revId": "13167320742f5f5ed8c50193336914fb0dcfe798",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e064c62_7828304d",
+        "filename": "tests/test_bridge.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-08-11T06:46:35Z",
+      "side": 1,
+      "message": "Thanks :)",
+      "revId": "13167320742f5f5ed8c50193336914fb0dcfe798",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
