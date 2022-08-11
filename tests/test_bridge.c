@@ -64,13 +64,13 @@ static void mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 	mctp_bus_rx(&binding->binding, pkt);
 }
 
-static struct mctp_binding_bridge *mctp_binding_bridge_init(void)
+static struct mctp_binding_bridge *mctp_binding_bridge_init(char* name)
 {
 	struct mctp_binding_bridge *binding;
 
 	binding = __mctp_alloc(sizeof(*binding));
 	memset(binding, 0, sizeof(*binding));
-	binding->binding.name = "test";
+	binding->binding.name = name;
 	binding->binding.version = 1;
 	binding->binding.tx = mctp_binding_bridge_tx;
 	binding->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
@@ -83,8 +83,8 @@ int main(void)
 {
 	struct test_ctx _ctx, *ctx = &_ctx;
 	ctx->mctp = mctp_init();
-	ctx->bindings[0] = mctp_binding_bridge_init();
-	ctx->bindings[1] = mctp_binding_bridge_init();
+	ctx->bindings[0] = mctp_binding_bridge_init("left");
+	ctx->bindings[1] = mctp_binding_bridge_init("right");
 	mctp_bridge_busses(ctx->mctp,
 			&ctx->bindings[0]->binding,
 			&ctx->bindings[1]->binding);
