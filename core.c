@@ -845,3 +845,24 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid, bool tag_owner,
 	return mctp_message_tx_on_bus(bus, bus->eid, eid, tag_owner, msg_tag,
 				      msg, msg_len);
 }
+
+int mctp_packet_raw_tx(struct mctp_binding *binding, void *pkt, size_t pkt_len)
+{
+       struct mctp_bus *bus = binding->bus;
+       struct mctp_pktbuf *pktbuf;
+
+       pktbuf = mctp_pktbuf_alloc(binding, pkt_len);
+       if (!pktbuf)
+               return -1;
+       memcpy(mctp_pktbuf_data(pktbuf), pkt, pkt_len);
+
+       if (bus->tx_queue_tail)
+               bus->tx_queue_tail->next = pkt;
+       else
+               bus->tx_queue_head = pkt;
+       bus->tx_queue_tail = pkt;
+
+       mctp_send_tx_queue(bus);
+
+       return 0;
+}
