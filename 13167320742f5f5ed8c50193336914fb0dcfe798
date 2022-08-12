@@ -24,6 +24,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "68f82725_e8486305",
+        "filename": "tests/test_bridge.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-08-12T00:06:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "721934bb_57f8fd7c",
+      "range": {
+        "startLine": 67,
+        "startChar": 60,
+        "endLine": 67,
+        "endChar": 70
+      },
+      "revId": "13167320742f5f5ed8c50193336914fb0dcfe798",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e064c62_7828304d",
