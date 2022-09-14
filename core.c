@@ -99,6 +99,7 @@ struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *binding, size_t len)
 	size_t size;
 
 	size = binding->pkt_size + binding->pkt_header + binding->pkt_trailer;
+	assert(len <= size);
 
 	/* todo: pools */
 	buf = __mctp_alloc(sizeof(*buf) + size);
