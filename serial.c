@@ -154,7 +154,7 @@ static int mctp_binding_serial_tx(struct mctp_binding *b,
 
 	len = mctp_serial_pkt_escape(pkt, NULL);
 	if (len + sizeof(*hdr) + sizeof(*tlr) > sizeof(serial->txbuf))
-		return -1;
+		return -EMSGSIZE;
 
 	mctp_serial_pkt_escape(pkt, buf);
 
