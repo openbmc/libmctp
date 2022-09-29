@@ -107,6 +107,14 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid, bool tag_owner,
 		    uint8_t msg_tag, void *msg, size_t msg_len);
 
 /* hardware bindings */
+
+/**
+ * @tx: Binding function to transmit one packet on the interface
+ *      Return:
+ *      * 0 - Success, pktbuf can be released
+ *	* -EMSGSIZE - Packet exceeds binding MTU, pktbuf must be dropped
+ *	* -EBUSY - Packet unable to be transmitted, pktbuf must be retained
+ */
 struct mctp_binding {
 	const char *name;
 	uint8_t version;

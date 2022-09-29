@@ -821,9 +821,10 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 		       __func__, len, hdr->src, hdr->dest, hdr->flags_seq_tag);
 
 	if (len > astlpc->proto->body_size(astlpc->layout.tx.size)) {
-		astlpc_prwarn(astlpc, "invalid TX len %" PRIu32 ": %" PRIu32, len,
-				astlpc->proto->body_size(astlpc->layout.tx.size));
-		return -1;
+		astlpc_prwarn(astlpc, "invalid TX len %" PRIu32 ": %" PRIu32,
+			      len,
+			      astlpc->proto->body_size(astlpc->layout.tx.size));
+		return -EMSGSIZE;
 	}
 
 	mctp_binding_set_tx_enabled(b, false);
