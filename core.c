@@ -694,13 +694,26 @@ static void mctp_send_tx_queue(struct mctp_bus *bus)
 		int rc;
 
 		rc = mctp_packet_tx(bus, pkt);
-		if (rc)
+		switch (rc) {
+		/* If transmission succeded, or */
+		case 0:
+		/* If the packet is somehow too large */
+		case -EMSGSIZE:
+			/* Drop the packet */
+			bus->tx_queue_head = pkt->next;
+			mctp_pktbuf_free(pkt);
 			break;
 
-		bus->tx_queue_head = pkt->next;
-		mctp_pktbuf_free(pkt);
+		/* If the binding was busy, or */
+		case -EBUSY:
+		/* Some other unknown error occurred */
+		default:
+			/* Make sure the tail pointer is consistent and retry later */
+			goto cleanup_tail;
+		};
 	}
 
+cleanup_tail:
 	if (!bus->tx_queue_head)
 		bus->tx_queue_tail = NULL;
 
