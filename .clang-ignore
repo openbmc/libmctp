@@ -1,6 +1,5 @@
 alloc.c
 astlpc.c
-container_of.h
 core.c
 libmctp-astlpc.h
 libmctp-serial.h
