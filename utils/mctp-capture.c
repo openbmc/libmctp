@@ -21,7 +21,7 @@ int capture_prepare(struct capture *cap)
 	int rc;
 
 	if (cap->linktype < CAPTURE_LINKTYPE_FIRST ||
-			cap->linktype > CAPTURE_LINKTYPE_LAST) {
+	    cap->linktype > CAPTURE_LINKTYPE_LAST) {
 		fprintf(stderr,
 			"Invalid private linktype value %d: see https://www.tcpdump.org/linktypes.html\n",
 			cap->linktype);
