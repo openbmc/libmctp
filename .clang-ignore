@@ -5,5 +5,4 @@ serial.c
 tests/test_bridge.c
 tests/test_eid.c
 tests/test_seq.c
-tests/test_serial.c
 utils/mctp-demux-daemon.c
