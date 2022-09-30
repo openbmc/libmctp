@@ -1,6 +1,5 @@
 astlpc.c
 core.c
-libmctp-astlpc.h
 libmctp-serial.h
 libmctp.h
 serial.c
