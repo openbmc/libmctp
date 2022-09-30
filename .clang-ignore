@@ -12,5 +12,4 @@ tests/test_seq.c
 tests/test_serial.c
 utils/mctp-astlpc-daemon.c
 utils/mctp-demux-daemon.c
-utils/mctp-in.c
 utils/mctp-pipe.c
