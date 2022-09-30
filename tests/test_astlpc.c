@@ -150,9 +150,10 @@ static const struct mctp_binding_astlpc_ops astlpc_indirect_mmio_ops = {
 	.lpc_write = mctp_astlpc_mmio_lpc_write,
 };
 
-static void rx_message(uint8_t eid __unused, bool tag_owner __unused,
-		       uint8_t msg_tag __unused, void *data __unused, void *msg,
-		       size_t len)
+static void astlpc_test_rx_message(uint8_t eid __unused,
+				   bool tag_owner __unused,
+				   uint8_t msg_tag __unused,
+				   void *data __unused, void *msg, size_t len)
 {
 	struct astlpc_test *test = data;
 
@@ -255,7 +256,7 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 
 	ctx.msg = &msg[0];
 	ctx.count = 0;
-	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
+	mctp_set_rx_all(ctx.host.mctp, astlpc_test_rx_message, &ctx);
 
 	/* BMC sends a message */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_SRC, 0, msg,
@@ -297,7 +298,7 @@ static void astlpc_test_simple_message_host_to_bmc(void)
 
 	ctx.msg = &msg[0];
 	ctx.count = 0;
-	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
+	mctp_set_rx_all(ctx.bmc.mctp, astlpc_test_rx_message, &ctx);
 
 	/* Host sends the single-packet message */
 	rc = mctp_message_tx(ctx.host.mctp, 8, MCTP_MESSAGE_TO_DST, tag, msg,
@@ -339,7 +340,7 @@ static void astlpc_test_simple_message_bmc_to_host(void)
 
 	ctx.msg = &msg[0];
 	ctx.count = 0;
-	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
+	mctp_set_rx_all(ctx.host.mctp, astlpc_test_rx_message, &ctx);
 
 	/* BMC sends the single-packet message */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_SRC, tag, msg,
@@ -598,7 +599,7 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 
 	ctx.msg = &msg[0];
 	ctx.count = 0;
-	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
+	mctp_set_rx_all(ctx.host.mctp, astlpc_test_rx_message, &ctx);
 
 	/* BMC sends the single-packet message */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_SRC, tag, msg,
@@ -653,7 +654,7 @@ static void astlpc_test_host_tx_bmc_gone(void)
 	rc = endpoint_init(&ctx.bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU,
 			   &ctx.kcs, ctx.lpc_mem);
 	assert(!rc);
-	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
+	mctp_set_rx_all(ctx.bmc.mctp, astlpc_test_rx_message, &ctx);
 
 	/* Host triggers channel init */
 	mctp_astlpc_poll(ctx.host.astlpc);
@@ -1115,7 +1116,7 @@ static void astlpc_test_send_large_packet(void)
 	assert(!rc);
 
 	ctx.count = 0;
-	mctp_set_rx_all(bmc->mctp, rx_message, &ctx);
+	mctp_set_rx_all(bmc->mctp, astlpc_test_rx_message, &ctx);
 
 	rc = mctp_astlpc_poll(bmc->astlpc);
 	assert(rc == 0);
@@ -1205,7 +1206,7 @@ static void astlpc_test_corrupt_host_tx(void)
 
 	ctx.msg = &msg[0];
 	ctx.count = 0;
-	mctp_set_rx_all(ctx.bmc.mctp, rx_message, &ctx);
+	mctp_set_rx_all(ctx.bmc.mctp, astlpc_test_rx_message, &ctx);
 
 	/* Host sends the single-packet message */
 	rc = mctp_message_tx(ctx.host.mctp, 8, MCTP_MESSAGE_TO_DST, tag, msg,
@@ -1259,7 +1260,7 @@ static void astlpc_test_corrupt_bmc_tx(void)
 
 	ctx.msg = &msg[0];
 	ctx.count = 0;
-	mctp_set_rx_all(ctx.host.mctp, rx_message, &ctx);
+	mctp_set_rx_all(ctx.host.mctp, astlpc_test_rx_message, &ctx);
 
 	/* BMC sends the single-packet message */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_SRC, tag, msg,
