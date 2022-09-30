@@ -1,4 +1,3 @@
-alloc.c
 astlpc.c
 core.c
 libmctp-astlpc.h
