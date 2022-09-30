@@ -17,14 +17,14 @@ typedef void pcap_t;
 typedef void pcap_dumper_t;
 #endif
 
-#define CAPTURE_LINKTYPE_FIRST	147
-#define CAPTURE_LINKTYPE_LAST	162
+#define CAPTURE_LINKTYPE_FIRST 147
+#define CAPTURE_LINKTYPE_LAST  162
 
 struct capture {
-	const char	*path;
-	int		linktype;
-	pcap_t		*pcap;
-	pcap_dumper_t	*dumper;
+	const char *path;
+	int linktype;
+	pcap_t *pcap;
+	pcap_dumper_t *dumper;
 };
 
 #if HAVE_PCAP
@@ -35,15 +35,14 @@ void capture_binding(struct mctp_pktbuf *pkt, void *user);
 void capture_socket(pcap_dumper_t *dumper, const void *buf, size_t len);
 #else
 #include <stdio.h>
-static inline int
-capture_init(void)
+static inline int capture_init(void)
 {
-	fprintf(stderr, "libpcap support is disabled, cannot initialise libpcap\n");
+	fprintf(stderr,
+		"libpcap support is disabled, cannot initialise libpcap\n");
 	return 0;
 }
 
-static inline int
-capture_prepare(struct capture *cap)
+static inline int capture_prepare(struct capture *cap)
 {
 	fprintf(stderr, "libpcap support is disabled, cannot capture to %s\n",
 		cap->path);
@@ -54,14 +53,13 @@ static inline void capture_close(struct capture *cap __unused)
 {
 }
 
-static inline void
-capture_binding(struct mctp_pktbuf *pkt __unused, void *user __unused)
+static inline void capture_binding(struct mctp_pktbuf *pkt __unused,
+				   void *user __unused)
 {
 }
 
 static inline void capture_socket(pcap_dumper_t *dumper __unused,
-				  const void *buf __unused,
-				  size_t len __unused)
+				  const void *buf __unused, size_t len __unused)
 {
 }
 #endif
