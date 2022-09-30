@@ -1,6 +1,5 @@
 astlpc.c
 core.c
-libmctp-serial.h
 libmctp.h
 serial.c
 tests/test_bridge.c
