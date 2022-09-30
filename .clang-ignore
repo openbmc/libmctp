@@ -4,8 +4,6 @@ libmctp-astlpc.h
 libmctp-serial.h
 libmctp.h
 serial.c
-tests/test-utils.c
-tests/test-utils.h
 tests/test_bridge.c
 tests/test_eid.c
 tests/test_seq.c
