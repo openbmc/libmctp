@@ -1149,6 +1149,115 @@ static void astlpc_test_send_large_packet(void)
 	free(lpc_mem);
 }
 
+static void astlpc_test_negotiate_mtu_high_low(void)
+{
+	uint8_t msg[3 * MCTP_BTU] = { 0 };
+	struct astlpc_test ctx = { 0 };
+	uint32_t bmtu, hmtu;
+	uint8_t tag = 0;
+	int rc;
+
+	/* Configure message */
+	memset(&msg[0], 0xa5, sizeof(msg));
+
+	/* Test harness initialisation */
+	ctx.lpc_mem = calloc(1, 1 * 1024 * 1024);
+	assert(ctx.lpc_mem);
+
+	/* BMC initialisation */
+	bmtu = 3 * MCTP_BTU;
+	rc = endpoint_init(&ctx.bmc, 8, MCTP_BINDING_ASTLPC_MODE_BMC, bmtu,
+			   &ctx.kcs, ctx.lpc_mem);
+	assert(!rc);
+
+	/* Host initialisation with low MTU */
+	hmtu = 3 * MCTP_BTU;
+	rc = endpoint_init(&ctx.host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, hmtu,
+			   &ctx.kcs, ctx.lpc_mem);
+	assert(!rc);
+
+	/* Configure host message handler */
+	ctx.msg = &msg[0];
+	ctx.count = 0;
+	mctp_set_rx_all(ctx.host.mctp, astlpc_test_rx_message, &ctx);
+
+	/* Startup BMC and host interfaces */
+	rc = mctp_astlpc_poll(ctx.bmc.astlpc);
+	assert(rc == 0);
+	rc = mctp_astlpc_poll(ctx.host.astlpc);
+	assert(rc == 0);
+
+	/*
+	 * Transmit a message to place a packet on the interface. This releases the buffer and
+	 * disables the binding, plugging the binding's transmit queue while the host hasn't polled
+	 * to pull the packet off.
+	 */
+	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_DST, tag, msg,
+			     sizeof(msg));
+
+	/* Leave the packet in place on the interface by not polling the host binding */
+
+	/*
+	 * Transmit another message to force packetisation at the current MTU while the binding is
+	 * disabled, leaving the packet(s) in the binding's transmit queue
+	 */
+	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_DST, tag, msg,
+			     sizeof(msg));
+
+	/* Tear-down the host so we can bring up a new one */
+	endpoint_destroy(&ctx.host);
+
+	/* Bring up a new host endpoint with a lower MTU than we previously negotiated */
+	hmtu = 2 * MCTP_BTU;
+	rc = endpoint_init(&ctx.host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, hmtu,
+			   &ctx.kcs, ctx.lpc_mem);
+	assert(!rc);
+
+	/* Configure host message handler again after reinitialisation */
+	ctx.msg = &msg[0];
+	ctx.count = 0;
+	mctp_set_rx_all(ctx.host.mctp, astlpc_test_rx_message, &ctx);
+
+	/* Process low MTU proposal */
+	rc = mctp_astlpc_poll(ctx.bmc.astlpc);
+	assert(rc == 0);
+
+	/* Accept low MTU proposal */
+	rc = mctp_astlpc_poll(ctx.host.astlpc);
+	assert(rc == 0);
+
+	/*
+	 * Check that there are no outstanding messages to be received by the host. The message
+	 * packetised on the BMC at the larger MTU must be dropped as its now no longer possible to
+	 * transmit those packets
+	 */
+	rc = mctp_astlpc_poll(ctx.host.astlpc);
+	assert(rc == 0);
+	assert(ctx.count == 0);
+
+	/* Transmit another message from the BMC to the host, packetised using the new MTU */
+	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_DST, tag, msg,
+			     hmtu);
+
+	/* Check that the most recent BMC transmission is received by the host */
+	rc = mctp_astlpc_poll(ctx.host.astlpc);
+	assert(rc == 0);
+	assert(ctx.count == 1);
+
+	/* Ensure buffer ownership is returned to the BMC and the BMC Tx queue is processed */
+	rc = mctp_astlpc_poll(ctx.host.astlpc);
+	assert(rc == 0);
+
+	/* Check that no further messages are propagated to the host */
+	rc = mctp_astlpc_poll(ctx.host.astlpc);
+	assert(rc == 0);
+	assert(ctx.count == 1);
+
+	endpoint_destroy(&ctx.host);
+	endpoint_destroy(&ctx.bmc);
+	free(ctx.lpc_mem);
+}
+
 static void astlpc_test_tx_before_channel_init(void)
 {
 	struct astlpc_endpoint *bmc;
@@ -1397,6 +1506,7 @@ static const struct {
 	TEST_CASE(astlpc_test_buffers_bad_host_init),
 	TEST_CASE(astlpc_test_negotiate_increased_mtu),
 	TEST_CASE(astlpc_test_negotiate_mtu_low_high),
+	TEST_CASE(astlpc_test_negotiate_mtu_high_low),
 	TEST_CASE(astlpc_test_send_large_packet),
 	TEST_CASE(astlpc_test_tx_before_channel_init),
 	TEST_CASE(astlpc_test_corrupt_host_tx),
