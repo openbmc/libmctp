@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4426c4aa_15593aa3",
+        "filename": "serial.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-10-03T23:28:19Z",
+      "side": 1,
+      "message": "Good catch, let me fix that.",
+      "parentUuid": "85093d7d_51338d0a",
+      "range": {
+        "startLine": 37,
+        "startChar": 8,
+        "endLine": 37,
+        "endChar": 13
+      },
+      "revId": "464137e26b0e20f6ceaaf54f8dc489e6380f0e45",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4a689eed_90ede4e3",
         "filename": "serial.c",
         "patchSetId": 2
@@ -37,6 +61,30 @@
       "writtenOn": "2022-10-03T23:13:36Z",
       "side": 1,
       "message": "What does fildes mean? I\u0027ve never heard of it.",
+      "range": {
+        "startLine": 40,
+        "startChar": 37,
+        "endLine": 40,
+        "endChar": 43
+      },
+      "revId": "464137e26b0e20f6ceaaf54f8dc489e6380f0e45",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89b00ac4_411d39bf",
+        "filename": "serial.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-10-03T23:28:19Z",
+      "side": 1,
+      "message": "\"file descriptor\" 😊",
+      "parentUuid": "4a689eed_90ede4e3",
       "range": {
         "startLine": 40,
         "startChar": 37,
