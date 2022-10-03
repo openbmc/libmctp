@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c2b0139_fb86f051",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-10-03T23:32:35Z",
+      "side": 1,
+      "message": "Makes sense as a test, and the test fails before your other patches and passes after, so lgtm",
+      "revId": "f64423f73cfdec1c92dc0d4896eb78c5e7f40a83",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
