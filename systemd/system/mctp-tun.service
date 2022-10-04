@@ -1,0 +1,13 @@
+[Unit]
+Description=MCTP tun daemon
+
+[Service]
+Restart=always
+Environment=TUN_OPTS=null
+EnvironmentFile=-/etc/default/mctp
+ExecStart=/usr/bin/mctp-tun $TUN_OPTS
+ExecStartPost=/usr/bin/setup-tun
+SyslogIdentifier=mctp-tun
+
+[Install]
+WantedBy=multi-user.target
