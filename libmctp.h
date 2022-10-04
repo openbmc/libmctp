@@ -76,8 +76,8 @@ struct mctp *mctp_init(void);
 void mctp_set_max_message_size(struct mctp *mctp, size_t message_size);
 typedef void (*mctp_capture_fn)(struct mctp_pktbuf *pkt, bool outgoing,
 				void *user);
-void mctp_set_capture_handler(struct mctp *mctp, mctp_capture_fn fn,
-			      void *user);
+void mctp_set_capture_handler(struct mctp_binding *binding, mctp_capture_fn fn,
+	       		      void *user);
 void mctp_destroy(struct mctp *mctp);
 
 /* Register a binding to the MCTP core, and creates a bus (populating
@@ -130,6 +130,10 @@ struct mctp_binding {
 	int (*tx)(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
 	mctp_rx_fn control_rx;
 	void *control_rx_data;
+	/* Packet capture callback */
+	mctp_capture_fn		capture;
+	void			*capture_data;
+
 };
 
 void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable);

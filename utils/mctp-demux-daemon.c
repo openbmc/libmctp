@@ -648,19 +648,6 @@ int main(int argc, char *const *argv)
 		}
 	}
 
-	if (ctx->pcap.binding.path) {
-		rc = capture_prepare(&ctx->pcap.binding);
-		if (rc == -1) {
-			fprintf(stderr, "Failed to initialise capture: %d\n",
-				rc);
-			rc = EXIT_FAILURE;
-			goto cleanup_mctp;
-		}
-
-		mctp_set_capture_handler(ctx->mctp, capture_binding,
-					 ctx->pcap.binding.dumper);
-	}
-
 	if (ctx->pcap.socket.path) {
 		rc = capture_prepare(&ctx->pcap.socket);
 		if (rc == -1) {
@@ -679,12 +666,24 @@ int main(int argc, char *const *argv)
 		goto cleanup_pcap_socket;
 	}
 
+	if (ctx->pcap.binding.path) {
+		rc = capture_prepare(&ctx->pcap.binding);
+		if (rc == -1) {
+			fprintf(stderr, "Failed to initialise capture: %d\n", rc);
+			rc = EXIT_FAILURE;
+			goto cleanup_binding;
+		}
+
+		mctp_set_capture_handler(ctx->binding->data, capture_binding,
+					 ctx->pcap.binding.dumper);
+	}
+
 	rc = sd_listen_fds(true);
 	if (rc <= 0) {
 		rc = socket_init(ctx);
 		if (rc) {
 			fprintf(stderr, "Failed to initialse socket: %d\n", rc);
-			goto cleanup_binding;
+			goto cleanup_pcap_binding;
 		}
 	} else {
 		ctx->sock = SD_LISTEN_FDS_START;
@@ -692,16 +691,16 @@ int main(int argc, char *const *argv)
 
 	rc = run_daemon(ctx);
 
+cleanup_pcap_binding:
+	if (ctx->pcap.binding.path)
+		capture_close(&ctx->pcap.binding);
+
 cleanup_binding:
 	binding_destroy(ctx);
 
 cleanup_pcap_socket:
 	if (ctx->pcap.socket.path)
 		capture_close(&ctx->pcap.socket);
-
-cleanup_pcap_binding:
-	if (ctx->pcap.binding.path)
-		capture_close(&ctx->pcap.binding);
 
 	rc = rc ? EXIT_FAILURE : EXIT_SUCCESS;
 cleanup_mctp:
