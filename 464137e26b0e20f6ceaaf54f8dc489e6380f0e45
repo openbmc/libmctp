@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c3518ae8_33be9a83",
+        "filename": "serial.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-10-04T05:40:33Z",
+      "side": 1,
+      "message": "I\u0027ve added some comments to clarify some of the behaviour. I also poked at it under a TLA+ model, because why not:\n\nhttps://gist.github.com/amboar/c9846ece800dc27ad52f9b57f8305c00",
+      "parentUuid": "4426c4aa_15593aa3",
+      "range": {
+        "startLine": 37,
+        "startChar": 8,
+        "endLine": 37,
+        "endChar": 13
+      },
+      "revId": "464137e26b0e20f6ceaaf54f8dc489e6380f0e45",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4a689eed_90ede4e3",
         "filename": "serial.c",
         "patchSetId": 2
