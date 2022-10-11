@@ -976,6 +976,7 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 {
 	struct mctp_pktbuf *pkt;
+	struct mctp_hdr *hdr;
 	uint32_t body, packet;
 
 	mctp_astlpc_lpc_read(astlpc, &body, astlpc->layout.rx.offset,
@@ -1015,6 +1016,13 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 	 */
 	if (!mctp_astlpc_kcs_send(astlpc, 0x2))
 		astlpc->layout.rx.state = buffer_state_released;
+
+	hdr = mctp_pktbuf_hdr(pkt);
+	if (hdr->ver != 1) {
+		mctp_pktbuf_free(pkt);
+		astlpc_prdebug(astlpc, "Dropped packet with invalid version");
+		return;
+	}
 
 	/*
 	 * v3 will validate the CRC32 in the medium-specific trailer and adjust
