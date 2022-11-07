@@ -12,26 +12,26 @@
 
 #if HAVE_PCAP
 #include <pcap/pcap.h>
+#include <pcap/sll.h>
+#include <linux/if_ether.h>
 #else
 typedef void pcap_t;
 typedef void pcap_dumper_t;
 #endif
 
-#define CAPTURE_LINKTYPE_FIRST 147
-#define CAPTURE_LINKTYPE_LAST  162
+#define CAPTURE_LINKTYPE_LINUX_SLL2 276
 
 struct capture {
-	const char *path;
-	int linktype;
-	pcap_t *pcap;
-	pcap_dumper_t *dumper;
+	const char	*path;
+	pcap_t		*pcap;
+	pcap_dumper_t	*dumper;
 };
 
 #if HAVE_PCAP
 int capture_init(void);
 int capture_prepare(struct capture *cap);
 void capture_close(struct capture *cap);
-void capture_binding(struct mctp_pktbuf *pkt, void *user);
+void capture_binding(struct mctp_pktbuf *pkt, bool from_us , void *user);
 void capture_socket(pcap_dumper_t *dumper, const void *buf, size_t len);
 #else
 #include <stdio.h>
@@ -53,8 +53,8 @@ static inline void capture_close(struct capture *cap __unused)
 {
 }
 
-static inline void capture_binding(struct mctp_pktbuf *pkt __unused,
-				   void *user __unused)
+static inline void
+capture_binding(struct mctp_pktbuf *pkt __unused, bool from_us __unused, void *user __unused)
 {
 }
 
