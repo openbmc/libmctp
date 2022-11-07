@@ -569,8 +569,6 @@ static int run_daemon(struct ctx *ctx)
 static const struct option options[] = {
 	{ "capture-binding", required_argument, 0, 'b' },
 	{ "capture-socket", required_argument, 0, 's' },
-	{ "binding-linktype", required_argument, 0, 'B' },
-	{ "socket-linktype", required_argument, 0, 'S' },
 	{ "verbose", no_argument, 0, 'v' },
 	{ "eid", required_argument, 0, 'e' },
 	{ 0 },
@@ -597,9 +595,7 @@ int main(int argc, char * const *argv)
 	ctx->local_eid = local_eid_default;
 	ctx->verbose = false;
 	ctx->pcap.binding.path = NULL;
-	ctx->pcap.binding.linktype = -1;
 	ctx->pcap.socket.path = NULL;
-	ctx->pcap.socket.linktype = -1;
 
 	for (;;) {
 		rc = getopt_long(argc, argv, "b:es::v", options, NULL);
@@ -611,12 +607,6 @@ int main(int argc, char * const *argv)
 			break;
 		case 's':
 			ctx->pcap.socket.path = optarg;
-			break;
-		case 'B':
-			ctx->pcap.binding.linktype = atoi(optarg);
-			break;
-		case 'S':
-			ctx->pcap.socket.linktype = atoi(optarg);
 			break;
 		case 'v':
 			ctx->verbose = true;
@@ -632,18 +622,6 @@ int main(int argc, char * const *argv)
 
 	if (optind >= argc) {
 		fprintf(stderr, "missing binding argument\n");
-		usage(argv[0]);
-		return EXIT_FAILURE;
-	}
-
-	if (ctx->pcap.binding.linktype < 0 && ctx->pcap.binding.path) {
-		fprintf(stderr, "missing binding-linktype argument\n");
-		usage(argv[0]);
-		return EXIT_FAILURE;
-	}
-
-	if (ctx->pcap.socket.linktype < 0 && ctx->pcap.socket.path) {
-		fprintf(stderr, "missing socket-linktype argument\n");
 		usage(argv[0]);
 		return EXIT_FAILURE;
 	}
