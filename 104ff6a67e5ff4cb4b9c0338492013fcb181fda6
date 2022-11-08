@@ -35,6 +35,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d8426f7_a28faa29",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-08T05:34:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c044bf2_e8b509e1",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb2f5cb0_5e0649fc",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-11-08T04:45:15Z",
       "side": 1,
       "message": "htons(ETH_P_MCTP) maybe?",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d8d99c1_4b9cbc05",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-08T05:34:37Z",
+      "side": 1,
+      "message": "Can do.",
+      "parentUuid": "bb2f5cb0_5e0649fc",
       "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -69,6 +105,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74b7ef9d_722b45c7",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-08T05:34:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4cd8067_9648e55a",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f12512bb_0e9caea4",
@@ -82,6 +136,24 @@
       "writtenOn": "2022-11-08T04:45:15Z",
       "side": 1,
       "message": "minor: you have some odd spacing around the \u003d here.",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "732e18cd_cf38d028",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-08T05:34:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f12512bb_0e9caea4",
       "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -103,6 +175,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e46fa2b0_a85942cc",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-08T05:34:37Z",
+      "side": 1,
+      "message": "😮 yes.",
+      "parentUuid": "157ced29_9d7badcc",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4feba07c_4c2175bc",
@@ -116,6 +206,24 @@
       "writtenOn": "2022-11-08T04:45:15Z",
       "side": 1,
       "message": "Do we need these here, or in the .c?",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bdfbe59_8bbb6e3f",
+        "filename": "utils/mctp-capture.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-08T05:34:37Z",
+      "side": 1,
+      "message": "good point, will move them",
+      "parentUuid": "4feba07c_4c2175bc",
       "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -150,6 +258,24 @@
       "writtenOn": "2022-11-08T04:45:15Z",
       "side": 1,
       "message": "this seems to have been re-wrapped, is that the correct layout?",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6129a468_2cf29ba1",
+        "filename": "utils/mctp-capture.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-08T05:34:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ec4a113_fa59e0e2",
       "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
