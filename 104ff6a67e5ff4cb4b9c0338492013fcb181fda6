@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7896da8_6ffacc2c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-11-08T04:45:15Z",
+      "side": 1,
+      "message": "Looks good in general - some feedback on a potential memory leak, and a bunch of really minor things.",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c044bf2_e8b509e1",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-11-08T04:45:15Z",
+      "side": 1,
+      "message": "At the header maybe?",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb2f5cb0_5e0649fc",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-11-08T04:45:15Z",
+      "side": 1,
+      "message": "htons(ETH_P_MCTP) maybe?",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4cd8067_9648e55a",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-11-08T04:45:15Z",
+      "side": 1,
+      "message": "where is 0x4 from?",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f12512bb_0e9caea4",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-11-08T04:45:15Z",
+      "side": 1,
+      "message": "minor: you have some odd spacing around the \u003d here.",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "157ced29_9d7badcc",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-11-08T04:45:15Z",
+      "side": 1,
+      "message": "free(pktbuf) maybe?",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4feba07c_4c2175bc",
+        "filename": "utils/mctp-capture.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-11-08T04:45:15Z",
+      "side": 1,
+      "message": "Do we need these here, or in the .c?",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1f4c1b1_92a5ad00",
+        "filename": "utils/mctp-capture.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-11-08T04:45:15Z",
+      "side": 1,
+      "message": "arj hates it when I do that, so strong ACK on this part 😄",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ec4a113_fa59e0e2",
+        "filename": "utils/mctp-capture.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-11-08T04:45:15Z",
+      "side": 1,
+      "message": "this seems to have been re-wrapped, is that the correct layout?",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
