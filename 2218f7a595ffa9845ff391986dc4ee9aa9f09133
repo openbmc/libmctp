@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f11d96b4_f6e7a38f",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-08T05:39:40Z",
+      "side": 1,
+      "message": "Should I be using mctp_alloc?",
+      "range": {
+        "startLine": 67,
+        "startChar": 9,
+        "endLine": 67,
+        "endChar": 15
+      },
+      "revId": "2218f7a595ffa9845ff391986dc4ee9aa9f09133",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
