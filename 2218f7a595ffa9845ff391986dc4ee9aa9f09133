@@ -22,6 +22,30 @@
       },
       "revId": "2218f7a595ffa9845ff391986dc4ee9aa9f09133",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7348b7c5_f9f2f672",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2022-11-08T06:19:38Z",
+      "side": 1,
+      "message": "Yep, that would be consistent with the existing uses; and allows embedded implementations to provide their own allocator .\n\n(It\u0027s unlikely that we\u0027ll be running the pcap code in those situations, but consistency is good...)",
+      "parentUuid": "f11d96b4_f6e7a38f",
+      "range": {
+        "startLine": 67,
+        "startChar": 9,
+        "endLine": 67,
+        "endChar": 15
+      },
+      "revId": "2218f7a595ffa9845ff391986dc4ee9aa9f09133",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
