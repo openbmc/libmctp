@@ -401,10 +401,10 @@ static int client_process_recv(struct ctx *ctx, int idx)
 		goto out_close;
 	}
 
-	if (ctx->pcap.socket.path)
-		capture_socket(ctx->pcap.socket.dumper, ctx->buf, rc);
-
 	eid = *(uint8_t *)ctx->buf;
+
+	if (ctx->pcap.socket.path)
+		capture_socket(ctx->pcap.socket.dumper, ctx->buf, rc, true, eid);
 
 	if (ctx->verbose)
 		fprintf(stderr,
@@ -597,9 +597,7 @@ int main(int argc, char * const *argv)
 	ctx->local_eid = local_eid_default;
 	ctx->verbose = false;
 	ctx->pcap.binding.path = NULL;
-	ctx->pcap.binding.linktype = -1;
 	ctx->pcap.socket.path = NULL;
-	ctx->pcap.socket.linktype = -1;
 
 	for (;;) {
 		rc = getopt_long(argc, argv, "b:es::v", options, NULL);
@@ -613,10 +611,10 @@ int main(int argc, char * const *argv)
 			ctx->pcap.socket.path = optarg;
 			break;
 		case 'B':
-			ctx->pcap.binding.linktype = atoi(optarg);
+			fprintf(stderr, "binding-linktype argument is deprecated\n");
 			break;
 		case 'S':
-			ctx->pcap.socket.linktype = atoi(optarg);
+			fprintf(stderr, "socket-linktype argument is deprecated\n");
 			break;
 		case 'v':
 			ctx->verbose = true;
@@ -632,18 +630,6 @@ int main(int argc, char * const *argv)
 
 	if (optind >= argc) {
 		fprintf(stderr, "missing binding argument\n");
-		usage(argv[0]);
-		return EXIT_FAILURE;
-	}
-
-	if (ctx->pcap.binding.linktype < 0 && ctx->pcap.binding.path) {
-		fprintf(stderr, "missing binding-linktype argument\n");
-		usage(argv[0]);
-		return EXIT_FAILURE;
-	}
-
-	if (ctx->pcap.socket.linktype < 0 && ctx->pcap.socket.path) {
-		fprintf(stderr, "missing socket-linktype argument\n");
 		usage(argv[0]);
 		return EXIT_FAILURE;
 	}
