@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4958e25b_d93394b2",
+        "filename": "core.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-11-09T00:17:16Z",
+      "side": 1,
+      "message": "I guess the function name should now be \"mctp_binding_set_capture_handler\"",
+      "revId": "836932cb21cc2e6c928a3359fa5c4a2e262002dd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ada959c9_dc32800c",
+        "filename": "libmctp.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-11-09T00:17:16Z",
+      "side": 1,
+      "message": "Bit of a bummer that this appears in a public struct now. I guess we just keep in mind the ABI implication, but that\u0027s kinda mitigated by the fact that we\u0027re still not at v1 and we don\u0027t have many (any?) distribution of binaries.",
+      "revId": "836932cb21cc2e6c928a3359fa5c4a2e262002dd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
