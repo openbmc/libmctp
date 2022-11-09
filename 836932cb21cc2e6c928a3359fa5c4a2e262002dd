@@ -51,6 +51,24 @@
       "parentUuid": "ada959c9_dc32800c",
       "revId": "836932cb21cc2e6c928a3359fa5c4a2e262002dd",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a640ad94_6b379dc0",
+        "filename": "libmctp.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-11-09T02:16:00Z",
+      "side": 1,
+      "message": "I think the change goes in the right direction, I don\u0027t think analyzing EIDs gives us the right level of power to understand where bugs lie (basically, we want to be able to measure at either side, I think). Do we lose anything by moving to mctp_bus?",
+      "parentUuid": "7d7150ce_f2fe10af",
+      "revId": "836932cb21cc2e6c928a3359fa5c4a2e262002dd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
