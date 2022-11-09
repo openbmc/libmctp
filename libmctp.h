@@ -37,8 +37,10 @@ struct mctp_hdr {
 #define MCTP_HDR_TAG_SHIFT (0)
 #define MCTP_HDR_TAG_MASK  (0x7)
 
-#define MCTP_MESSAGE_TO_SRC true
-#define MCTP_MESSAGE_TO_DST false
+#define MCTP_MESSAGE_TO_SRC	      true
+#define MCTP_MESSAGE_TO_DST	      false
+#define MCTP_MESSAGE_CAPTURE_OUTGOING true
+#define MCTP_MESSAGE_CAPTURE_INCOMING false
 
 /* Baseline Transmission Unit and packet size */
 #define MCTP_BTU	       64
@@ -72,7 +74,8 @@ struct mctp_bus;
 
 struct mctp *mctp_init(void);
 void mctp_set_max_message_size(struct mctp *mctp, size_t message_size);
-typedef void (*mctp_capture_fn)(struct mctp_pktbuf *pkt, void *user);
+typedef void (*mctp_capture_fn)(struct mctp_pktbuf *pkt, bool outgoing,
+				void *user);
 void mctp_set_capture_handler(struct mctp *mctp, mctp_capture_fn fn,
 			      void *user);
 void mctp_destroy(struct mctp *mctp);
