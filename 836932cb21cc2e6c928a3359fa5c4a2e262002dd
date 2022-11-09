@@ -33,6 +33,24 @@
       "message": "Bit of a bummer that this appears in a public struct now. I guess we just keep in mind the ABI implication, but that\u0027s kinda mitigated by the fact that we\u0027re still not at v1 and we don\u0027t have many (any?) distribution of binaries.",
       "revId": "836932cb21cc2e6c928a3359fa5c4a2e262002dd",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d7150ce_f2fe10af",
+        "filename": "libmctp.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-09T02:04:44Z",
+      "side": 1,
+      "message": "Hmm. We could move it into the mctp_bus struct which is internal. As long as there is only one binding per bus it would work? \n\nOr we could consider how necessary this is. In the case I want this for there are two bindings using the bridge, and if you generate a pcap (without this patch) you can determine which packet came from which binding by looking at which eid it came from and the order it appears in.",
+      "parentUuid": "ada959c9_dc32800c",
+      "revId": "836932cb21cc2e6c928a3359fa5c4a2e262002dd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
