@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "375e2348_9d784411",
+        "filename": "utils/mctp-demux-daemon.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 573,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-11-09T00:09:13Z",
+      "side": 0,
+      "message": "I\u0027m wondering whether we leave these in place and make them just issue a log message saying they\u0027re deprecated for now?",
+      "range": {
+        "startLine": 572,
+        "startChar": 1,
+        "endLine": 573,
+        "endChar": 50
+      },
+      "revId": "836932cb21cc2e6c928a3359fa5c4a2e262002dd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
