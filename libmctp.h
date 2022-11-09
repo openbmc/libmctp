@@ -72,7 +72,7 @@ struct mctp_bus;
 
 struct mctp *mctp_init(void);
 void mctp_set_max_message_size(struct mctp *mctp, size_t message_size);
-typedef void (*mctp_capture_fn)(struct mctp_pktbuf *pkt, void *user);
+typedef void (*mctp_capture_fn)(struct mctp_pktbuf *pkt, bool outgoing, void *user);
 void mctp_set_capture_handler(struct mctp *mctp, mctp_capture_fn fn, void *user);
 void mctp_destroy(struct mctp *mctp);
 
