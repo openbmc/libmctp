@@ -1,4 +1,4 @@
-libmctp: Implementation of MCTP (DTMF DSP0236)
+libmctp: Implementation of MCTP (DMTF DSP0236)
 ==============================================
 
 This library is intended to be a portable implementation of the Management
