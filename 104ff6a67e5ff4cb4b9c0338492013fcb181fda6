@@ -281,6 +281,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4eb52e0b_83e554d1",
+        "filename": "utils/mctp-capture.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-30T04:40:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "900dce24_76b4bbdf",
+      "revId": "104ff6a67e5ff4cb4b9c0338492013fcb181fda6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ec4a113_fa59e0e2",

@@ -22,6 +22,30 @@
       },
       "revId": "836932cb21cc2e6c928a3359fa5c4a2e262002dd",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3383e7cd_eb97e719",
+        "filename": "utils/mctp-demux-daemon.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 573,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-11-30T04:40:53Z",
+      "side": 0,
+      "message": "Yeah, that\u0027s probably better.",
+      "parentUuid": "375e2348_9d784411",
+      "range": {
+        "startLine": 572,
+        "startChar": 1,
+        "endLine": 573,
+        "endChar": 50
+      },
+      "revId": "836932cb21cc2e6c928a3359fa5c4a2e262002dd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
