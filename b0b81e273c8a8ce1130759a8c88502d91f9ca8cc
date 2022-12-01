@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e52c9055_13bec83a",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-12-01T00:16:34Z",
+      "side": 1,
+      "message": "I think we could improve the usability here by the following:\n\n if (outgoing) {\n  mctp-\u003edest \u003d eid;\n  mctp-\u003esrc \u003d 0;\n } else\n  mctp-\u003edest \u003d 0;\n  mctp-\u003esrc \u003d eid;\n }\n\nThat way we can infer the direction from which field contains the EID.",
+      "range": {
+        "startLine": 123,
+        "startChar": 1,
+        "endLine": 124,
+        "endChar": 15
+      },
+      "revId": "b0b81e273c8a8ce1130759a8c88502d91f9ca8cc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
