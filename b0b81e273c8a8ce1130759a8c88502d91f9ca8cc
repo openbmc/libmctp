@@ -22,6 +22,30 @@
       },
       "revId": "b0b81e273c8a8ce1130759a8c88502d91f9ca8cc",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e39f2def_b85086a0",
+        "filename": "utils/mctp-capture.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-12-02T00:36:17Z",
+      "side": 1,
+      "message": "Good point!",
+      "parentUuid": "e52c9055_13bec83a",
+      "range": {
+        "startLine": 123,
+        "startChar": 1,
+        "endLine": 124,
+        "endChar": 15
+      },
+      "revId": "b0b81e273c8a8ce1130759a8c88502d91f9ca8cc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
