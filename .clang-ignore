@@ -1,8 +1,0 @@
-astlpc.c
-core.c
-libmctp.h
-serial.c
-tests/test_bridge.c
-tests/test_eid.c
-tests/test_seq.c
-utils/mctp-demux-daemon.c

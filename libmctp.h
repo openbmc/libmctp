@@ -15,15 +15,15 @@ extern "C" {
 typedef uint8_t mctp_eid_t;
 
 /* Special Endpoint ID values */
-#define MCTP_EID_NULL 0
+#define MCTP_EID_NULL	   0
 #define MCTP_EID_BROADCAST 0xff
 
 /* MCTP packet definitions */
 struct mctp_hdr {
-	uint8_t	ver;
-	uint8_t	dest;
-	uint8_t	src;
-	uint8_t	flags_seq_tag;
+	uint8_t ver;
+	uint8_t dest;
+	uint8_t src;
+	uint8_t flags_seq_tag;
 };
 
 /* Definitions for flags_seq_tag field */
@@ -41,17 +41,17 @@ struct mctp_hdr {
 #define MCTP_MESSAGE_TO_DST false
 
 /* Baseline Transmission Unit and packet size */
-#define MCTP_BTU		64
-#define MCTP_PACKET_SIZE(unit)	((unit) + sizeof(struct mctp_hdr))
-#define MCTP_BODY_SIZE(unit)	((unit) - sizeof(struct mctp_hdr))
+#define MCTP_BTU	       64
+#define MCTP_PACKET_SIZE(unit) ((unit) + sizeof(struct mctp_hdr))
+#define MCTP_BODY_SIZE(unit)   ((unit) - sizeof(struct mctp_hdr))
 
 /* packet buffers */
 
 struct mctp_pktbuf {
-	size_t		start, end, size;
-	size_t		mctp_hdr_off;
+	size_t start, end, size;
+	size_t mctp_hdr_off;
 	struct mctp_pktbuf *next;
-	unsigned char	data[];
+	unsigned char data[];
 };
 
 struct mctp_binding;
@@ -73,7 +73,8 @@ struct mctp_bus;
 struct mctp *mctp_init(void);
 void mctp_set_max_message_size(struct mctp *mctp, size_t message_size);
 typedef void (*mctp_capture_fn)(struct mctp_pktbuf *pkt, void *user);
-void mctp_set_capture_handler(struct mctp *mctp, mctp_capture_fn fn, void *user);
+void mctp_set_capture_handler(struct mctp *mctp, mctp_capture_fn fn,
+			      void *user);
 void mctp_destroy(struct mctp *mctp);
 
 /* Register a binding to the MCTP core, and creates a bus (populating
@@ -83,9 +84,8 @@ void mctp_destroy(struct mctp *mctp);
  * and will deliver local packets to a RX callback - see `mctp_set_rx_all()`
  * below.
  */
-int mctp_register_bus(struct mctp *mctp,
-		struct mctp_binding *binding,
-		mctp_eid_t eid);
+int mctp_register_bus(struct mctp *mctp, struct mctp_binding *binding,
+		      mctp_eid_t eid);
 
 void mctp_unregister_bus(struct mctp *mctp, struct mctp_binding *binding);
 
@@ -95,8 +95,8 @@ void mctp_unregister_bus(struct mctp *mctp, struct mctp_binding *binding);
  * defined, so no packets are considered local. Instead, all messages from one
  * binding are forwarded to the other.
  */
-int mctp_bridge_busses(struct mctp *mctp,
-		struct mctp_binding *b1, struct mctp_binding *b2);
+int mctp_bridge_busses(struct mctp *mctp, struct mctp_binding *b1,
+		       struct mctp_binding *b2);
 
 typedef void (*mctp_rx_fn)(uint8_t src_eid, bool tag_owner, uint8_t msg_tag,
 			   void *data, void *msg, size_t len);
@@ -138,9 +138,8 @@ void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable);
 void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt);
 
 /* environment-specific allocation */
-void mctp_set_alloc_ops(void *(*alloc)(size_t),
-		void (*free)(void *),
-		void *(realloc)(void *, size_t));
+void mctp_set_alloc_ops(void *(*alloc)(size_t), void (*free)(void *),
+			void *(realloc)(void *, size_t));
 
 /* environment-specific logging */
 
@@ -150,12 +149,11 @@ void mctp_set_log_custom(void (*fn)(int, const char *, va_list));
 
 /* these should match the syslog-standard LOG_* definitions, for
  * easier use with syslog */
-#define MCTP_LOG_ERR		3
-#define MCTP_LOG_WARNING	4
-#define MCTP_LOG_NOTICE		5
-#define MCTP_LOG_INFO		6
-#define MCTP_LOG_DEBUG		7
-
+#define MCTP_LOG_ERR	 3
+#define MCTP_LOG_WARNING 4
+#define MCTP_LOG_NOTICE	 5
+#define MCTP_LOG_INFO	 6
+#define MCTP_LOG_DEBUG	 7
 
 #ifdef __cplusplus
 }
