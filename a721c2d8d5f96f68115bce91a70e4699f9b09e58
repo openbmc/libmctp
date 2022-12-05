@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92180f73_9cc46496",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2022-12-05T02:30:45Z",
+      "side": 1,
+      "message": "I had been avoiding a big-bang reformatting and was doing it piece-meal to minimise disruption, but I think it\u0027s ended up causing more pain than I\u0027d hoped. This is consumable enough. I think we just do it.",
+      "revId": "a721c2d8d5f96f68115bce91a70e4699f9b09e58",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
