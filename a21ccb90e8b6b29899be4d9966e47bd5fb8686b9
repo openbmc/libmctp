@@ -16,6 +16,24 @@
       "message": "So we have bools here, and that\u0027s fine, however how do you feel about adding macros for true/false that help describe the direction at the point of invocation. For example:\n\n #define MCTP_CAPTURE_OUTGOING true\n #define MCTP_CAPTURE_INCOMING false\n\nWe\u0027ve done similar over here: https://gerrit.openbmc.org/c/openbmc/libmctp/+/57959/9/libmctp.h#40\n\nHappy to bikeshed the names :) Also happy to take the idea in a later patch.",
       "revId": "a21ccb90e8b6b29899be4d9966e47bd5fb8686b9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "809c944a_88e1a9a6",
+        "filename": "utils/mctp-capture.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2022-12-07T22:19:46Z",
+      "side": 1,
+      "message": "I think macros would make usage of this less error prone. As far as I can see they would need to be added into libmctp.h as well -- is it reasonable to add these macros in the library header file for such a small thing?",
+      "parentUuid": "83fbbac5_081b32c1",
+      "revId": "a21ccb90e8b6b29899be4d9966e47bd5fb8686b9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
