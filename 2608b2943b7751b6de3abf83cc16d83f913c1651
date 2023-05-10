@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73c096f0_0e0ece89",
+        "filename": ".clang-format",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-05-10T21:13:42Z",
+      "side": 0,
+      "message": "I think a more subtle effort is required here to have less difference to the existing source formatting.",
+      "revId": "2608b2943b7751b6de3abf83cc16d83f913c1651",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
