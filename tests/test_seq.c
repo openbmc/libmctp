@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
 #include <assert.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "compiler.h"
@@ -44,56 +44,61 @@ struct test {
 	int exp_rx_count;
 	size_t exp_rx_len;
 } tests[] = {
-	{
-		/* single packet */
-		.n_packets = 1,
-		.flags_seq_tags = {
-			SEQ(1) | MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM,
-		},
-		.exp_rx_count = 1,
-		.exp_rx_len = 1,
-	},
-	{
-		/* two packets: one start, one end */
-		.n_packets = 2,
-		.flags_seq_tags = {
-			SEQ(1) | MCTP_HDR_FLAG_SOM,
-			SEQ(2) | MCTP_HDR_FLAG_EOM,
-		},
-		.exp_rx_count = 1,
-		.exp_rx_len = 2,
-	},
-	{
-		/* three packets: one start, one no flags, one end */
-		.n_packets = 3,
-		.flags_seq_tags = {
-			SEQ(1) | MCTP_HDR_FLAG_SOM,
-			SEQ(2),
-			SEQ(3) | MCTP_HDR_FLAG_EOM,
-		},
-		.exp_rx_count = 1,
-		.exp_rx_len = 3,
-	},
-	{
-		/* two packets, wrapping sequence numbers */
-		.n_packets = 2,
-		.flags_seq_tags = {
-			SEQ(3) | MCTP_HDR_FLAG_SOM,
-			SEQ(0) | MCTP_HDR_FLAG_EOM,
-		},
-		.exp_rx_count = 1,
-		.exp_rx_len = 2,
-	},
-	{
-		/* two packets, invalid sequence number */
-		.n_packets = 2,
-		.flags_seq_tags = {
-			SEQ(1) | MCTP_HDR_FLAG_SOM,
-			SEQ(3) | MCTP_HDR_FLAG_EOM,
-		},
-		.exp_rx_count = 0,
-		.exp_rx_len = 0,
-	},
+    {
+	/* single packet */
+	.n_packets = 1,
+	.flags_seq_tags =
+	    {
+		SEQ(1) | MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM,
+	    },
+	.exp_rx_count = 1,
+	.exp_rx_len = 1,
+    },
+    {
+	/* two packets: one start, one end */
+	.n_packets = 2,
+	.flags_seq_tags =
+	    {
+		SEQ(1) | MCTP_HDR_FLAG_SOM,
+		SEQ(2) | MCTP_HDR_FLAG_EOM,
+	    },
+	.exp_rx_count = 1,
+	.exp_rx_len = 2,
+    },
+    {
+	/* three packets: one start, one no flags, one end */
+	.n_packets = 3,
+	.flags_seq_tags =
+	    {
+		SEQ(1) | MCTP_HDR_FLAG_SOM,
+		SEQ(2),
+		SEQ(3) | MCTP_HDR_FLAG_EOM,
+	    },
+	.exp_rx_count = 1,
+	.exp_rx_len = 3,
+    },
+    {
+	/* two packets, wrapping sequence numbers */
+	.n_packets = 2,
+	.flags_seq_tags =
+	    {
+		SEQ(3) | MCTP_HDR_FLAG_SOM,
+		SEQ(0) | MCTP_HDR_FLAG_EOM,
+	    },
+	.exp_rx_count = 1,
+	.exp_rx_len = 2,
+    },
+    {
+	/* two packets, invalid sequence number */
+	.n_packets = 2,
+	.flags_seq_tags =
+	    {
+		SEQ(1) | MCTP_HDR_FLAG_SOM,
+		SEQ(3) | MCTP_HDR_FLAG_EOM,
+	    },
+	.exp_rx_count = 0,
+	.exp_rx_len = 0,
+    },
 };
 
 static void run_one_test(struct test_ctx *ctx, struct test *test)

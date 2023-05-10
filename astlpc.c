@@ -20,20 +20,20 @@
 
 #include "container_of.h"
 #include "crc32.h"
-#include "libmctp.h"
 #include "libmctp-alloc.h"
-#include "libmctp-log.h"
 #include "libmctp-astlpc.h"
+#include "libmctp-log.h"
+#include "libmctp.h"
 #include "range.h"
 
 #ifdef MCTP_HAVE_FILEIO
 
-#include <unistd.h>
 #include <fcntl.h>
+#include <linux/aspeed-lpc-ctrl.h>
 #include <poll.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <linux/aspeed-lpc-ctrl.h>
+#include <unistd.h>
 
 /* kernel interface */
 static const char *kcs_path = "/dev/mctp0";
@@ -50,11 +50,12 @@ enum mctp_astlpc_cmd {
 
 enum mctp_astlpc_buffer_state {
 	/*
-	 * Prior to "Channel Ready" we mark the buffers as "idle" to catch illegal accesses. In this
-	 * state neither side is considered the owner of the buffer.
+	 * Prior to "Channel Ready" we mark the buffers as "idle" to catch
+	 * illegal accesses. In this state neither side is considered the owner
+	 * of the buffer.
 	 *
-	 * Upon "Channel Ready", each side transitions the buffers from the initial "idle" state
-	 * to the following target states:
+	 * Upon "Channel Ready", each side transitions the buffers from the
+	 * initial "idle" state to the following target states:
 	 *
 	 * Tx buffer: "acquired"
 	 * Rx buffer: "released"
@@ -62,40 +63,49 @@ enum mctp_astlpc_buffer_state {
 	buffer_state_idle,
 
 	/*
-	 * Beyond initialisation by "Channel Ready", buffers are in the "acquired" state once:
+	 * Beyond initialisation by "Channel Ready", buffers are in the
+	 * "acquired" state once:
 	 *
-	 * 1. We dequeue a control command transferring the buffer to our ownership out of the KCS
-	 *    interface, and
+	 * 1. We dequeue a control command transferring the buffer to our
+	 * ownership out of the KCS interface, and
 	 * 2. We are yet to complete all of our required accesses to the buffer
 	 *
-	 * * The Tx buffer enters the "acquired" state when we dequeue the "Rx Complete" command
-	 * * The Rx buffer enters the "acquired" state when we dequeue the "Tx Begin" command
+	 * * The Tx buffer enters the "acquired" state when we dequeue the "Rx
+	 * Complete" command
+	 * * The Rx buffer enters the "acquired" state when we dequeue the "Tx
+	 * Begin" command
 	 *
-	 * It is a failure of implementation if it's possible for both sides to simultaneously
-	 * consider a buffer as "acquired".
+	 * It is a failure of implementation if it's possible for both sides to
+	 * simultaneously consider a buffer as "acquired".
 	 */
 	buffer_state_acquired,
 
 	/*
 	 * Buffers are in the "prepared" state when:
 	 *
-	 * 1. We have completed all of our required accesses (read or write) for the buffer, and
-	 * 2. We have not yet successfully enqueued the control command to hand off ownership
+	 * 1. We have completed all of our required accesses (read or write) for
+	 * the buffer, and
+	 * 2. We have not yet successfully enqueued the control command to hand
+	 * off ownership
 	 */
 	buffer_state_prepared,
 
 	/*
-	 * Beyond initialisation by "Channel Ready", buffers are in the "released" state once:
+	 * Beyond initialisation by "Channel Ready", buffers are in the
+	 * "released" state once:
 	 *
-	 * 1. We successfully enqueue the control command transferring ownership to the remote
-	 *    side in to the KCS interface
+	 * 1. We successfully enqueue the control command transferring ownership
+	 * to the remote side in to the KCS interface
 	 *
-	 * * The Tx buffer enters the "released" state when we enqueue the "Tx Begin" command
-	 * * The Rx buffer enters the "released" state when we enqueue the "Rx Complete" command
+	 * * The Tx buffer enters the "released" state when we enqueue the "Tx
+	 * Begin" command
+	 * * The Rx buffer enters the "released" state when we enqueue the "Rx
+	 * Complete" command
 	 *
-	 * It may be the case that both sides simultaneously consider a buffer to be in the
-	 * "released" state. However, if this is true, it must also be true that a buffer ownership
-	 * transfer command has been enqueued in the KCS interface and is yet to be dequeued.
+	 * It may be the case that both sides simultaneously consider a buffer
+	 * to be in the "released" state. However, if this is true, it must also
+	 * be true that a buffer ownership transfer command has been enqueued in
+	 * the KCS interface and is yet to be dequeued.
 	 */
 	buffer_state_released,
 };
@@ -233,33 +243,37 @@ bool astlpc_pktbuf_validate_v3(struct mctp_pktbuf *pkt)
 }
 
 static const struct mctp_astlpc_protocol astlpc_protocol_version[] = {
-	[0] = {
-		.version = 0,
-		.packet_size = NULL,
-		.body_size = NULL,
-		.pktbuf_protect = NULL,
-		.pktbuf_validate = NULL,
+    [0] =
+	{
+	    .version = 0,
+	    .packet_size = NULL,
+	    .body_size = NULL,
+	    .pktbuf_protect = NULL,
+	    .pktbuf_validate = NULL,
 	},
-	[1] = {
-		.version = 1,
-		.packet_size = astlpc_packet_size_v1,
-		.body_size = astlpc_body_size_v1,
-		.pktbuf_protect = astlpc_pktbuf_protect_v1,
-		.pktbuf_validate = astlpc_pktbuf_validate_v1,
+    [1] =
+	{
+	    .version = 1,
+	    .packet_size = astlpc_packet_size_v1,
+	    .body_size = astlpc_body_size_v1,
+	    .pktbuf_protect = astlpc_pktbuf_protect_v1,
+	    .pktbuf_validate = astlpc_pktbuf_validate_v1,
 	},
-	[2] = {
-		.version = 2,
-		.packet_size = astlpc_packet_size_v1,
-		.body_size = astlpc_body_size_v1,
-		.pktbuf_protect = astlpc_pktbuf_protect_v1,
-		.pktbuf_validate = astlpc_pktbuf_validate_v1,
+    [2] =
+	{
+	    .version = 2,
+	    .packet_size = astlpc_packet_size_v1,
+	    .body_size = astlpc_body_size_v1,
+	    .pktbuf_protect = astlpc_pktbuf_protect_v1,
+	    .pktbuf_validate = astlpc_pktbuf_validate_v1,
 	},
-	[3] = {
-		.version = 3,
-		.packet_size = astlpc_packet_size_v3,
-		.body_size = astlpc_body_size_v3,
-		.pktbuf_protect = astlpc_pktbuf_protect_v3,
-		.pktbuf_validate = astlpc_pktbuf_validate_v3,
+    [3] =
+	{
+	    .version = 3,
+	    .packet_size = astlpc_packet_size_v3,
+	    .body_size = astlpc_body_size_v3,
+	    .pktbuf_protect = astlpc_pktbuf_protect_v3,
+	    .pktbuf_validate = astlpc_pktbuf_validate_v3,
 	},
 };
 
@@ -285,10 +299,10 @@ static const uint32_t control_size = 0x100;
 
 #define LPC_WIN_SIZE (1 * 1024 * 1024)
 
-#define KCS_STATUS_BMC_READY	  0x80
+#define KCS_STATUS_BMC_READY 0x80
 #define KCS_STATUS_CHANNEL_ACTIVE 0x40
-#define KCS_STATUS_IBF		  0x02
-#define KCS_STATUS_OBF		  0x01
+#define KCS_STATUS_IBF 0x02
+#define KCS_STATUS_OBF 0x01
 
 static inline int mctp_astlpc_kcs_write(struct mctp_binding_astlpc *astlpc,
 					enum mctp_binding_astlpc_kcs_reg reg,
@@ -422,10 +436,10 @@ static int mctp_astlpc_layout_write(struct mctp_binding_astlpc *astlpc,
 		hdr.layout.tx_offset = htobe32(layout->rx.offset);
 		hdr.layout.tx_size = htobe32(layout->rx.size);
 
-		return mctp_astlpc_lpc_write(astlpc, &hdr.layout,
-					     offsetof(struct mctp_lpcmap_hdr,
-						      layout),
-					     sizeof(hdr.layout));
+		return mctp_astlpc_lpc_write(
+		    astlpc, &hdr.layout,
+		    offsetof(struct mctp_lpcmap_hdr, layout),
+		    sizeof(hdr.layout));
 	}
 
 	assert(astlpc->mode == MCTP_BINDING_ASTLPC_MODE_HOST);
@@ -435,10 +449,10 @@ static int mctp_astlpc_layout_write(struct mctp_binding_astlpc *astlpc,
 	 * by the BMC, as is the BMC's rx_size (host tx_size).
 	 */
 	rx_size_be = htobe32(layout->rx.size);
-	return mctp_astlpc_lpc_write(astlpc, &rx_size_be,
-				     offsetof(struct mctp_lpcmap_hdr,
-					      layout.rx_size),
-				     sizeof(rx_size_be));
+	return mctp_astlpc_lpc_write(
+	    astlpc, &rx_size_be,
+	    offsetof(struct mctp_lpcmap_hdr, layout.rx_size),
+	    sizeof(rx_size_be));
 }
 
 static bool
@@ -449,19 +463,18 @@ mctp_astlpc_buffer_validate(const struct mctp_binding_astlpc *astlpc,
 	/* Check for overflow */
 	if (buf->offset + buf->size < buf->offset) {
 		mctp_prerr(
-			"%s packet buffer parameters overflow: offset: 0x%" PRIx32
-			", size: %" PRIu32,
-			name, buf->offset, buf->size);
+		    "%s packet buffer parameters overflow: offset: 0x%" PRIx32
+		    ", size: %" PRIu32,
+		    name, buf->offset, buf->size);
 		return false;
 	}
 
 	/* Check that the buffers are contained within the allocated space */
 	if (buf->offset + buf->size > LPC_WIN_SIZE) {
-		mctp_prerr(
-			"%s packet buffer parameters exceed %uM window size: offset: 0x%" PRIx32
-			", size: %" PRIu32,
-			name, (LPC_WIN_SIZE / (1024 * 1024)), buf->offset,
-			buf->size);
+		mctp_prerr("%s packet buffer parameters exceed %uM window "
+			   "size: offset: 0x%" PRIx32 ", size: %" PRIu32,
+			   name, (LPC_WIN_SIZE / (1024 * 1024)), buf->offset,
+			   buf->size);
 		return false;
 	}
 
@@ -469,20 +482,21 @@ mctp_astlpc_buffer_validate(const struct mctp_binding_astlpc *astlpc,
 	if (buf->size <
 	    astlpc->proto->packet_size(MCTP_PACKET_SIZE(MCTP_BTU))) {
 		mctp_prerr(
-			"%s packet buffer too small: Require %" PRIu32
-			" bytes to support the %u byte baseline transmission unit, found %" PRIu32,
-			name,
-			astlpc->proto->packet_size(MCTP_PACKET_SIZE(MCTP_BTU)),
-			MCTP_BTU, buf->size);
+		    "%s packet buffer too small: Require %" PRIu32
+		    " bytes to support the %u byte baseline transmission unit, "
+		    "found %" PRIu32,
+		    name,
+		    astlpc->proto->packet_size(MCTP_PACKET_SIZE(MCTP_BTU)),
+		    MCTP_BTU, buf->size);
 		return false;
 	}
 
 	/* Check for overlap with the control space */
 	if (buf->offset < control_size) {
 		mctp_prerr(
-			"%s packet buffer overlaps control region {0x%" PRIx32
-			", %" PRIu32 "}: Rx {0x%" PRIx32 ", %" PRIu32 "}",
-			name, 0U, control_size, buf->offset, buf->size);
+		    "%s packet buffer overlaps control region {0x%" PRIx32
+		    ", %" PRIu32 "}: Rx {0x%" PRIx32 ", %" PRIu32 "}",
+		    name, 0U, control_size, buf->offset, buf->size);
 		return false;
 	}
 
@@ -517,7 +531,7 @@ mctp_astlpc_layout_validate(const struct mctp_binding_astlpc *astlpc,
 
 static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 {
-	struct mctp_lpcmap_hdr hdr = { 0 };
+	struct mctp_lpcmap_hdr hdr = {0};
 	uint8_t status;
 	uint32_t sz;
 
@@ -547,7 +561,7 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 	astlpc->layout.tx.offset = control_size;
 	astlpc->layout.tx.size = sz;
 	astlpc->layout.rx.offset =
-		astlpc->layout.tx.offset + astlpc->layout.tx.size;
+	    astlpc->layout.tx.offset + astlpc->layout.tx.size;
 	astlpc->layout.rx.size = sz;
 
 	if (!mctp_astlpc_layout_validate(astlpc, &astlpc->layout)) {
@@ -556,16 +570,16 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 	}
 
 	hdr = (struct mctp_lpcmap_hdr){
-		.magic = htobe32(ASTLPC_MCTP_MAGIC),
-		.bmc_ver_min = htobe16(ASTLPC_VER_MIN),
-		.bmc_ver_cur = htobe16(ASTLPC_VER_CUR),
+	    .magic = htobe32(ASTLPC_MCTP_MAGIC),
+	    .bmc_ver_min = htobe16(ASTLPC_VER_MIN),
+	    .bmc_ver_cur = htobe16(ASTLPC_VER_CUR),
 
-		/* Flip the buffers back as we're now describing the host's
-		 * configuration to the host */
-		.layout.rx_offset = htobe32(astlpc->layout.tx.offset),
-		.layout.rx_size = htobe32(astlpc->layout.tx.size),
-		.layout.tx_offset = htobe32(astlpc->layout.rx.offset),
-		.layout.tx_size = htobe32(astlpc->layout.rx.size),
+	    /* Flip the buffers back as we're now describing the host's
+	     * configuration to the host */
+	    .layout.rx_offset = htobe32(astlpc->layout.tx.offset),
+	    .layout.rx_size = htobe32(astlpc->layout.tx.size),
+	    .layout.tx_offset = htobe32(astlpc->layout.rx.offset),
+	    .layout.tx_size = htobe32(astlpc->layout.rx.size),
 	};
 
 	mctp_astlpc_lpc_write(astlpc, &hdr, 0, sizeof(hdr));
@@ -582,7 +596,7 @@ static int mctp_astlpc_init_bmc(struct mctp_binding_astlpc *astlpc)
 static int mctp_binding_astlpc_start_bmc(struct mctp_binding *b)
 {
 	struct mctp_binding_astlpc *astlpc =
-		container_of(b, struct mctp_binding_astlpc, binding);
+	    container_of(b, struct mctp_binding_astlpc, binding);
 
 	astlpc->proto = &astlpc_protocol_version[ASTLPC_VER_CUR];
 
@@ -613,9 +627,9 @@ static bool mctp_astlpc_validate_version(uint16_t bmc_ver_min,
 	} else if ((host_ver_cur < bmc_ver_min) ||
 		   (host_ver_min > bmc_ver_cur)) {
 		mctp_prerr(
-			"Unable to satisfy version negotiation with ranges [%" PRIu16
-			", %" PRIu16 "] and [%" PRIu16 ", %" PRIu16 "]",
-			bmc_ver_min, bmc_ver_cur, host_ver_min, host_ver_cur);
+		    "Unable to satisfy version negotiation with ranges "
+		    "[%" PRIu16 ", %" PRIu16 "] and [%" PRIu16 ", %" PRIu16 "]",
+		    bmc_ver_min, bmc_ver_cur, host_ver_min, host_ver_cur);
 		return false;
 	}
 
@@ -635,11 +649,11 @@ static int mctp_astlpc_negotiate_layout_host(struct mctp_binding_astlpc *astlpc)
 
 	if (!mctp_astlpc_layout_validate(astlpc, &layout)) {
 		astlpc_prerr(
-			astlpc,
-			"BMC provided invalid buffer layout: Rx {0x%" PRIx32
-			", %" PRIu32 "}, Tx {0x%" PRIx32 ", %" PRIu32 "}",
-			layout.rx.offset, layout.rx.size, layout.tx.offset,
-			layout.tx.size);
+		    astlpc,
+		    "BMC provided invalid buffer layout: Rx {0x%" PRIx32
+		    ", %" PRIu32 "}, Tx {0x%" PRIx32 ", %" PRIu32 "}",
+		    layout.rx.offset, layout.rx.size, layout.tx.offset,
+		    layout.tx.size);
 		return -EINVAL;
 	}
 
@@ -652,12 +666,12 @@ static int mctp_astlpc_negotiate_layout_host(struct mctp_binding_astlpc *astlpc)
 
 	if (!mctp_astlpc_layout_validate(astlpc, &layout)) {
 		astlpc_prerr(
-			astlpc,
-			"Generated invalid buffer layout with size %" PRIu32
-			": Rx {0x%" PRIx32 ", %" PRIu32 "}, Tx {0x%" PRIx32
-			", %" PRIu32 "}",
-			sz, layout.rx.offset, layout.rx.size, layout.tx.offset,
-			layout.tx.size);
+		    astlpc,
+		    "Generated invalid buffer layout with size %" PRIu32
+		    ": Rx {0x%" PRIx32 ", %" PRIu32 "}, Tx {0x%" PRIx32
+		    ", %" PRIu32 "}",
+		    sz, layout.rx.offset, layout.rx.size, layout.tx.offset,
+		    layout.tx.size);
 		return -EINVAL;
 	}
 
@@ -709,7 +723,7 @@ static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 
 	/* Calculate the expected value of negotiated_ver */
 	negotiated = mctp_astlpc_negotiate_version(
-		bmc_ver_min, bmc_ver_cur, ASTLPC_VER_MIN, ASTLPC_VER_CUR);
+	    bmc_ver_min, bmc_ver_cur, ASTLPC_VER_MIN, ASTLPC_VER_CUR);
 	if (!negotiated) {
 		astlpc_prerr(astlpc, "Cannot negotiate with invalid versions");
 		return -EINVAL;
@@ -759,7 +773,7 @@ static int mctp_astlpc_init_host(struct mctp_binding_astlpc *astlpc)
 static int mctp_binding_astlpc_start_host(struct mctp_binding *b)
 {
 	struct mctp_binding_astlpc *astlpc =
-		container_of(b, struct mctp_binding_astlpc, binding);
+	    container_of(b, struct mctp_binding_astlpc, binding);
 
 	return mctp_astlpc_init_host(astlpc);
 }
@@ -942,10 +956,9 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 	mctp_astlpc_lpc_read(astlpc, &hdr, 0, sizeof(hdr));
 
 	/* Version negotiation */
-	negotiated =
-		mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_CUR,
-					      be16toh(hdr.host_ver_min),
-					      be16toh(hdr.host_ver_cur));
+	negotiated = mctp_astlpc_negotiate_version(
+	    ASTLPC_VER_MIN, ASTLPC_VER_CUR, be16toh(hdr.host_ver_min),
+	    be16toh(hdr.host_ver_cur));
 
 	/* MTU negotiation requires knowing which protocol we'll use */
 	assert(negotiated < ARRAY_SIZE(astlpc_protocol_version));
@@ -1059,10 +1072,10 @@ static int mctp_astlpc_finalise_channel(struct mctp_binding_astlpc *astlpc)
 	uint16_t negotiated;
 	int rc;
 
-	rc = mctp_astlpc_lpc_read(astlpc, &negotiated,
-				  offsetof(struct mctp_lpcmap_hdr,
-					   negotiated_ver),
-				  sizeof(negotiated));
+	rc = mctp_astlpc_lpc_read(
+	    astlpc, &negotiated,
+	    offsetof(struct mctp_lpcmap_hdr, negotiated_ver),
+	    sizeof(negotiated));
 	if (rc < 0)
 		return rc;
 
@@ -1092,7 +1105,7 @@ static int mctp_astlpc_finalise_channel(struct mctp_binding_astlpc *astlpc)
 
 	if (negotiated >= 2)
 		astlpc->binding.pkt_size =
-			astlpc->proto->body_size(astlpc->layout.tx.size);
+		    astlpc->proto->body_size(astlpc->layout.tx.size);
 
 	/* Track buffer ownership */
 	astlpc->layout.tx.state = buffer_state_acquired;
@@ -1187,20 +1200,20 @@ int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 		break;
 	case cmd_tx_begin:
 		if (astlpc->layout.rx.state != buffer_state_released) {
-			astlpc_prerr(
-				astlpc,
-				"Protocol error: Invalid Rx buffer state for event %d: %d\n",
-				data, astlpc->layout.rx.state);
+			astlpc_prerr(astlpc,
+				     "Protocol error: Invalid Rx buffer state "
+				     "for event %d: %d\n",
+				     data, astlpc->layout.rx.state);
 			return 0;
 		}
 		mctp_astlpc_rx_start(astlpc);
 		break;
 	case cmd_rx_complete:
 		if (astlpc->layout.tx.state != buffer_state_released) {
-			astlpc_prerr(
-				astlpc,
-				"Protocol error: Invalid Tx buffer state for event %d: %d\n",
-				data, astlpc->layout.tx.state);
+			astlpc_prerr(astlpc,
+				     "Protocol error: Invalid Tx buffer state "
+				     "for event %d: %d\n",
+				     data, astlpc->layout.tx.state);
 			return 0;
 		}
 		mctp_astlpc_tx_complete(astlpc);
@@ -1248,7 +1261,7 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(uint8_t mode,
 	astlpc->binding.name = "astlpc";
 	astlpc->binding.version = 1;
 	astlpc->binding.pkt_size =
-		MCTP_PACKET_SIZE(mtu > MCTP_BTU ? mtu : MCTP_BTU);
+	    MCTP_PACKET_SIZE(mtu > MCTP_BTU ? mtu : MCTP_BTU);
 	astlpc->binding.pkt_header = 4;
 	astlpc->binding.pkt_trailer = 4;
 	astlpc->binding.tx = mctp_binding_astlpc_tx;
@@ -1315,13 +1328,12 @@ void mctp_astlpc_destroy(struct mctp_binding_astlpc *astlpc)
 static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 {
 	struct aspeed_lpc_ctrl_mapping map = {
-		.window_type = ASPEED_LPC_CTRL_WINDOW_MEMORY,
-		.window_id = 0, /* There's only one */
-		.flags = 0,
-		.addr = 0,
-		.offset = 0,
-		.size = 0
-	};
+	    .window_type = ASPEED_LPC_CTRL_WINDOW_MEMORY,
+	    .window_id = 0, /* There's only one */
+	    .flags = 0,
+	    .addr = 0,
+	    .offset = 0,
+	    .size = 0};
 	void *lpc_map_base;
 	int fd, rc;
 
@@ -1360,12 +1372,13 @@ static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 	 * 🚨🚨🚨
 	 */
 
-	/* Map the reserved memory at the top of the 28-bit LPC firmware address space */
+	/* Map the reserved memory at the top of the 28-bit LPC firmware address
+	 * space */
 	map.addr = 0x0FFFFFFF & -map.size;
-	astlpc_prinfo(
-		astlpc,
-		"Configuring FW2AHB to map reserved memory at 0x%08x for 0x%x in the LPC FW cycle address-space",
-		map.addr, map.size);
+	astlpc_prinfo(astlpc,
+		      "Configuring FW2AHB to map reserved memory at 0x%08x for "
+		      "0x%x in the LPC FW cycle address-space",
+		      map.addr, map.size);
 
 	rc = ioctl(fd, ASPEED_LPC_CTRL_IOCTL_MAP, &map);
 	if (rc) {
@@ -1377,7 +1390,7 @@ static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 
 	/* Map the reserved memory into our address space */
 	lpc_map_base =
-		mmap(NULL, map.size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	    mmap(NULL, map.size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	if (lpc_map_base == MAP_FAILED) {
 		astlpc_prwarn(astlpc, "LPC mmap failed");
 		rc = -1;

@@ -3,8 +3,8 @@
 #ifndef _MCTP_TESTS_TEST_UTILS_H
 #define _MCTP_TESTS_TEST_UTILS_H
 
-#include <libmctp.h>
 #include <container_of.h>
+#include <libmctp.h>
 
 /* test binding implementation */
 

@@ -1,13 +1,13 @@
 #include "utils/mctp-capture.h"
 
 #include <stdio.h>
-#include <sys/time.h>
 #include <string.h>
+#include <sys/time.h>
 
 #if HAVE_PCAP
-#include <pcap/sll.h>
-#include <linux/if_ether.h>
 #include "libmctp-alloc.h"
+#include <linux/if_ether.h>
+#include <pcap/sll.h>
 
 #ifndef ETH_P_MCTP
 #define ETH_P_MCTP 0xfa
@@ -32,8 +32,8 @@ int capture_prepare(struct capture *cap)
 {
 	int rc;
 
-	if (!(cap->pcap = pcap_open_dead(CAPTURE_LINKTYPE_LINUX_SLL2,
-					 UINT16_MAX))) {
+	if (!(cap->pcap =
+		  pcap_open_dead(CAPTURE_LINKTYPE_LINUX_SLL2, UINT16_MAX))) {
 		fprintf(stderr, "pcap_open_dead: failed\n");
 		return -1;
 	}
@@ -122,9 +122,9 @@ void capture_socket(pcap_dumper_t *dumper, const void *buf, size_t len,
 
 	/* Write fake mctp header */
 	struct mctp_hdr *mctp =
-		(struct mctp_hdr *)(pktbuf + sizeof(struct sll2_header));
+	    (struct mctp_hdr *)(pktbuf + sizeof(struct sll2_header));
 	mctp->ver = 1;
-	mctp->flags_seq_tag = 0xc0; //set SOM and EOM
+	mctp->flags_seq_tag = 0xc0; // set SOM and EOM
 	if (outgoing) {
 		mctp->dest = eid;
 		mctp->src = 0;

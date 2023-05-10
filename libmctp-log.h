@@ -6,7 +6,7 @@
 /* libmctp-internal logging */
 
 void mctp_prlog(int level, const char *fmt, ...)
-	__attribute__((format(printf, 2, 3)));
+    __attribute__((format(printf, 2, 3)));
 
 #ifndef pr_fmt
 #define pr_fmt(x) x

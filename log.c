@@ -2,8 +2,8 @@
 
 #include <stdarg.h>
 
-#include "libmctp.h"
 #include "libmctp-log.h"
+#include "libmctp.h"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

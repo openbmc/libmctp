@@ -9,13 +9,13 @@ extern "C" {
 
 #include <stdarg.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 typedef uint8_t mctp_eid_t;
 
 /* Special Endpoint ID values */
-#define MCTP_EID_NULL	   0
+#define MCTP_EID_NULL 0
 #define MCTP_EID_BROADCAST 0xff
 
 /* MCTP packet definitions */
@@ -27,25 +27,25 @@ struct mctp_hdr {
 };
 
 /* Definitions for flags_seq_tag field */
-#define MCTP_HDR_FLAG_SOM  (1 << 7)
-#define MCTP_HDR_FLAG_EOM  (1 << 6)
-#define MCTP_HDR_FLAG_TO   (1 << 3)
-#define MCTP_HDR_TO_SHIFT  (3)
-#define MCTP_HDR_TO_MASK   (1)
+#define MCTP_HDR_FLAG_SOM (1 << 7)
+#define MCTP_HDR_FLAG_EOM (1 << 6)
+#define MCTP_HDR_FLAG_TO (1 << 3)
+#define MCTP_HDR_TO_SHIFT (3)
+#define MCTP_HDR_TO_MASK (1)
 #define MCTP_HDR_SEQ_SHIFT (4)
-#define MCTP_HDR_SEQ_MASK  (0x3)
+#define MCTP_HDR_SEQ_MASK (0x3)
 #define MCTP_HDR_TAG_SHIFT (0)
-#define MCTP_HDR_TAG_MASK  (0x7)
+#define MCTP_HDR_TAG_MASK (0x7)
 
-#define MCTP_MESSAGE_TO_SRC	      true
-#define MCTP_MESSAGE_TO_DST	      false
+#define MCTP_MESSAGE_TO_SRC true
+#define MCTP_MESSAGE_TO_DST false
 #define MCTP_MESSAGE_CAPTURE_OUTGOING true
 #define MCTP_MESSAGE_CAPTURE_INCOMING false
 
 /* Baseline Transmission Unit and packet size */
-#define MCTP_BTU	       64
+#define MCTP_BTU 64
 #define MCTP_PACKET_SIZE(unit) ((unit) + sizeof(struct mctp_hdr))
-#define MCTP_BODY_SIZE(unit)   ((unit) - sizeof(struct mctp_hdr))
+#define MCTP_BODY_SIZE(unit) ((unit) - sizeof(struct mctp_hdr))
 
 /* packet buffers */
 
@@ -152,11 +152,11 @@ void mctp_set_log_custom(void (*fn)(int, const char *, va_list));
 
 /* these should match the syslog-standard LOG_* definitions, for
  * easier use with syslog */
-#define MCTP_LOG_ERR	 3
+#define MCTP_LOG_ERR 3
 #define MCTP_LOG_WARNING 4
-#define MCTP_LOG_NOTICE	 5
-#define MCTP_LOG_INFO	 6
-#define MCTP_LOG_DEBUG	 7
+#define MCTP_LOG_NOTICE 5
+#define MCTP_LOG_INFO 6
+#define MCTP_LOG_DEBUG 7
 
 #ifdef __cplusplus
 }

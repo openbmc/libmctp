@@ -2,8 +2,8 @@
 
 #include <assert.h>
 
-#include "libmctp.h"
 #include "libmctp-alloc.h"
+#include "libmctp.h"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -15,9 +15,9 @@ struct {
 	void *(*m_realloc)(void *, size_t);
 } alloc_ops = {
 #ifdef MCTP_DEFAULT_ALLOC
-	malloc,
-	free,
-	realloc,
+    malloc,
+    free,
+    realloc,
 #endif
 };
 

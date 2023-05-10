@@ -12,10 +12,10 @@
 #undef pr_fmt
 #define pr_fmt(fmt) "core: " fmt
 
-#include "libmctp.h"
 #include "libmctp-alloc.h"
-#include "libmctp-log.h"
 #include "libmctp-cmds.h"
+#include "libmctp-log.h"
+#include "libmctp.h"
 #include "range.h"
 
 /* Internal data structures */
@@ -248,8 +248,8 @@ static int mctp_msg_ctx_add_pkt(struct mctp_msg_ctx *ctx,
 		if (!ctx->buf_alloc_size) {
 			new_alloc_size = MAX(len, 4096UL);
 		} else {
-			new_alloc_size = MAX(ctx->buf_alloc_size * 2,
-					     len + ctx->buf_size);
+			new_alloc_size =
+			    MAX(ctx->buf_alloc_size * 2, len + ctx->buf_size);
 		}
 
 		/* Don't allow heap to grow beyond a limit */
@@ -506,7 +506,7 @@ static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus, mctp_eid_t src,
 			if (mctp_ctrl_cmd_is_request(msg_hdr)) {
 				bool handled;
 				handled = mctp_ctrl_handle_msg(
-					bus, src, msg_tag, tag_owner, buf, len);
+				    bus, src, msg_tag, tag_owner, buf, len);
 				if (handled)
 					return;
 			}
@@ -564,7 +564,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 	tag = (hdr->flags_seq_tag >> MCTP_HDR_TAG_SHIFT) & MCTP_HDR_TAG_MASK;
 	seq = (hdr->flags_seq_tag >> MCTP_HDR_SEQ_SHIFT) & MCTP_HDR_SEQ_MASK;
 	tag_owner =
-		(hdr->flags_seq_tag >> MCTP_HDR_TO_SHIFT) & MCTP_HDR_TO_MASK;
+	    (hdr->flags_seq_tag >> MCTP_HDR_TO_SHIFT) & MCTP_HDR_TO_MASK;
 
 	switch (flags) {
 	case MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM:
@@ -583,10 +583,10 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		if (ctx) {
 			mctp_msg_ctx_reset(ctx);
 		} else {
-			ctx = mctp_msg_ctx_create(mctp, hdr->src, hdr->dest,
-						  tag);
-			/* If context creation fails due to exhaution of contexts we
-			* can support, drop the packet */
+			ctx =
+			    mctp_msg_ctx_create(mctp, hdr->src, hdr->dest, tag);
+			/* If context creation fails due to exhaution of
+			 * contexts we can support, drop the packet */
 			if (!ctx) {
 				mctp_prdebug("Context buffers exhausted.");
 				goto out;
@@ -615,8 +615,8 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 		if (exp_seq != seq) {
 			mctp_prdebug(
-				"Sequence number %d does not match expected %d",
-				seq, exp_seq);
+			    "Sequence number %d does not match expected %d",
+			    seq, exp_seq);
 			mctp_msg_ctx_drop(ctx);
 			goto out;
 		}
@@ -648,8 +648,8 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 		exp_seq = (ctx->last_seq + 1) % 4;
 		if (exp_seq != seq) {
 			mctp_prdebug(
-				"Sequence number %d does not match expected %d",
-				seq, exp_seq);
+			    "Sequence number %d does not match expected %d",
+			    seq, exp_seq);
 			mctp_msg_ctx_drop(ctx);
 			goto out;
 		}
@@ -713,7 +713,8 @@ static void mctp_send_tx_queue(struct mctp_bus *bus)
 		case -EBUSY:
 		/* Some other unknown error occurred */
 		default:
-			/* Make sure the tail pointer is consistent and retry later */
+			/* Make sure the tail pointer is consistent and retry
+			 * later */
 			goto cleanup_tail;
 		};
 	}
@@ -734,9 +735,8 @@ void mctp_binding_set_tx_enabled(struct mctp_binding *binding, bool enable)
 
 		if (binding->pkt_size < MCTP_PACKET_SIZE(MCTP_BTU)) {
 			mctp_prerr(
-				"Cannot start %s binding with invalid MTU: %zu",
-				binding->name,
-				MCTP_BODY_SIZE(binding->pkt_size));
+			    "Cannot start %s binding with invalid MTU: %zu",
+			    binding->name, MCTP_BODY_SIZE(binding->pkt_size));
 			return;
 		}
 
@@ -785,9 +785,9 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 			return -EINVAL;
 	}
 
-	mctp_prdebug(
-		"%s: Generating packets for transmission of %zu byte message from %hhu to %hhu",
-		__func__, msg_len, src, dest);
+	mctp_prdebug("%s: Generating packets for transmission of %zu byte "
+		     "message from %hhu to %hhu",
+		     __func__, msg_len, src, dest);
 
 	/* queue up packets, each of max MCTP_MTU size */
 	for (p = 0, i = 0; p < msg_len; i++) {
@@ -795,8 +795,8 @@ static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 		if (payload_len > max_payload_len)
 			payload_len = max_payload_len;
 
-		pkt = mctp_pktbuf_alloc(bus->binding,
-					payload_len + sizeof(*hdr));
+		pkt =
+		    mctp_pktbuf_alloc(bus->binding, payload_len + sizeof(*hdr));
 		hdr = mctp_pktbuf_hdr(pkt);
 
 		hdr->ver = bus->binding->version & 0xf;

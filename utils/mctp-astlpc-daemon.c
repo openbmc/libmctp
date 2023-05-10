@@ -4,12 +4,12 @@
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
-#include "libmctp.h"
 #include "libmctp-astlpc.h"
+#include "libmctp.h"
 
 static const mctp_eid_t local_eid = 8;
 static const mctp_eid_t remote_eid = 9;

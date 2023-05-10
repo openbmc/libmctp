@@ -3,13 +3,13 @@
 #include "test-utils.h"
 
 #include "compiler.h"
-#include "libmctp.h"
 #include "libmctp-alloc.h"
 #include "libmctp-cmds.h"
+#include "libmctp.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 
 #ifdef NDEBUG
 #undef NDEBUG
@@ -79,15 +79,17 @@ static void send_transport_control_message(void)
 	struct mctp_binding binding;
 	struct callback_data ctx;
 	static const struct msg_payload send_control_message_payload = {
-		.hdr = {
-			.dest = eid_1,
-			.src = eid_2,
-			.flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM,
+	    .hdr =
+		{
+		    .dest = eid_1,
+		    .src = eid_2,
+		    .flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM,
 		},
-		.ctrl_hdr = {
-			.ic_msg_type = MCTP_CTRL_HDR_MSG_TYPE,
-			.rq_dgram_inst = MCTP_CTRL_HDR_FLAG_REQUEST,
-			.command_code = 0xF2,
+	    .ctrl_hdr =
+		{
+		    .ic_msg_type = MCTP_CTRL_HDR_MSG_TYPE,
+		    .rq_dgram_inst = MCTP_CTRL_HDR_FLAG_REQUEST,
+		    .command_code = 0xF2,
 		},
 	};
 

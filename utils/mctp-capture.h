@@ -49,9 +49,7 @@ static inline int capture_prepare(struct capture *cap)
 	return 0;
 }
 
-static inline void capture_close(struct capture *cap __unused)
-{
-}
+static inline void capture_close(struct capture *cap __unused) {}
 
 static inline void capture_binding(struct mctp_pktbuf *pkt __unused,
 				   bool outgoing __unused, void *user __unused)

@@ -24,7 +24,8 @@ static const size_t write(int fd, void *buf, size_t len)
 #define pr_fmt(x) "serial: " x
 
 /*
- * @fn: A function that will copy data from the buffer at src into the dst object
+ * @fn: A function that will copy data from the buffer at src into the dst
+ * object
  * @dst: An opaque object to pass as state to fn
  * @src: A pointer to the buffer of data to copy to dst
  * @len: The length of the data pointed to by src
@@ -54,11 +55,11 @@ static ssize_t mctp_serial_write(int fildes, const void *buf, size_t nbyte)
 	return ((wrote = write(fildes, buf, nbyte)) < 0) ? -errno : wrote;
 }
 
-#include "libmctp.h"
+#include "container_of.h"
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
 #include "libmctp-serial.h"
-#include "container_of.h"
+#include "libmctp.h"
 
 struct mctp_binding_serial {
 	struct mctp_binding binding;
@@ -91,9 +92,9 @@ struct mctp_binding_serial {
 #define binding_to_serial(b)                                                   \
 	container_of(b, struct mctp_binding_serial, binding)
 
-#define MCTP_SERIAL_REVISION	 0x01
+#define MCTP_SERIAL_REVISION 0x01
 #define MCTP_SERIAL_FRAMING_FLAG 0x7e
-#define MCTP_SERIAL_ESCAPE	 0x7d
+#define MCTP_SERIAL_ESCAPE 0x7d
 
 struct mctp_serial_header {
 	uint8_t flag;

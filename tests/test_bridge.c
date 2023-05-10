@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
 
 #include <assert.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include <libmctp.h>
 #include <libmctp-alloc.h>
+#include <libmctp.h>
 
 #include "test-utils.h"
 
@@ -26,7 +26,7 @@ static int mctp_binding_bridge_tx(struct mctp_binding *b,
 				  struct mctp_pktbuf *pkt)
 {
 	struct mctp_binding_bridge *binding =
-		container_of(b, struct mctp_binding_bridge, binding);
+	    container_of(b, struct mctp_binding_bridge, binding);
 
 	binding->tx_count++;
 	assert(mctp_pktbuf_size(pkt) == sizeof(struct mctp_hdr) + 1);

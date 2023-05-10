@@ -7,9 +7,9 @@
 #define SD_LISTEN_FDS_START 3
 
 #include "compiler.h"
-#include "libmctp.h"
-#include "libmctp-serial.h"
 #include "libmctp-astlpc.h"
+#include "libmctp-serial.h"
+#include "libmctp.h"
 #include "utils/mctp-capture.h"
 
 #include <assert.h>
@@ -249,24 +249,24 @@ static int binding_astlpc_process(struct binding *binding)
 	return mctp_astlpc_poll(binding->data);
 }
 
-struct binding bindings[] = { {
-				      .name = "null",
-				      .init = binding_null_init,
-			      },
-			      {
-				      .name = "serial",
-				      .init = binding_serial_init,
-				      .destroy = NULL,
-				      .init_pollfd = binding_serial_init_pollfd,
-				      .process = binding_serial_process,
-			      },
-			      {
-				      .name = "astlpc",
-				      .init = binding_astlpc_init,
-				      .destroy = binding_astlpc_destroy,
-				      .init_pollfd = binding_astlpc_init_pollfd,
-				      .process = binding_astlpc_process,
-			      } };
+struct binding bindings[] = {{
+				 .name = "null",
+				 .init = binding_null_init,
+			     },
+			     {
+				 .name = "serial",
+				 .init = binding_serial_init,
+				 .destroy = NULL,
+				 .init_pollfd = binding_serial_init_pollfd,
+				 .process = binding_serial_process,
+			     },
+			     {
+				 .name = "astlpc",
+				 .init = binding_astlpc_init,
+				 .destroy = binding_astlpc_destroy,
+				 .init_pollfd = binding_astlpc_init_pollfd,
+				 .process = binding_astlpc_process,
+			     }};
 
 struct binding *binding_lookup(const char *name)
 {
@@ -329,7 +329,7 @@ static int socket_process(struct ctx *ctx)
 
 	ctx->n_clients++;
 	ctx->clients =
-		realloc(ctx->clients, ctx->n_clients * sizeof(struct client));
+	    realloc(ctx->clients, ctx->n_clients * sizeof(struct client));
 
 	client = &ctx->clients[ctx->n_clients - 1];
 	memset(client, 0, sizeof(*client));
@@ -486,13 +486,13 @@ static int run_daemon(struct ctx *ctx)
 		if (clients_changed) {
 			int i;
 
-			ctx->pollfds = realloc(ctx->pollfds,
-					       (ctx->n_clients + FD_NR) *
-						       sizeof(struct pollfd));
+			ctx->pollfds =
+			    realloc(ctx->pollfds, (ctx->n_clients + FD_NR) *
+						      sizeof(struct pollfd));
 
 			for (i = 0; i < ctx->n_clients; i++) {
 				ctx->pollfds[FD_NR + i].fd =
-					ctx->clients[i].sock;
+				    ctx->clients[i].sock;
 				ctx->pollfds[FD_NR + i].events = POLLIN;
 			}
 			clients_changed = false;
@@ -523,7 +523,8 @@ static int run_daemon(struct ctx *ctx)
 			} else {
 				warnx("Unexpected read result for signalfd: %d",
 				      rc);
-				warnx("Quitting on the basis that signalfd became ready");
+				warnx("Quitting on the basis that signalfd "
+				      "became ready");
 				rc = -1;
 				break;
 			}
@@ -563,13 +564,13 @@ static int run_daemon(struct ctx *ctx)
 }
 
 static const struct option options[] = {
-	{ "capture-binding", required_argument, 0, 'b' },
-	{ "capture-socket", required_argument, 0, 's' },
-	{ "binding-linktype", required_argument, 0, 'B' },
-	{ "socket-linktype", required_argument, 0, 'S' },
-	{ "verbose", no_argument, 0, 'v' },
-	{ "eid", required_argument, 0, 'e' },
-	{ 0 },
+    {"capture-binding", required_argument, 0, 'b'},
+    {"capture-socket", required_argument, 0, 's'},
+    {"binding-linktype", required_argument, 0, 'B'},
+    {"socket-linktype", required_argument, 0, 'S'},
+    {"verbose", no_argument, 0, 'v'},
+    {"eid", required_argument, 0, 'e'},
+    {0},
 };
 
 static void usage(const char *progname)

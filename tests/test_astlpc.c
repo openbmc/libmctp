@@ -110,8 +110,8 @@ static int mctp_astlpc_mmio_kcs_write(void *data,
 }
 
 static const struct mctp_binding_astlpc_ops astlpc_direct_mmio_ops = {
-	.kcs_read = mctp_astlpc_mmio_kcs_read,
-	.kcs_write = mctp_astlpc_mmio_kcs_write,
+    .kcs_read = mctp_astlpc_mmio_kcs_read,
+    .kcs_write = mctp_astlpc_mmio_kcs_write,
 };
 
 int mctp_astlpc_mmio_lpc_read(void *data, void *buf, long offset, size_t len)
@@ -144,10 +144,10 @@ int mctp_astlpc_mmio_lpc_write(void *data, const void *buf, long offset,
 }
 
 static const struct mctp_binding_astlpc_ops astlpc_indirect_mmio_ops = {
-	.kcs_read = mctp_astlpc_mmio_kcs_read,
-	.kcs_write = mctp_astlpc_mmio_kcs_write,
-	.lpc_read = mctp_astlpc_mmio_lpc_read,
-	.lpc_write = mctp_astlpc_mmio_lpc_write,
+    .kcs_read = mctp_astlpc_mmio_kcs_read,
+    .kcs_write = mctp_astlpc_mmio_kcs_write,
+    .lpc_read = mctp_astlpc_mmio_lpc_read,
+    .lpc_write = mctp_astlpc_mmio_lpc_write,
 };
 
 static void astlpc_test_rx_message(uint8_t eid __unused,
@@ -243,7 +243,7 @@ static void astlpc_assert_tx_packet(struct astlpc_endpoint *src,
 
 static void astlpc_test_packetised_message_bmc_to_host(void)
 {
-	struct astlpc_test ctx = { 0 };
+	struct astlpc_test ctx = {0};
 	uint8_t msg[2 * MCTP_BTU];
 	int rc;
 
@@ -285,7 +285,7 @@ static void astlpc_test_packetised_message_bmc_to_host(void)
 
 static void astlpc_test_simple_message_host_to_bmc(void)
 {
-	struct astlpc_test ctx = { 0 };
+	struct astlpc_test ctx = {0};
 	uint8_t msg[MCTP_BTU];
 	uint8_t tag = 0;
 	int rc;
@@ -327,7 +327,7 @@ static void astlpc_test_simple_message_host_to_bmc(void)
 
 static void astlpc_test_simple_message_bmc_to_host(void)
 {
-	struct astlpc_test ctx = { 0 };
+	struct astlpc_test ctx = {0};
 	uint8_t msg[MCTP_BTU];
 	uint8_t tag = 0;
 	int rc;
@@ -369,9 +369,9 @@ static void astlpc_test_simple_message_bmc_to_host(void)
 
 static void astlpc_test_host_before_bmc(void)
 {
-	struct mctp_binding_astlpc_mmio mmio = { 0 };
+	struct mctp_binding_astlpc_mmio mmio = {0};
 	struct mctp_binding_astlpc *astlpc;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	struct mctp *mctp;
 	int rc;
 
@@ -410,21 +410,21 @@ static void astlpc_test_bad_version(void)
 	       mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_CUR,
 					     ASTLPC_VER_MIN, ASTLPC_VER_BAD));
 	assert(0 == mctp_astlpc_negotiate_version(
-			    ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR, ASTLPC_VER_MIN,
-			    ASTLPC_VER_CUR + 1));
+			ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR, ASTLPC_VER_MIN,
+			ASTLPC_VER_CUR + 1));
 	assert(0 == mctp_astlpc_negotiate_version(
-			    ASTLPC_VER_MIN, ASTLPC_VER_CUR + 1,
-			    ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR));
+			ASTLPC_VER_MIN, ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR + 1,
+			ASTLPC_VER_CUR));
 }
 
 static void astlpc_test_incompatible_versions(void)
 {
 	assert(0 == mctp_astlpc_negotiate_version(
-			    ASTLPC_VER_CUR, ASTLPC_VER_CUR, ASTLPC_VER_CUR + 1,
-			    ASTLPC_VER_CUR + 1));
+			ASTLPC_VER_CUR, ASTLPC_VER_CUR, ASTLPC_VER_CUR + 1,
+			ASTLPC_VER_CUR + 1));
 	assert(0 == mctp_astlpc_negotiate_version(
-			    ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR + 1,
-			    ASTLPC_VER_CUR, ASTLPC_VER_CUR));
+			ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR + 1, ASTLPC_VER_CUR,
+			ASTLPC_VER_CUR));
 }
 
 static void astlpc_test_choose_bmc_ver_cur(void)
@@ -441,7 +441,7 @@ static void astlpc_test_version_host_fails_negotiation(void)
 {
 	struct astlpc_endpoint bmc, host;
 	struct mctp_lpcmap_hdr *hdr;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	void *lpc_mem;
 	int rc;
 
@@ -472,7 +472,7 @@ static void astlpc_test_version_bmc_fails_negotiation(void)
 {
 	struct astlpc_endpoint bmc, host;
 	struct mctp_lpcmap_hdr *hdr;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	void *lpc_mem;
 	int rc;
 
@@ -510,7 +510,7 @@ static void astlpc_test_version_bmc_fails_negotiation(void)
 static void astlpc_test_simple_init(void)
 {
 	struct astlpc_endpoint bmc, host;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	void *lpc_mem;
 	int rc;
 
@@ -553,8 +553,8 @@ static void astlpc_test_simple_init(void)
 
 static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 {
-	struct astlpc_test ctx = { 0 };
-	uint8_t kcs[2] = { 0 };
+	struct astlpc_test ctx = {0};
+	uint8_t kcs[2] = {0};
 	uint8_t msg[MCTP_BTU];
 	uint8_t tag = 0;
 	int rc;
@@ -575,8 +575,8 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 	ctx.bmc.mmio.lpc = ctx.lpc_mem;
 	ctx.bmc.mmio.lpc_size = LPC_WIN_SIZE;
 	ctx.bmc.astlpc =
-		mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU, NULL,
-				 &astlpc_indirect_mmio_ops, &ctx.bmc.mmio);
+	    mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_BMC, MCTP_BTU, NULL,
+			     &astlpc_indirect_mmio_ops, &ctx.bmc.mmio);
 	mctp_register_bus(ctx.bmc.mctp, &ctx.bmc.astlpc->binding, 8);
 
 	/* Host initialisation */
@@ -587,8 +587,8 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 	ctx.host.mmio.lpc = ctx.lpc_mem;
 	ctx.host.mmio.lpc_size = LPC_WIN_SIZE;
 	ctx.host.astlpc =
-		mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU, NULL,
-				 &astlpc_indirect_mmio_ops, &ctx.host.mmio);
+	    mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_HOST, MCTP_BTU, NULL,
+			     &astlpc_indirect_mmio_ops, &ctx.host.mmio);
 	mctp_register_bus(ctx.host.mctp, &ctx.host.astlpc->binding, 9);
 
 	/* BMC processes host channel init request, alerts host */
@@ -621,7 +621,7 @@ static void astlpc_test_simple_indirect_message_bmc_to_host(void)
 
 static void astlpc_test_host_tx_bmc_gone(void)
 {
-	struct astlpc_test ctx = { 0 };
+	struct astlpc_test ctx = {0};
 	uint8_t unwritten[MCTP_BTU];
 	uint8_t msg[MCTP_BTU];
 	uint8_t tag = 0;
@@ -675,7 +675,7 @@ static void astlpc_test_host_tx_bmc_gone(void)
 static void astlpc_test_poll_not_ready(void)
 {
 	struct astlpc_endpoint bmc;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	void *lpc_mem;
 	int rc;
 
@@ -701,7 +701,7 @@ static void astlpc_test_poll_not_ready(void)
 static void astlpc_test_undefined_command(void)
 {
 	struct astlpc_endpoint bmc;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	void *lpc_mem;
 	int rc;
 
@@ -730,14 +730,14 @@ static void astlpc_test_undefined_command(void)
 
 #define BUFFER_MIN (MCTP_PACKET_SIZE(MCTP_BTU) + 4 + 4)
 static const struct mctp_binding_astlpc astlpc_layout_ctx = {
-	.proto = &astlpc_protocol_version[3],
+    .proto = &astlpc_protocol_version[3],
 };
 
 static void astlpc_test_buffers_rx_offset_overflow(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { UINT32_MAX, BUFFER_MIN },
-		.tx = { control_size, BUFFER_MIN },
+	    .rx = {UINT32_MAX, BUFFER_MIN},
+	    .tx = {control_size, BUFFER_MIN},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -746,8 +746,8 @@ static void astlpc_test_buffers_rx_offset_overflow(void)
 static void astlpc_test_buffers_tx_offset_overflow(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, BUFFER_MIN },
-		.tx = { UINT32_MAX, BUFFER_MIN },
+	    .rx = {control_size, BUFFER_MIN},
+	    .tx = {UINT32_MAX, BUFFER_MIN},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -756,8 +756,8 @@ static void astlpc_test_buffers_tx_offset_overflow(void)
 static void astlpc_test_buffers_rx_size_overflow(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size + BUFFER_MIN, UINT32_MAX },
-		.tx = { control_size, BUFFER_MIN },
+	    .rx = {control_size + BUFFER_MIN, UINT32_MAX},
+	    .tx = {control_size, BUFFER_MIN},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -766,8 +766,8 @@ static void astlpc_test_buffers_rx_size_overflow(void)
 static void astlpc_test_buffers_tx_size_overflow(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, BUFFER_MIN },
-		.tx = { control_size + BUFFER_MIN, UINT32_MAX },
+	    .rx = {control_size, BUFFER_MIN},
+	    .tx = {control_size + BUFFER_MIN, UINT32_MAX},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -776,8 +776,8 @@ static void astlpc_test_buffers_tx_size_overflow(void)
 static void astlpc_test_buffers_rx_window_violation(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN },
-		.tx = { control_size, BUFFER_MIN },
+	    .rx = {LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN},
+	    .tx = {control_size, BUFFER_MIN},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -786,8 +786,8 @@ static void astlpc_test_buffers_rx_window_violation(void)
 static void astlpc_test_buffers_tx_window_violation(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, BUFFER_MIN },
-		.tx = { LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN },
+	    .rx = {control_size, BUFFER_MIN},
+	    .tx = {LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -796,8 +796,8 @@ static void astlpc_test_buffers_tx_window_violation(void)
 static void astlpc_test_buffers_rx_size_fails_btu(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, BUFFER_MIN - 1 },
-		.tx = { control_size + BUFFER_MIN, BUFFER_MIN },
+	    .rx = {control_size, BUFFER_MIN - 1},
+	    .tx = {control_size + BUFFER_MIN, BUFFER_MIN},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -806,8 +806,8 @@ static void astlpc_test_buffers_rx_size_fails_btu(void)
 static void astlpc_test_buffers_tx_size_fails_btu(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, BUFFER_MIN },
-		.tx = { control_size + BUFFER_MIN, BUFFER_MIN - 1 },
+	    .rx = {control_size, BUFFER_MIN},
+	    .tx = {control_size + BUFFER_MIN, BUFFER_MIN - 1},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -816,8 +816,8 @@ static void astlpc_test_buffers_tx_size_fails_btu(void)
 static void astlpc_test_buffers_overlap_rx_low(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, 2 * BUFFER_MIN },
-		.tx = { control_size + BUFFER_MIN, 2 * BUFFER_MIN },
+	    .rx = {control_size, 2 * BUFFER_MIN},
+	    .tx = {control_size + BUFFER_MIN, 2 * BUFFER_MIN},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -826,8 +826,8 @@ static void astlpc_test_buffers_overlap_rx_low(void)
 static void astlpc_test_buffers_overlap_tx_low(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size + BUFFER_MIN, 2 * BUFFER_MIN },
-		.tx = { control_size, 2 * BUFFER_MIN },
+	    .rx = {control_size + BUFFER_MIN, 2 * BUFFER_MIN},
+	    .tx = {control_size, 2 * BUFFER_MIN},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -836,8 +836,8 @@ static void astlpc_test_buffers_overlap_tx_low(void)
 static void astlpc_test_buffers_overlap_exact(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, 2 * BUFFER_MIN },
-		.tx = { control_size, 2 * BUFFER_MIN },
+	    .rx = {control_size, 2 * BUFFER_MIN},
+	    .tx = {control_size, 2 * BUFFER_MIN},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -846,8 +846,8 @@ static void astlpc_test_buffers_overlap_exact(void)
 static void astlpc_test_buffers_overlap_control(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { 0, BUFFER_MIN },
-		.tx = { control_size + BUFFER_MIN, BUFFER_MIN },
+	    .rx = {0, BUFFER_MIN},
+	    .tx = {control_size + BUFFER_MIN, BUFFER_MIN},
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -857,7 +857,7 @@ static void astlpc_test_buffers_bad_host_proposal(void)
 {
 	struct astlpc_endpoint bmc, host;
 	struct mctp_lpcmap_hdr *hdr;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	void *lpc_mem;
 	int rc;
 
@@ -896,7 +896,7 @@ static void astlpc_test_buffers_bad_bmc_proposal(void)
 {
 	struct astlpc_endpoint bmc, host;
 	struct mctp_lpcmap_hdr *hdr;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	void *lpc_mem;
 	int rc;
 
@@ -930,7 +930,7 @@ static void astlpc_test_buffers_bad_bmc_negotiation(void)
 {
 	struct astlpc_endpoint bmc, host;
 	struct mctp_lpcmap_hdr *hdr;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	void *lpc_mem;
 	int rc;
 
@@ -968,7 +968,7 @@ static void astlpc_test_buffers_bad_bmc_negotiation(void)
 static void astlpc_test_buffers_bad_host_init(void)
 {
 	struct astlpc_endpoint host;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	void *lpc_mem;
 	int rc;
 
@@ -983,8 +983,8 @@ static void astlpc_test_buffers_bad_host_init(void)
 
 	/* Set the MTU to 0 to provoke a failure */
 	host.astlpc =
-		mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_HOST, 0, lpc_mem,
-				 &astlpc_direct_mmio_ops, &host.mmio);
+	    mctp_astlpc_init(MCTP_BINDING_ASTLPC_MODE_HOST, 0, lpc_mem,
+			     &astlpc_direct_mmio_ops, &host.mmio);
 
 	rc = mctp_register_bus(host.mctp, &host.astlpc->binding, 8);
 	assert(rc < 0);
@@ -997,7 +997,7 @@ static void astlpc_test_buffers_bad_host_init(void)
 static void astlpc_test_negotiate_increased_mtu(void)
 {
 	struct astlpc_endpoint bmc, host;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	void *lpc_mem;
 	int rc;
 
@@ -1029,7 +1029,7 @@ static void astlpc_test_negotiate_increased_mtu(void)
 static void astlpc_test_negotiate_mtu_low_high(void)
 {
 	struct astlpc_endpoint bmc, host;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	uint32_t bmtu, hmtu;
 	void *lpc_mem;
 	int rc;
@@ -1093,7 +1093,7 @@ static void astlpc_test_send_large_packet(void)
 {
 	struct astlpc_endpoint *bmc, *host;
 	struct astlpc_test ctx;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	uint8_t tag = 0;
 	void *lpc_mem;
 	int rc;
@@ -1151,8 +1151,8 @@ static void astlpc_test_send_large_packet(void)
 
 static void astlpc_test_negotiate_mtu_high_low(void)
 {
-	uint8_t msg[3 * MCTP_BTU] = { 0 };
-	struct astlpc_test ctx = { 0 };
+	uint8_t msg[3 * MCTP_BTU] = {0};
+	struct astlpc_test ctx = {0};
 	uint32_t bmtu, hmtu;
 	uint8_t tag = 0;
 	int rc;
@@ -1188,18 +1188,20 @@ static void astlpc_test_negotiate_mtu_high_low(void)
 	assert(rc == 0);
 
 	/*
-	 * Transmit a message to place a packet on the interface. This releases the buffer and
-	 * disables the binding, plugging the binding's transmit queue while the host hasn't polled
-	 * to pull the packet off.
+	 * Transmit a message to place a packet on the interface. This releases
+	 * the buffer and disables the binding, plugging the binding's transmit
+	 * queue while the host hasn't polled to pull the packet off.
 	 */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_DST, tag, msg,
 			     sizeof(msg));
 
-	/* Leave the packet in place on the interface by not polling the host binding */
+	/* Leave the packet in place on the interface by not polling the host
+	 * binding */
 
 	/*
-	 * Transmit another message to force packetisation at the current MTU while the binding is
-	 * disabled, leaving the packet(s) in the binding's transmit queue
+	 * Transmit another message to force packetisation at the current MTU
+	 * while the binding is disabled, leaving the packet(s) in the binding's
+	 * transmit queue
 	 */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_DST, tag, msg,
 			     sizeof(msg));
@@ -1207,7 +1209,8 @@ static void astlpc_test_negotiate_mtu_high_low(void)
 	/* Tear-down the host so we can bring up a new one */
 	endpoint_destroy(&ctx.host);
 
-	/* Bring up a new host endpoint with a lower MTU than we previously negotiated */
+	/* Bring up a new host endpoint with a lower MTU than we previously
+	 * negotiated */
 	hmtu = 2 * MCTP_BTU;
 	rc = endpoint_init(&ctx.host, 9, MCTP_BINDING_ASTLPC_MODE_HOST, hmtu,
 			   &ctx.kcs, ctx.lpc_mem);
@@ -1227,24 +1230,27 @@ static void astlpc_test_negotiate_mtu_high_low(void)
 	assert(rc == 0);
 
 	/*
-	 * Check that there are no outstanding messages to be received by the host. The message
-	 * packetised on the BMC at the larger MTU must be dropped as its now no longer possible to
-	 * transmit those packets
+	 * Check that there are no outstanding messages to be received by the
+	 * host. The message packetised on the BMC at the larger MTU must be
+	 * dropped as its now no longer possible to transmit those packets
 	 */
 	rc = mctp_astlpc_poll(ctx.host.astlpc);
 	assert(rc == 0);
 	assert(ctx.count == 0);
 
-	/* Transmit another message from the BMC to the host, packetised using the new MTU */
+	/* Transmit another message from the BMC to the host, packetised using
+	 * the new MTU */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_DST, tag, msg,
 			     hmtu);
 
-	/* Check that the most recent BMC transmission is received by the host */
+	/* Check that the most recent BMC transmission is received by the host
+	 */
 	rc = mctp_astlpc_poll(ctx.host.astlpc);
 	assert(rc == 0);
 	assert(ctx.count == 1);
 
-	/* Ensure buffer ownership is returned to the BMC and the BMC Tx queue is processed */
+	/* Ensure buffer ownership is returned to the BMC and the BMC Tx queue
+	 * is processed */
 	rc = mctp_astlpc_poll(ctx.bmc.astlpc);
 	assert(rc == 0);
 
@@ -1262,7 +1268,7 @@ static void astlpc_test_tx_before_channel_init(void)
 {
 	struct astlpc_endpoint *bmc;
 	struct astlpc_test ctx;
-	uint8_t kcs[2] = { 0 };
+	uint8_t kcs[2] = {0};
 	uint8_t msg[MCTP_BTU];
 	uint8_t tag = 0;
 	void *lpc_mem;
@@ -1298,7 +1304,7 @@ static void astlpc_test_tx_before_channel_init(void)
 
 static void astlpc_test_corrupt_host_tx(void)
 {
-	struct astlpc_test ctx = { 0 };
+	struct astlpc_test ctx = {0};
 	struct mctp_lpcmap_hdr *hdr;
 	uint8_t msg[MCTP_BTU];
 	uint32_t offset;
@@ -1352,7 +1358,7 @@ static void astlpc_test_corrupt_host_tx(void)
 
 static void astlpc_test_corrupt_bmc_tx(void)
 {
-	struct astlpc_test ctx = { 0 };
+	struct astlpc_test ctx = {0};
 	struct mctp_lpcmap_hdr *hdr;
 	uint8_t msg[MCTP_BTU];
 	uint32_t offset;
@@ -1407,7 +1413,7 @@ static void astlpc_test_corrupt_bmc_tx(void)
 
 static void astlpc_test_async_exchange(void)
 {
-	struct astlpc_test ctx = { 0 };
+	struct astlpc_test ctx = {0};
 	uint8_t msg[MCTP_BTU];
 	struct pollfd pollfd;
 	uint8_t tag = 0;
@@ -1417,8 +1423,8 @@ static void astlpc_test_async_exchange(void)
 	memset(&msg[0], 0x5a, MCTP_BTU);
 
 	/* (1)
-	 * Fill the KCS transmit buffer by sending a message from the BMC to the host without
-	 * dequeuing it on the host side
+	 * Fill the KCS transmit buffer by sending a message from the BMC to the
+	 * host without dequeuing it on the host side
 	 */
 	mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_SRC, tag, msg,
 			sizeof(msg));
@@ -1431,24 +1437,25 @@ static void astlpc_test_async_exchange(void)
 	assert(!(pollfd.events & POLLOUT));
 
 	/* (3)
-	 * Send a message from the host to the BMC and dequeue the message on the BMC, triggering a
-	 * buffer ownership transfer command back to the host
+	 * Send a message from the host to the BMC and dequeue the message on
+	 * the BMC, triggering a buffer ownership transfer command back to the
+	 * host
 	 */
 	mctp_message_tx(ctx.host.mctp, 8, MCTP_MESSAGE_TO_SRC, tag, msg,
 			sizeof(msg));
 	mctp_astlpc_poll(ctx.bmc.astlpc);
 
 	/* (4)
-	 * Assert that the BMC has to wait for the host to dequeue the ownership transfer command
-	 * from (1) before further transfers take place.
+	 * Assert that the BMC has to wait for the host to dequeue the ownership
+	 * transfer command from (1) before further transfers take place.
 	 */
 	mctp_astlpc_init_pollfd(ctx.bmc.astlpc, &pollfd);
 	assert(!(pollfd.events & POLLIN));
 	assert(pollfd.events & POLLOUT);
 
 	/* (5)
-	 * Dequeue the message from (1) on the host side, allowing transmisson of the outstanding
-	 * ownership transfer command from (3)
+	 * Dequeue the message from (1) on the host side, allowing transmisson
+	 * of the outstanding ownership transfer command from (3)
 	 */
 	mctp_astlpc_poll(ctx.host.astlpc);
 
