@@ -16,6 +16,24 @@
       "message": "I think a more subtle effort is required here to have less difference to the existing source formatting.",
       "revId": "2608b2943b7751b6de3abf83cc16d83f913c1651",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "caed6d2c_171bbcd3",
+        "filename": ".clang-format",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2023-05-10T21:26:00Z",
+      "side": 0,
+      "message": "I assumed you had just worked on the libpldm one a bunch and it was a good clang-format to use as a starting point for C repos.  I\u0027m fine if you want to make changes one way or the other.  I don\u0027t know where this particular one came from and it is referencing clang-format-really-old in comments.\n\nI don\u0027t really care what the .clang-format looks like for C repos except that we come up with a consistent one we can apply everywhere.  Honestly, I don\u0027t really understand why we choose to have a different one for C vs C++ as none of this code is contributed to the kernel... but my amount of care is pretty low.",
+      "parentUuid": "73c096f0_0e0ece89",
+      "revId": "2608b2943b7751b6de3abf83cc16d83f913c1651",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
