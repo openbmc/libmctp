@@ -942,10 +942,10 @@ static void mctp_astlpc_init_channel(struct mctp_binding_astlpc *astlpc)
 	mctp_astlpc_lpc_read(astlpc, &hdr, 0, sizeof(hdr));
 
 	/* Version negotiation */
-	negotiated =
-		mctp_astlpc_negotiate_version(ASTLPC_VER_MIN, ASTLPC_VER_CUR,
-					      be16toh(hdr.host_ver_min),
-					      be16toh(hdr.host_ver_cur));
+	negotiated = mctp_astlpc_negotiate_version(ASTLPC_VER_MIN,
+						   ASTLPC_VER_CUR,
+						   be16toh(hdr.host_ver_min),
+						   be16toh(hdr.host_ver_cur));
 
 	/* MTU negotiation requires knowing which protocol we'll use */
 	assert(negotiated < ARRAY_SIZE(astlpc_protocol_version));
