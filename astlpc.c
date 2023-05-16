@@ -1142,6 +1142,11 @@ static int mctp_astlpc_update_channel(struct mctp_binding_astlpc *astlpc,
 	return rc;
 }
 
+bool mctp_astlpc_tx_done(struct mctp_binding_astlpc *astlpc)
+{
+	return astlpc->layout.tx.state == buffer_state_acquired;
+}
+
 int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 {
 	uint8_t status, data;
