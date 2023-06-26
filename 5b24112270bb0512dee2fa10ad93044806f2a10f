@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b93af983_9db65d98",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1001194
+      },
+      "writtenOn": "2023-06-26T21:48:58Z",
+      "side": 1,
+      "message": "typo - inefficient ?",
+      "range": {
+        "startLine": 10,
+        "startChar": 40,
+        "endLine": 10,
+        "endChar": 52
+      },
+      "revId": "5b24112270bb0512dee2fa10ad93044806f2a10f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "760f4819_effbb491",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1001194
+      },
+      "writtenOn": "2023-06-26T21:48:58Z",
+      "side": 1,
+      "message": "typo - transmitted ?",
+      "revId": "5b24112270bb0512dee2fa10ad93044806f2a10f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44a19393_d48ac7a6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1001194
+      },
+      "writtenOn": "2023-06-26T21:48:58Z",
+      "side": 1,
+      "message": "typo - Added?",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 7
+      },
+      "revId": "5b24112270bb0512dee2fa10ad93044806f2a10f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab5af094_abd737df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001194
+      },
+      "writtenOn": "2023-06-26T21:48:58Z",
+      "side": 1,
+      "message": "Please address typos in commit message",
+      "revId": "5b24112270bb0512dee2fa10ad93044806f2a10f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
