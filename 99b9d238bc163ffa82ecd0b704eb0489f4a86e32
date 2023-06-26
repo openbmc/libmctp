@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "554f013c_b12ee38b",
+        "filename": "astlpc.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1000224
+      },
+      "writtenOn": "2023-06-26T04:44:33Z",
+      "side": 1,
+      "message": "Do we not care about `KCS_STATUS_IBF`?",
+      "range": {
+        "startLine": 361,
+        "startChar": 2,
+        "endLine": 361,
+        "endChar": 53
+      },
+      "revId": "99b9d238bc163ffa82ecd0b704eb0489f4a86e32",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
