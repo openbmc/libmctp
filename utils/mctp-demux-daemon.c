@@ -120,7 +120,7 @@ static void rx_message(uint8_t eid, bool tag_owner __unused,
 	if (len < 2)
 		return;
 
-	type = *(uint8_t *)msg;
+	type = *(uint8_t *)msg & 0x7F;
 
 	if (ctx->verbose)
 		fprintf(stderr, "MCTP message received: len %zd, type %d\n",
