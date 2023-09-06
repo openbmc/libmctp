@@ -8,6 +8,7 @@
 
 #include "compiler.h"
 #include "libmctp.h"
+#include "libmctp-kcs.h"
 #include "libmctp-serial.h"
 #include "libmctp-astlpc.h"
 #include "utils/mctp-capture.h"
@@ -166,6 +167,48 @@ static int binding_null_init(struct mctp *mctp __unused,
 	return 0;
 }
 
+static int binding_kcs_init(struct mctp *mctp, struct binding *binding,
+			    mctp_eid_t eid, int n_params,
+			    char *const *params __attribute__((unused)))
+{
+	struct mctp_binding_kcs *kcs;
+	if (n_params) {
+		warnx("kcs binding does not accept parameters");
+		return -1;
+	}
+
+	kcs = mctp_kcs_init_fileio();
+	if (!kcs) {
+		warnx("could not initialise kcs binding");
+		return -1;
+	}
+
+	mctp_register_bus(mctp, mctp_binding_kcs_core(kcs), eid);
+
+	binding->data = kcs;
+	return 0;
+}
+
+static void binding_kcs_destroy(struct mctp *mctp, struct binding *binding)
+{
+	struct mctp_binding_kcs *kcs = binding->data;
+
+	mctp_unregister_bus(mctp, mctp_binding_kcs_core(kcs));
+
+	mctp_kcs_destroy(kcs);
+}
+
+static int binding_kcs_init_pollfd(struct binding *binding,
+				   struct pollfd *pollfd)
+{
+	return mctp_kcs_init_pollfd(binding->data, pollfd);
+}
+
+static int binding_kcs_process(struct binding *binding)
+{
+	return mctp_kcs_poll(binding->data);
+}
+
 static int binding_serial_init(struct mctp *mctp, struct binding *binding,
 			       mctp_eid_t eid, int n_params,
 			       char *const *params)
@@ -252,6 +295,13 @@ static int binding_astlpc_process(struct binding *binding)
 struct binding bindings[] = { {
 				      .name = "null",
 				      .init = binding_null_init,
+			      },
+			      {
+				      .name = "kcs",
+				      .init = binding_kcs_init,
+				      .destroy = binding_kcs_destroy,
+				      .init_pollfd = binding_kcs_init_pollfd,
+				      .process = binding_kcs_process,
 			      },
 			      {
 				      .name = "serial",

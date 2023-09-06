@@ -157,6 +157,7 @@ free(malloc(4096));
 # Enable all bindings. AC_ARG_ENABLE in future.
 AM_CONDITIONAL([LIBMCTP_BINDING_serial], [true])
 AM_CONDITIONAL([LIBMCTP_BINDING_astlpc], [true])
+AM_CONDITIONAL([LIBMCTP_BINDING_kcs], [true])
 
 # Check for valgrind
 AS_IF([test "x$enable_tests" = "xno"], [enable_valgrind=no])
