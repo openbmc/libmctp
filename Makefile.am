@@ -16,6 +16,11 @@ libmctp_la_SOURCES += astlpc.c crc32.c
 include_HEADERS += libmctp-astlpc.h
 endif
 
+if LIBMCTP_BINDING_kcs
+libmctp_la_SOURCES += kcs.c
+include_HEADERS += libmctp-kcs.h
+endif
+
 if HAVE_SYSTEMD
 systemdsystemunit_DATA = \
 	systemd/system/mctp-demux.service \
