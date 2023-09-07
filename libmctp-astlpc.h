@@ -45,7 +45,7 @@ bool mctp_astlpc_tx_done(struct mctp_binding_astlpc *astlpc);
 int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc);
 
 /* fileio-based interface */
-struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void);
+struct mctp_binding_astlpc *mctp_astlpc_init_fileio(const char *kcs_path);
 
 struct pollfd;
 int mctp_astlpc_init_pollfd(struct mctp_binding_astlpc *astlpc,

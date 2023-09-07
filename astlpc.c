@@ -36,7 +36,6 @@
 #include <linux/aspeed-lpc-ctrl.h>
 
 /* kernel interface */
-static const char *kcs_path = "/dev/mctp0";
 static const char *lpc_path = "/dev/aspeed-lpc-ctrl";
 
 #endif
@@ -1410,7 +1409,8 @@ static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 	return rc;
 }
 
-static int mctp_astlpc_init_fileio_kcs(struct mctp_binding_astlpc *astlpc)
+static int mctp_astlpc_init_fileio_kcs(struct mctp_binding_astlpc *astlpc,
+				       const char *kcs_path)
 {
 	astlpc->kcs_fd = open(kcs_path, O_RDWR);
 	if (astlpc->kcs_fd < 0)
@@ -1461,7 +1461,7 @@ int mctp_astlpc_init_pollfd(struct mctp_binding_astlpc *astlpc,
 	return 0;
 }
 
-struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
+struct mctp_binding_astlpc *mctp_astlpc_init_fileio(const char *kcs_path)
 {
 	struct mctp_binding_astlpc *astlpc;
 	int rc;
@@ -1489,7 +1489,7 @@ struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 		return NULL;
 	}
 
-	rc = mctp_astlpc_init_fileio_kcs(astlpc);
+	rc = mctp_astlpc_init_fileio_kcs(astlpc, kcs_path);
 	if (rc) {
 		free(astlpc);
 		return NULL;
@@ -1498,7 +1498,8 @@ struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
 	return astlpc;
 }
 #else
-struct mctp_binding_astlpc *mctp_astlpc_init_fileio(void)
+struct mctp_binding_astlpc *
+mctp_astlpc_init_fileio(const char *kcs_path __unused)
 {
 	mctp_prlog(MCTP_LOG_ERR, "%s: Missing support for file IO", __func__);
 	return NULL;

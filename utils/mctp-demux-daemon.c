@@ -211,13 +211,16 @@ static int binding_astlpc_init(struct mctp *mctp, struct binding *binding,
 			       char *const *params __attribute__((unused)))
 {
 	struct mctp_binding_astlpc *astlpc;
+	const char *path;
 
-	if (n_params) {
-		warnx("astlpc binding does not accept parameters");
+	if (n_params != 1) {
+		warnx("astlpc binding requires kcs device param");
 		return -1;
 	}
 
-	astlpc = mctp_astlpc_init_fileio();
+	path = params[0];
+
+	astlpc = mctp_astlpc_init_fileio(path);
 	if (!astlpc) {
 		warnx("could not initialise astlpc binding");
 		return -1;
