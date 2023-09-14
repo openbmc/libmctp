@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9faa8a22_8a1bbbeb",
+        "filename": "libmctp-astlpc.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-09-14T06:40:38Z",
+      "side": 0,
+      "message": "Generally I would push back on changing the prototype of a public API. This problem is usually dealt with by adding a variant of the function with a different symbol name and deprecating the existing one. However, I think we have mitigating circumstances: `mctp_astlpc_init_fileio()` is not useful in freestanding environments, and the only significant application linking against libmctp under Linux is mctp-demux-daemon, which is fixed by this patch.",
+      "revId": "8803dc12a969480e2efc41677bef15196cb3b0b9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
