@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7c483169_450f4ae8",
+        "filename": "libmctp-kcs.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-09-15T08:24:37Z",
+      "side": 1,
+      "message": "Can we place all of it in some other header which is not a library API header?\n\nFor example `kcs.h`?",
+      "parentUuid": "379cb8ce_2d8bac44",
+      "revId": "3a168c8481c36421c842e024025c81e638a75564",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d9967f3d_82aca4eb",
         "filename": "libmctp-kcs.h",
         "patchSetId": 3
