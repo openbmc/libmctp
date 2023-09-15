@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f47c8f6_3677d4d2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-09-15T01:11:57Z",
+      "side": 1,
+      "message": "Only a partial review, but something that I think can be addressed relatively quickly",
+      "revId": "3a168c8481c36421c842e024025c81e638a75564",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "379cb8ce_2d8bac44",
+        "filename": "libmctp-kcs.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-09-15T01:11:57Z",
+      "side": 1,
+      "message": "Bare in mind that this is the public header for the binding, that is, the declarations that a user will have access to by including the header.\n\nMost of the above are implementation details. I much prefer those are placed in the `.c` file and not in the header, as we don\u0027t have any motivation to expose them. Rather, we have a motivation to avoid exposing them, as otherwise we\u0027re stuck maintaining them forever (someone will use them for something and prevent us from removing them).",
+      "revId": "3a168c8481c36421c842e024025c81e638a75564",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9967f3d_82aca4eb",
+        "filename": "libmctp-kcs.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-09-15T01:11:57Z",
+      "side": 1,
+      "message": "This can also go in the implementation",
+      "revId": "3a168c8481c36421c842e024025c81e638a75564",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
