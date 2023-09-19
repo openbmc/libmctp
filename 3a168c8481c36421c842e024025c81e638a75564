@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e74504b9_47bcb022",
+        "filename": "libmctp-kcs.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-09-19T00:58:49Z",
+      "side": 1,
+      "message": "Is there a need to though? What other code are the definitions and macros going to be shared with?\n\nMaybe there\u0027s some scope for sharing some of the definitions and macros with astlpc.c, but that\u0027s not how the patch is written currently. That\u0027s also a cleanup we can do later on. I think it\u0027s probably easier if we keep these changes isolated for the moment.",
+      "parentUuid": "7c483169_450f4ae8",
+      "revId": "3a168c8481c36421c842e024025c81e638a75564",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d9967f3d_82aca4eb",
         "filename": "libmctp-kcs.h",
         "patchSetId": 3
