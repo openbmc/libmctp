@@ -71,6 +71,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6e4c7b9_c36c12b2",
+        "filename": "libmctp-kcs.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-02T08:12:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e74504b9_47bcb022",
+      "revId": "3a168c8481c36421c842e024025c81e638a75564",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d9967f3d_82aca4eb",
