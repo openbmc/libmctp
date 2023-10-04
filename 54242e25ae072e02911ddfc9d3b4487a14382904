@@ -1,0 +1,368 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7e90b73_680fb89c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "Can you please add a link to the specification in the commit message?\n\nI think it\u0027s also worth noting here that it makes use of the \"raw\" KCS chardev, which is not likely to go into the upstream kernel at any point.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6000796_63b148a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "Hi Konstantin, I\u0027ve left a few comments. The most significant issue is the implementation blocks rather than driving a state machine through polling for file descriptor readiness.\n\nAlso not sure how much effort you want to put into this given you have the kernel implementation getting reviews upstream.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc12fae3_225953ae",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "Perhaps state here that Table 1 defines the PEC in terms of the SMBus specification, with a link to the SMBus specification.\n\nThat said, on what basis do we ignore bit 8? What is the source of that assertion?",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6e03a0e_41d2fdfb",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "I\u0027ve developed a bit of a preference for avoiding `__attribute__((packed))` where we can. It\u0027s non-standard, and the compiler is smart enough to optimise away `memcpy()` calls.\n\nHowever, this is just an implementation detail. We\u0027re not spraying `__attribute__((packed))` over structs visible in the public headers (unlike other libraries I\u0027m aware of). If you\u0027re happy to change it that would be nice, but I won\u0027t require you do so.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b755feb_aea8b0ea",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "Generally capitalisation is used for constants. I\u0027d prefer we `s/PEC/pec/`.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2515ac16_8d82aaf2",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "As above.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a456b53_61235c7f",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "Why `void *`?",
+      "range": {
+        "startLine": 129,
+        "startChar": 25,
+        "endLine": 129,
+        "endChar": 34
+      },
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8076b9e9_36072832",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "Perhaps we could defer to strace here?",
+      "range": {
+        "startLine": 137,
+        "startChar": 1,
+        "endLine": 138,
+        "endChar": 16
+      },
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07796b4d_fe16accc",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "Why `void *`?",
+      "range": {
+        "startLine": 142,
+        "startChar": 26,
+        "endLine": 142,
+        "endChar": 35
+      },
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3841c81_4ed71e38",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "Again, these values are all something we can determine with strace.",
+      "range": {
+        "startLine": 149,
+        "startChar": 1,
+        "endLine": 150,
+        "endChar": 10
+      },
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45cd9a4d_750d3314",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "On the BMC side a write to the status register updates the status (unlike the host side, which puts data into ODR and sets the Command bit in the status register). This should be called `mctp_kcs_write_status()`.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b837510_78f35559",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "I\u0027d prefer we learn the lessons from having to convert the astlpc driver from blocking to polling. Can you please implement the binding as a state machine driven by events on the raw KCS file descriptor instead?",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12ec70e8_d0ddfa0c",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "We already have `crc32.h` and `crc32.c`. Maybe pull this out into `crc8.h` and `crc8.c`? Or amalgamate both into just `crc.h` and `crc.c`. Ideally we\u0027d add some tests as well.\n\nAlso, do we need to be generic over the polynomial?",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5608c0c_68f759e3",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "This might be a slightly less tedious using designated initialisers:\n\n```\nstruct mctp_kcs_header kcs_hdr \u003d {\n    .netFnAndLUN \u003d MCTP_KCS_NETFN_LUN;\n    .definingBody \u003d DEFINING_BODY_DMTF_PRE_OS_WORKING_GROUP;\n    .len \u003d mctp_pktbuf_size(pkt);\n};\n```",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b52f0f47_1c3e020b",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "libmctp tries to follow kernel style. While any reasonably recent GCC supports mixed declarations and statements it would be nice to group the declarations at the top of the function.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce651729_38502d03",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "`memcpy(send_buf, \u0026kcs_hdr, sizeof(kcs_hdr));`",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e377579a_eee0b04f",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "Maybe a comment here that this can\u0027t overflow as `kcs_hdr.len` is `uint8_t`, which is accounted for by the 256 in the declaration of `send_buf`?",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "605e03f5_331a1ac6",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "If we\u0027re going to stick with packed structs, this should be `memcpy(..., \u0026kcs_tlr, sizeof(kcs_tlr));`",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49836de1_463f16ab",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "See previous comments about this being a state machine rather than a blocking loop.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52da84c2_6b5d1209",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-04T00:43:32Z",
+      "side": 1,
+      "message": "Again, this should be a state machine whose actions hand control back to the caller without blocking.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
