@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "82a96a57_d61381e5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7e90b73_680fb89c",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "b6000796_63b148a3",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -31,6 +49,24 @@
       "writtenOn": "2023-10-04T00:43:32Z",
       "side": 1,
       "message": "Hi Konstantin, I\u0027ve left a few comments. The most significant issue is the implementation blocks rather than driving a state machine through polling for file descriptor readiness.\n\nAlso not sure how much effort you want to put into this given you have the kernel implementation getting reviews upstream.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "879da320_ffd4d58c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "Yeah, the motivation to refactor all of the code to state machine logic is very low at this point. Not sure if I\u0027ll find the time to do all of this.\n\nBut nevertheless since the current solution is working I think it would be nice to make it a good patch at least. I\u0027ve corrected all the other comments that you\u0027ve left.\n\nBTW, can we still merge:\n\n`66497: astlpc: Provide KCS device path as a binding argument` | https://gerrit.openbmc.org/c/openbmc/libmctp/+/66497\n\n`66498: libmctp: Drop \u0027astlpc-raw-kcs\u0027 PACKAGECONFIG option` | https://gerrit.openbmc.org/c/openbmc/openbmc/+/66498\n\n?",
+      "parentUuid": "b6000796_63b148a3",
       "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -48,6 +84,24 @@
       "writtenOn": "2023-10-04T00:43:32Z",
       "side": 1,
       "message": "Perhaps state here that Table 1 defines the PEC in terms of the SMBus specification, with a link to the SMBus specification.\n\nThat said, on what basis do we ignore bit 8? What is the source of that assertion?",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cddf5764_d4d5e27c",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "All this algorithm along with the comments was copied from the edk2 code.\n\nIn the kernel driver I\u0027ve verified that I can just use standard \u0027i2c_smbus_pec\u0027 from the \nhttps://github.com/torvalds/linux/blob/71e58659bfc02e4171345f80b13d6485e9cdf687/drivers/i2c/i2c-core-smbus.c#L28 instead. So I probably copy that code and refer to kernel. I think this would be more clear.",
+      "parentUuid": "bc12fae3_225953ae",
       "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -82,6 +136,24 @@
       "writtenOn": "2023-10-04T00:43:32Z",
       "side": 1,
       "message": "Generally capitalisation is used for constants. I\u0027d prefer we `s/PEC/pec/`.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa6cf183_dec7c325",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "Done\n\nI\u0027ve also renamed the fields in the header as they are named in the kernel driver:\n```\nnetFnAndLUN   -\u003e netfn_lun\ndefiningBody  -\u003e defining_body\n```",
+      "parentUuid": "0b755feb_aea8b0ea",
       "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -126,6 +198,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccf20919_9c213c59",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "I\u0027ve replaced it to `struct mctp_binding_kcs *kcs`.\nNot sure why I did `void` initially",
+      "parentUuid": "0a456b53_61235c7f",
+      "range": {
+        "startLine": 129,
+        "startChar": 25,
+        "endLine": 129,
+        "endChar": 34
+      },
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8076b9e9_36072832",
@@ -139,6 +235,30 @@
       "writtenOn": "2023-10-04T00:43:32Z",
       "side": 1,
       "message": "Perhaps we could defer to strace here?",
+      "range": {
+        "startLine": 137,
+        "startChar": 1,
+        "endLine": 138,
+        "endChar": 16
+      },
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "578ecae4_61d263f2",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "I don\u0027t usually have strace in my builds for example. So for me prints are preferred approach.\n\nBut I\u0027ve dropped them for your request",
+      "parentUuid": "8076b9e9_36072832",
       "range": {
         "startLine": 137,
         "startChar": 1,
@@ -172,6 +292,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f30cf2b0_bb49a9ff",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "I\u0027ve replaced it to `struct mctp_binding_kcs *kcs`.\nNot sure why I did `void` initially",
+      "parentUuid": "07796b4d_fe16accc",
+      "range": {
+        "startLine": 142,
+        "startChar": 26,
+        "endLine": 142,
+        "endChar": 35
+      },
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3841c81_4ed71e38",
@@ -195,6 +339,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a21b9057_6ac4a7dc",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "I don\u0027t usually have strace in my builds for example. So for me prints are preferred approach.\n\nBut I\u0027ve dropped them for your request",
+      "parentUuid": "f3841c81_4ed71e38",
+      "range": {
+        "startLine": 149,
+        "startChar": 1,
+        "endLine": 150,
+        "endChar": 10
+      },
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45cd9a4d_750d3314",
@@ -208,6 +376,24 @@
       "writtenOn": "2023-10-04T00:43:32Z",
       "side": 1,
       "message": "On the BMC side a write to the status register updates the status (unlike the host side, which puts data into ODR and sets the Command bit in the status register). This should be called `mctp_kcs_write_status()`.",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "910802f6_24437538",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45cd9a4d_750d3314",
       "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -248,6 +434,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b52d4b7c_af2b7a65",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "Would it be okay if we write it like this?\n\nKernel also have a function generic over the polynomial. But at the same time the POLY is fixed as define, so I\u0027m not sure if it should be placed in something called `crc.c`. We can make `crc8` to accept `poly` as an argument to keep all the SMBUS stuff out of the `crc.c`. But in this case the code would be not identical to kernel.\n\nhttps://github.com/torvalds/linux/blob/71e58659bfc02e4171345f80b13d6485e9cdf687/drivers/i2c/i2c-core-smbus.c#L28\n```\n#define POLY    (0x1070U \u003c\u003c 3)\nstatic uint8_t crc8(uint16_t data)\n{\n        int i;\n\n        for (i \u003d 0; i \u003c 8; i++) {\n                if (data \u0026 0x8000)\n                        data \u003d data ^ POLY;\n                data \u003d data \u003c\u003c 1;\n        }\n        return (uint8_t)(data \u003e\u003e 8);\n}\n\n// Packet error code (PEC), as defined in the SMBus 2.0 Specification\n// PEC calculation algorithm is copied from the \u0027linux/drivers/i2c/i2c-core-smbus.c\u0027 driver\nstatic uint8_t i2c_smbus_pec(uint8_t crc, uint8_t *p, size_t count)\n{\n        int i;\n\n        for (i \u003d 0; i \u003c count; i++)\n                crc \u003d crc8((crc ^ p[i]) \u003c\u003c 8);\n        return crc;\n}\n```",
+      "parentUuid": "12ec70e8_d0ddfa0c",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c5608c0c_68f759e3",
         "filename": "kcs.c",
         "patchSetId": 4
@@ -259,6 +463,24 @@
       "writtenOn": "2023-10-04T00:43:32Z",
       "side": 1,
       "message": "This might be a slightly less tedious using designated initialisers:\n\n```\nstruct mctp_kcs_header kcs_hdr \u003d {\n    .netFnAndLUN \u003d MCTP_KCS_NETFN_LUN;\n    .definingBody \u003d DEFINING_BODY_DMTF_PRE_OS_WORKING_GROUP;\n    .len \u003d mctp_pktbuf_size(pkt);\n};\n```",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7c4c5e8_19303c74",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5608c0c_68f759e3",
       "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -280,6 +502,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bb043b8_f8e0534d",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "Done. Move all of the declaration to the function start here and in other places",
+      "parentUuid": "b52f0f47_1c3e020b",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce651729_38502d03",
@@ -293,6 +533,24 @@
       "writtenOn": "2023-10-04T00:43:32Z",
       "side": 1,
       "message": "`memcpy(send_buf, \u0026kcs_hdr, sizeof(kcs_hdr));`",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4981936c_9dd478d9",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "Done\n\nI\u0027ve renamed all\n```\nsizeof(struct ...)\n```\nto\n```\nsizeof(*ptr_to_struct)\n```\nor\n```\nsizeof(struct_variable)\n```",
+      "parentUuid": "ce651729_38502d03",
       "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -314,6 +572,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de1d6999_d7049214",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e377579a_eee0b04f",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "605e03f5_331a1ac6",
@@ -327,6 +603,24 @@
       "writtenOn": "2023-10-04T00:43:32Z",
       "side": 1,
       "message": "If we\u0027re going to stick with packed structs, this should be `memcpy(..., \u0026kcs_tlr, sizeof(kcs_tlr));`",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4da5a1d7_a4b187aa",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-04T14:13:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "605e03f5_331a1ac6",
       "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
