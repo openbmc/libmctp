@@ -126,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "beb3c17d_09cc3f91",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-05T01:01:38Z",
+      "side": 1,
+      "message": "What\u0027s the license of the EDK2 code? Regarding the kernel, you can\u0027t immediately copy that code in as it will be under a GPL license, which is not compatible with Apache-2.\n\nThere may be some room to move as the routines are short and fairly universal, but we need to be cautious.",
+      "parentUuid": "cddf5764_d4d5e27c",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c6e03a0e_41d2fdfb",
         "filename": "kcs.c",
         "patchSetId": 4

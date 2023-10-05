@@ -1,0 +1,164 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e20293fa_85cd2164",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-05T01:01:38Z",
+      "side": 1,
+      "message": "I kept the previous review a bit abstract as I was hoping for a refactor to make the implementation async, but given you don\u0027t plan to do that I\u0027ve taken a closer look at the blocking implementation. I\u0027ve made some further comments.",
+      "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd18cd2b_fd4372ee",
+        "filename": "kcs.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-05T01:01:38Z",
+      "side": 1,
+      "message": "bit of a nit but this should probably be `(b)` for expansion-safety",
+      "range": {
+        "startLine": 104,
+        "startChar": 39,
+        "endLine": 104,
+        "endChar": 40
+      },
+      "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "514cb631_dd6fd387",
+        "filename": "kcs.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-05T01:01:38Z",
+      "side": 1,
+      "message": "Can we at least implement this internally using `poll(2)`?",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 3
+      },
+      "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3afbc30_c7dda07a",
+        "filename": "kcs.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-05T01:01:38Z",
+      "side": 1,
+      "message": "Can we at least implement this internally using `poll(2)`?",
+      "range": {
+        "startLine": 223,
+        "startChar": 1,
+        "endLine": 231,
+        "endChar": 3
+      },
+      "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f0f480e_f68f00ca",
+        "filename": "kcs.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-05T01:01:38Z",
+      "side": 1,
+      "message": "Is this necessary?",
+      "range": {
+        "startLine": 250,
+        "startChar": 1,
+        "endLine": 257,
+        "endChar": 3
+      },
+      "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06b8cf64_b31ad1fd",
+        "filename": "kcs.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-05T01:01:38Z",
+      "side": 1,
+      "message": "See the concern about mixing GPL-2 and Apache-2 code.",
+      "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4303fa84_e6e7e69b",
+        "filename": "kcs.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-05T01:01:38Z",
+      "side": 1,
+      "message": "You must terminate the loop and transition to an error state if read_len exceeds 255. We don\u0027t want it to be possible to overflow the buffer.",
+      "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3752d29d_4d15a411",
+        "filename": "kcs.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-05T01:01:38Z",
+      "side": 1,
+      "message": "Why not allocate the packet up front and push the data directly into the packet buffer rather than bounce through a stack buffer?",
+      "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
