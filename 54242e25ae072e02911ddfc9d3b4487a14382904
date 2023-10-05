@@ -144,6 +144,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3c85d938_18cc7931",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-05T21:02:56Z",
+      "side": 1,
+      "message": "I\u0027m not an expert on the license stuff, but here I can see:\n```\nSPDX-License-Identifier: BSD-2-Clause-Patent\n```\nhttps://github.com/tianocore/edk2-platforms/blob/master/License.txt\n\nThere is also a `License-History` file in the repository:\n```\nhttps://github.com/tianocore/edk2-platforms/blob/master/License-History.txt\n```\nWhat does it mean for us?",
+      "parentUuid": "beb3c17d_09cc3f91",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c6e03a0e_41d2fdfb",
         "filename": "kcs.c",
         "patchSetId": 4

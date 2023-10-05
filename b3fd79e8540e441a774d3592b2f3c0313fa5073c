@@ -159,6 +159,24 @@
       "message": "Why not allocate the packet up front and push the data directly into the packet buffer rather than bounce through a stack buffer?",
       "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "005ef4cd_05237f9c",
+        "filename": "kcs.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-05T21:02:56Z",
+      "side": 1,
+      "message": "We don\u0027t know the allocation size since the `kcs_header-\u003elen` is a part of the received data.\n\nMaybe we can use max possible size here instead (256)? The API is not documented very well, so I\u0027m unsure if this code would lead to the correct MCTP packet for example:\n```\nmctp_pktbuf_alloc(\u0026kcs-\u003ebinding, 256);\nmemcpy(mctp_pktbuf_hdr(pkt), (uint8_t *)(kcs_header + 1), kcs_header-\u003elen);\n```\n\nAlso using static memory instead of the dynamic allocation (malloc/free) is probably easier for the system. Not sure if this relevant though.",
+      "parentUuid": "3752d29d_4d15a411",
+      "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
