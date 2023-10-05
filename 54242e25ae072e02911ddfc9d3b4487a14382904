@@ -71,6 +71,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e3e17be_a62200b7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-05T00:44:40Z",
+      "side": 1,
+      "message": "I\u0027ve merged the libmctp patch, we\u0027ll have to squash the recipe patch into the bump when it appears.",
+      "parentUuid": "879da320_ffd4d58c",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc12fae3_225953ae",
