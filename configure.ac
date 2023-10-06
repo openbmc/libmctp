@@ -1,6 +1,6 @@
 # Initialization
-AC_PREREQ([2.69])
-AC_INIT([libmctp], 0.11, [https://github.com/openbmc/libmctp/issues])
+AC_PREREQ([2.71])
+AC_INIT([libmctp],[0.11],[https://github.com/openbmc/libmctp/issues])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([m4])
 AM_INIT_AUTOMAKE([subdir-objects -Wall -Werror -Wno-portability foreign dist-xz])
@@ -23,8 +23,7 @@ PKG_PROG_PKG_CONFIG
 PKG_INSTALLDIR
 
 AC_ARG_ENABLE([capture],
-              [AC_HELP_STRING([--enable-capture],
-                              [Use libpcap to capture messages and packets])])
+              [AS_HELP_STRING([--enable-capture],[Use libpcap to capture messages and packets])])
 AS_IF([test "x$enable_capture" = "xyes"],
        [PKG_CHECK_MODULES(pcap, libpcap,
                           [AC_DEFINE([HAVE_PCAP], [1],
