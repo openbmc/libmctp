@@ -162,6 +162,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6e5db394_4b997e44",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-06T00:09:52Z",
+      "side": 1,
+      "message": "My brief investigation suggests Apache-2 and BSD-2-Clause should be fine. However, we need to abide by the BSD requirements and make sure the copyright information is retained (along with the SPDX license specifier). I think it would be easiest to do this in its own file. If you don\u0027t mind creating a crc8.c and moving it there that would help.",
+      "parentUuid": "3c85d938_18cc7931",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c6e03a0e_41d2fdfb",
         "filename": "kcs.c",
         "patchSetId": 4
@@ -500,6 +518,24 @@
       "side": 1,
       "message": "Would it be okay if we write it like this?\n\nKernel also have a function generic over the polynomial. But at the same time the POLY is fixed as define, so I\u0027m not sure if it should be placed in something called `crc.c`. We can make `crc8` to accept `poly` as an argument to keep all the SMBUS stuff out of the `crc.c`. But in this case the code would be not identical to kernel.\n\nhttps://github.com/torvalds/linux/blob/71e58659bfc02e4171345f80b13d6485e9cdf687/drivers/i2c/i2c-core-smbus.c#L28\n```\n#define POLY    (0x1070U \u003c\u003c 3)\nstatic uint8_t crc8(uint16_t data)\n{\n        int i;\n\n        for (i \u003d 0; i \u003c 8; i++) {\n                if (data \u0026 0x8000)\n                        data \u003d data ^ POLY;\n                data \u003d data \u003c\u003c 1;\n        }\n        return (uint8_t)(data \u003e\u003e 8);\n}\n\n// Packet error code (PEC), as defined in the SMBus 2.0 Specification\n// PEC calculation algorithm is copied from the \u0027linux/drivers/i2c/i2c-core-smbus.c\u0027 driver\nstatic uint8_t i2c_smbus_pec(uint8_t crc, uint8_t *p, size_t count)\n{\n        int i;\n\n        for (i \u003d 0; i \u003c count; i++)\n                crc \u003d crc8((crc ^ p[i]) \u003c\u003c 8);\n        return crc;\n}\n```",
       "parentUuid": "12ec70e8_d0ddfa0c",
+      "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e6b344c_b8e5a0d5",
+        "filename": "kcs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-06T00:09:52Z",
+      "side": 1,
+      "message": "Okay. I don\u0027t mind, I was just curious about whether we needed to be generic over the polynomial. I don\u0027t think we do. We can bake the polynomial into the implementation and call it `crc8_ccitt()` in accordance with the table here:\n\nhttps://en.wikipedia.org/wiki/Cyclic_redundancy_check#Polynomial_representations_of_cyclic_redundancy_checks\n\nOtherwise, my concern here is mixing GPLv2 kernel code with other licenses. If you\u0027ve used the BSD-2-Clause EDK2 as a reference let\u0027s keep that. See my comment above about separating out the implementation into `crc8.c`.",
+      "parentUuid": "b52d4b7c_af2b7a65",
       "revId": "54242e25ae072e02911ddfc9d3b4487a14382904",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
