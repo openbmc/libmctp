@@ -18,6 +18,23 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58996044_237df0e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-10-06T12:30:13Z",
+      "side": 1,
+      "message": "It turned out that the current `kcs_bmc_cdev_raw` driver can\u0027t be used as-is in the code. And the modifications for the driver are not that simple and even if possible probably not worth the effort since the Linux kernel driver approach is on the way.\n\nFor example in some points KCS state machine requires BMC to read STR, but in the process the code can\u0027t read IDR. And the `kcs_bmc_cdev_raw` driver doesn\u0027t satisfy such requirements.\n\nWith these race cases communication is not reliable, sometimes your packets would go flawlessly and sometimes KCS machine would stuck.\n\nThe error that I\u0027ve caught was connected with the `WR_END` command byte:\n\nHOST writes `WR_END\u003d0x62` command, but BMC sees 0x62 as `DATA` (bit 4 in the STR register is read as 0).",
+      "revId": "b3fd79e8540e441a774d3592b2f3c0313fa5073c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd18cd2b_fd4372ee",
