@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dad9b38_2b509217",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2023-10-23T23:54:39Z",
+      "side": 1,
+      "message": "Given that:\n\n1. The patch has no impact on the code, but\n2. Prevent us from using \u003c clang-format-17, and\n3. clang-format-17 is only available via the Debian experimental archive for Sid, and\n4. The maintainers are both running Debian\n\nI think we might hold off on this for a little bit.",
+      "revId": "223c782215be89208e2b888b84a8872790b6ee94",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
