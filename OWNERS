@@ -32,7 +32,7 @@
 # data within them will be kept sorted.
 
 owners:
-- andrew@aj.id.au
+- andrew@codeconstruct.com.au
 - jk@ozlabs.org
 
 reviewers:
@@ -43,7 +43,7 @@ matchers:
 
 openbmc:
 - name: Andrew Jeffery
-  email: andrew@aj.id.au
+  email: andrew@codeconstruct.com.au
   discord: arj
 - name: Iwona Winiarska
   email: iwona.winiarska@intel.com
