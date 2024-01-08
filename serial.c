@@ -94,6 +94,7 @@ struct mctp_binding_serial {
 #define MCTP_SERIAL_REVISION	 0x01
 #define MCTP_SERIAL_FRAMING_FLAG 0x7e
 #define MCTP_SERIAL_ESCAPE	 0x7d
+#define MCTP_SERIAL_END_FLAG	 0x7f
 
 struct mctp_serial_header {
 	uint8_t flag;
@@ -161,7 +162,7 @@ static int mctp_binding_serial_tx(struct mctp_binding *b,
 	buf += len;
 
 	tlr = (void *)buf;
-	tlr->flag = MCTP_SERIAL_FRAMING_FLAG;
+	tlr->flag = MCTP_SERIAL_END_FLAG;
 	/* todo: trailer FCS */
 	tlr->fcs_msb = 0;
 	tlr->fcs_lsb = 0;
@@ -266,7 +267,7 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial, uint8_t c)
 		break;
 
 	case STATE_WAIT_SYNC_END:
-		if (c == MCTP_SERIAL_FRAMING_FLAG) {
+		if (c == MCTP_SERIAL_END_FLAG) {
 			mctp_serial_finish_packet(serial, true);
 		} else {
 			mctp_prdebug("missing end frame marker");
