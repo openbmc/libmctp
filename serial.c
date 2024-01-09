@@ -218,6 +218,15 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial, uint8_t c)
 	case STATE_WAIT_REVISION:
 		if (c == MCTP_SERIAL_REVISION) {
 			serial->rx_state = STATE_WAIT_LEN;
+		} else if (c == MCTP_SERIAL_FRAMING_FLAG) {
+			/* Handle the case where there are bytes dropped in request,
+			 * and the state machine is out of sync. The failed request's
+			 * trailing footer i.e. 0x7e would be interpreted as next
+			 * request's framing footer. So if we are in STATE_WAIT_REVISION
+			 * and receive 0x7e byte, then contine to stay in
+			 * STATE_WAIT_REVISION
+			 */
+			serial->rx_state = STATE_WAIT_REVISION;
 		} else {
 			mctp_prdebug("invalid revision 0x%02x", c);
 			serial->rx_state = STATE_WAIT_SYNC_START;
