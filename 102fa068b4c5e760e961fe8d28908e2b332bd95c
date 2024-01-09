@@ -16,6 +16,23 @@
       "message": "This would violate the MCTP-over-serial standard, which defines the framing bytes as 0x7e.\n\nI would suggest an appropriate fix would be to detect that the state machine is out-of-phase with the framing bytes, and recover there.",
       "revId": "102fa068b4c5e760e961fe8d28908e2b332bd95c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0446065f_b83245ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001369
+      },
+      "writtenOn": "2024-01-09T01:16:54Z",
+      "side": 1,
+      "message": "Looks like the MCTP over Serial spec enforces use of 0x7e for framing and trailing flag. I was looking at incorrect spec previously (MCTP over USB). Would like to hear if there is any other way to solve this",
+      "revId": "102fa068b4c5e760e961fe8d28908e2b332bd95c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
