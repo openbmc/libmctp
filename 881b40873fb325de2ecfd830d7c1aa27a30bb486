@@ -35,6 +35,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d46d188_3e4dee55",
+        "filename": "serial.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1001369
+      },
+      "writtenOn": "2024-01-09T06:23:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46c32606_bceac0f1",
+      "revId": "881b40873fb325de2ecfd830d7c1aa27a30bb486",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "78820fda_07f1cdf3",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-01-09T05:54:09Z",
       "side": 1,
       "message": "We\u0027re already in this state...",
+      "revId": "881b40873fb325de2ecfd830d7c1aa27a30bb486",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f54846f1_3d363751",
+        "filename": "serial.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1001369
+      },
+      "writtenOn": "2024-01-09T06:23:44Z",
+      "side": 1,
+      "message": "Yes, but I wanted to keep this just for readability and to make it explicitly clear. I can remove it if there is strong preference. Let me know.\n\n\nAlso I wonder, why did the OpenBMC CI tool did not kick in for the review ? Can you add it in the CL ? I don\u0027t seem to have permission",
+      "parentUuid": "78820fda_07f1cdf3",
       "revId": "881b40873fb325de2ecfd830d7c1aa27a30bb486",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
