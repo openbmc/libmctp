@@ -86,6 +86,24 @@
       "parentUuid": "78820fda_07f1cdf3",
       "revId": "881b40873fb325de2ecfd830d7c1aa27a30bb486",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23349767_4d83d6d5",
+        "filename": "serial.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1001369
+      },
+      "writtenOn": "2024-01-09T17:50:47Z",
+      "side": 1,
+      "message": "On a second thought, I think the comment makes it pretty clear..\n\nAs for OpenBMC CI tool. I added it manually for now",
+      "parentUuid": "f54846f1_3d363751",
+      "revId": "881b40873fb325de2ecfd830d7c1aa27a30bb486",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
