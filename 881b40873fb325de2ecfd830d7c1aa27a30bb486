@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0a23043_b1a9a80b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-01-09T05:54:09Z",
+      "side": 1,
+      "message": "This looks reasonable, and still complies with the spec 😊\n\nThere\u0027s an opportunity to make this more resilient by recognising the framing byte at any state (say, before we enter the main \u0027switch\u0027 statement), and re-synchronising at that point. That means we don\u0027t discard a complete packet if the end-frame byte is dropped (ie, we don\u0027t rely on two 0x7e bytes to resync).\n\nA couple of comments inline though.",
+      "revId": "881b40873fb325de2ecfd830d7c1aa27a30bb486",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46c32606_bceac0f1",
+        "filename": "serial.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-01-09T05:54:09Z",
+      "side": 1,
+      "message": "To stay consistent with the existing code, can you use C-style comments (`/* .. */`) here, and wrap at 80?",
+      "revId": "881b40873fb325de2ecfd830d7c1aa27a30bb486",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78820fda_07f1cdf3",
+        "filename": "serial.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-01-09T05:54:09Z",
+      "side": 1,
+      "message": "We\u0027re already in this state...",
+      "revId": "881b40873fb325de2ecfd830d7c1aa27a30bb486",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
