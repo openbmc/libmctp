@@ -33,6 +33,24 @@
       "message": "Looks like the MCTP over Serial spec enforces use of 0x7e for framing and trailing flag. I was looking at incorrect spec previously (MCTP over USB). Would like to hear if there is any other way to solve this",
       "revId": "102fa068b4c5e760e961fe8d28908e2b332bd95c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf09fa18_2fa19452",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001369
+      },
+      "writtenOn": "2024-01-09T01:19:24Z",
+      "side": 1,
+      "message": "yeah, I just realized that too. I was looking at incorrect spec (MCTP over USB). I see. I will think on a a way to detect and recover",
+      "parentUuid": "14840dac_b3dda32d",
+      "revId": "102fa068b4c5e760e961fe8d28908e2b332bd95c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
