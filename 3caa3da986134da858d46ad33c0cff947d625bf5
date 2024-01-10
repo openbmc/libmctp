@@ -33,6 +33,24 @@
       "message": "Oh, just noticed the typo in the commit title (\"machie\"), sorry for the hassle, but would you mind fixing that up?",
       "revId": "3caa3da986134da858d46ad33c0cff947d625bf5",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47d1551e_5a8395c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001369
+      },
+      "writtenOn": "2024-01-10T04:03:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c7968ac_ce3d9ada",
+      "revId": "3caa3da986134da858d46ad33c0cff947d625bf5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
