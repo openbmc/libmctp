@@ -1,0 +1,8 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Jeremy Kerr <jk@ozlabs.org>
+Submitted-by: Nikhil Namjoshi <nikhilnamjoshi@google.com>
+Submitted-at: Wed, 10 Jan 2024 20:30:35 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/libmctp/+/68657
+Comments-Total: 9
+Project: openbmc/libmctp
+Branch: refs/heads/master
