@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "crc-16-ccitt.h"
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -73,6 +75,7 @@ struct mctp_binding_serial {
 	struct mctp_pktbuf *rx_pkt;
 	uint8_t rx_exp_len;
 	uint16_t rx_fcs;
+	uint16_t rx_fcs_calc;
 	enum {
 		STATE_WAIT_SYNC_START,
 		STATE_WAIT_REVISION,
@@ -140,6 +143,7 @@ static int mctp_binding_serial_tx(struct mctp_binding *b,
 	struct mctp_serial_trailer *tlr;
 	uint8_t *buf;
 	size_t len;
+	uint16_t fcs;
 
 	/* the length field in the header excludes serial framing
 	 * and escape sequences */
@@ -149,6 +153,10 @@ static int mctp_binding_serial_tx(struct mctp_binding *b,
 	hdr->flag = MCTP_SERIAL_FRAMING_FLAG;
 	hdr->revision = MCTP_SERIAL_REVISION;
 	hdr->len = len;
+
+	// Calculate fcs
+	fcs = crc_16_ccitt(FCS_INIT_16, (const uint8_t *)hdr + 1, 2);
+	fcs = crc_16_ccitt(fcs, (const uint8_t *)mctp_pktbuf_hdr(pkt), len);
 
 	buf = (void *)(hdr + 1);
 
@@ -162,9 +170,8 @@ static int mctp_binding_serial_tx(struct mctp_binding *b,
 
 	tlr = (void *)buf;
 	tlr->flag = MCTP_SERIAL_FRAMING_FLAG;
-	/* todo: trailer FCS */
-	tlr->fcs_msb = 0;
-	tlr->fcs_lsb = 0;
+	tlr->fcs_msb = fcs >> 8;
+	tlr->fcs_lsb = fcs & 0xff;
 
 	len += sizeof(*hdr) + sizeof(*tlr);
 
@@ -197,6 +204,7 @@ static void mctp_serial_start_packet(struct mctp_binding_serial *serial,
 static void mctp_rx_consume_one(struct mctp_binding_serial *serial, uint8_t c)
 {
 	struct mctp_pktbuf *pkt = serial->rx_pkt;
+	bool valid = false;
 
 	mctp_prdebug("state: %d, char 0x%02x", serial->rx_state, c);
 
@@ -218,6 +226,7 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial, uint8_t c)
 	case STATE_WAIT_REVISION:
 		if (c == MCTP_SERIAL_REVISION) {
 			serial->rx_state = STATE_WAIT_LEN;
+			serial->rx_fcs_calc = crc_16_ccitt_byte(FCS_INIT_16, c);
 		} else if (c == MCTP_SERIAL_FRAMING_FLAG) {
 			/* Handle the case where there are bytes dropped in request,
 			 * and the state machine is out of sync. The failed request's
@@ -245,6 +254,8 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial, uint8_t c)
 			pkt = serial->rx_pkt;
 			serial->rx_exp_len = c;
 			serial->rx_state = STATE_DATA;
+			serial->rx_fcs_calc =
+				crc_16_ccitt_byte(serial->rx_fcs_calc, c);
 		}
 		break;
 
@@ -253,6 +264,8 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial, uint8_t c)
 			serial->rx_state = STATE_DATA_ESCAPED;
 		} else {
 			mctp_pktbuf_push(pkt, &c, 1);
+			serial->rx_fcs_calc =
+				crc_16_ccitt_byte(serial->rx_fcs_calc, c);
 			if (pkt->end - pkt->mctp_hdr_off == serial->rx_exp_len)
 				serial->rx_state = STATE_WAIT_FCS1;
 		}
@@ -261,6 +274,7 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial, uint8_t c)
 	case STATE_DATA_ESCAPED:
 		c ^= 0x20;
 		mctp_pktbuf_push(pkt, &c, 1);
+		serial->rx_fcs_calc = crc_16_ccitt_byte(serial->rx_fcs_calc, c);
 		if (pkt->end - pkt->mctp_hdr_off == serial->rx_exp_len)
 			serial->rx_state = STATE_WAIT_FCS1;
 		else
@@ -273,17 +287,24 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial, uint8_t c)
 		break;
 	case STATE_WAIT_FCS2:
 		serial->rx_fcs |= c;
-		/* todo: check fcs */
 		serial->rx_state = STATE_WAIT_SYNC_END;
 		break;
 
 	case STATE_WAIT_SYNC_END:
-		if (c == MCTP_SERIAL_FRAMING_FLAG) {
-			mctp_serial_finish_packet(serial, true);
+		if (serial->rx_fcs == serial->rx_fcs_calc) {
+			if (c == MCTP_SERIAL_FRAMING_FLAG) {
+				valid = true;
+			} else {
+				valid = false;
+				mctp_prdebug("missing end frame marker");
+			}
 		} else {
-			mctp_prdebug("missing end frame marker");
-			mctp_serial_finish_packet(serial, false);
+			valid = false;
+			mctp_prdebug("invalid fcs : 0x%04x, expect 0x%04x",
+				     serial->rx_fcs, serial->rx_fcs_calc);
 		}
+
+		mctp_serial_finish_packet(serial, valid);
 		serial->rx_state = STATE_WAIT_SYNC_START;
 		break;
 	}

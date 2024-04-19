@@ -83,7 +83,23 @@ int main(void)
 
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
 
-	memset(&mctp_msg_src[0], 0x5a, MCTP_BTU);
+	/*
+	 * Adding data bytes (0x7e & 0x7d) for testing FCS calculation while the
+	 * escaped data is presented.
+	 *
+	 * Refer to DSP0253 chapter 7, data byte 0x7e / 0x7d should be replaced
+	 * to escape sequence 0x7d 0x5e / 0x7d 0x5d.
+	 *
+	 * For sender, FCS calculation should count data byte (0x7e / 0x7d) only,
+	 * not the escape sequece. For receiver, the escape sequence should be
+	 * translated back to data byte and put it in FCS calculation.
+	 *
+	 * If FCS calculation is not expected, similiar error msg
+	 * `serial: invalid fcs : 0xf5c1, expect 0x1d3e` will be observed.
+	 */
+	memset(&mctp_msg_src[0], 0x7e, 10);
+	memset(&mctp_msg_src[10], 0x7d, 10);
+	memset(&mctp_msg_src[20], 0x5a, MCTP_BTU - 20);
 	memset(&mctp_msg_src[MCTP_BTU], 0xa5, MCTP_BTU);
 
 	rc = pipe(p[0]);
