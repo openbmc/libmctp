@@ -7,7 +7,7 @@ libmctp_la_SOURCES = core.c alloc.c log.c \
 include_HEADERS = libmctp.h
 
 if LIBMCTP_BINDING_serial
-libmctp_la_SOURCES += serial.c
+libmctp_la_SOURCES += serial.c crc-16-ccitt.c
 include_HEADERS += libmctp-serial.h
 endif
 

@@ -83,7 +83,9 @@ int main(void)
 
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
 
-	memset(&mctp_msg_src[0], 0x5a, MCTP_BTU);
+	memset(&mctp_msg_src[0], 0x7e, 10);
+	memset(&mctp_msg_src[10], 0x7d, 10);
+	memset(&mctp_msg_src[20], 0x5a, MCTP_BTU - 20);
 	memset(&mctp_msg_src[MCTP_BTU], 0xa5, MCTP_BTU);
 
 	rc = pipe(p[0]);
