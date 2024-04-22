@@ -16,6 +16,91 @@
       "message": "Looks reasonable, though I\u0027ll defer to Jeremy for merging.",
       "revId": "5123e28afe11a8852a82891c6d34229ee7767fe2",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cebce49_f70af79f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-04-22T07:50:39Z",
+      "side": 1,
+      "message": "I think you have a bug in the FCS calculation when escaped data is present, but otherwise looks good.",
+      "revId": "5123e28afe11a8852a82891c6d34229ee7767fe2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c563ca2_309f818b",
+        "filename": "crc-16-ccitt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-04-22T07:50:39Z",
+      "side": 1,
+      "message": "Can this be `static` too?",
+      "revId": "5123e28afe11a8852a82891c6d34229ee7767fe2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7010d1ad_4b522d24",
+        "filename": "serial.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-04-22T07:50:39Z",
+      "side": 1,
+      "message": "Can you use the `hdr` pointer here instead of txbuf? That will make it more explicit about what you\u0027re checksumming.",
+      "revId": "5123e28afe11a8852a82891c6d34229ee7767fe2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a37dc4a_33676dea",
+        "filename": "serial.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-04-22T07:50:39Z",
+      "side": 1,
+      "message": "You\u0027re using the length of escaped data here, but the data itself is unescaped. Did you test this with data that needed escaping?",
+      "revId": "5123e28afe11a8852a82891c6d34229ee7767fe2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "661631cd_0244e7e7",
+        "filename": "serial.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-04-22T07:50:39Z",
+      "side": 1,
+      "message": "We now have three calls to `mctp_serial_finish_packet` here. Would it work to just set the `valid` flag and call from one site?",
+      "revId": "5123e28afe11a8852a82891c6d34229ee7767fe2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
