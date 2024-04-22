@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "034e37d1_0574e140",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002038
+      },
+      "writtenOn": "2024-04-22T19:52:02Z",
+      "side": 1,
+      "message": "Fix the bug in the FCS calculation",
+      "revId": "880c78cfb91ab4f066641871f4cb4b7bb69159c4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
