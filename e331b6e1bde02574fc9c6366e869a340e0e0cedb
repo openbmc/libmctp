@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c49939f9_b8273f11",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002038
+      },
+      "writtenOn": "2024-04-23T06:19:16Z",
+      "side": 1,
+      "message": "Adding escaped data in test suite to identify if any issue remains and passed test suite on send/receive data and verify fcs of data correctly.",
+      "revId": "e331b6e1bde02574fc9c6366e869a340e0e0cedb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
