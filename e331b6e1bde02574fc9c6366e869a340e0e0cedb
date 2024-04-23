@@ -16,6 +16,46 @@
       "message": "Adding escaped data in test suite to identify if any issue remains and passed test suite on send/receive data and verify fcs of data correctly.",
       "revId": "e331b6e1bde02574fc9c6366e869a340e0e0cedb",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e01763ac_0426e531",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2024-04-23T23:13:09Z",
+      "side": 1,
+      "message": "Hi John, thanks for adapting the tests in PS3. I do have a further request for a little more documentation.",
+      "revId": "e331b6e1bde02574fc9c6366e869a340e0e0cedb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0763c119_74af30c7",
+        "filename": "tests/test_serial.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2024-04-23T23:13:09Z",
+      "side": 1,
+      "message": "Can you please add a comment describing what this setup is trying to achieve, a bit about how it works, and some reasoning about why it exercises the FCS? What effect should we observe if we break the FCS implementation in some way?\n\nWithout the commentary it\u0027s a bit impenetrable.",
+      "range": {
+        "startLine": 86,
+        "startChar": 1,
+        "endLine": 88,
+        "endChar": 48
+      },
+      "revId": "e331b6e1bde02574fc9c6366e869a340e0e0cedb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
