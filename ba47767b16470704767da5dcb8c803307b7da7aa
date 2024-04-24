@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d384a397_191c0d33",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002038
+      },
+      "writtenOn": "2024-04-24T06:41:32Z",
+      "side": 1,
+      "message": "Add a comment for testing FCS in test suite.",
+      "revId": "ba47767b16470704767da5dcb8c803307b7da7aa",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
