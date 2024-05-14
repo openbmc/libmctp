@@ -25,8 +25,10 @@
 #include "range.h"
 #include "test-utils.h"
 
-#define TEST_DEST_EID 9
-#define TEST_SRC_EID  10
+#define TEST_DEST_EID		9
+#define TEST_DEST_NULL_EID	0
+#define TEST_DEST_BROADCAST_EID 255
+#define TEST_SRC_EID		10
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -532,6 +534,74 @@ static void mctp_core_test_rx_with_tag_multifragment()
 	mctp_destroy(mctp);
 }
 
+/*
+ * This test case covers null destination eid. MCTP
+ * daemon might query endpoint (i.e., Get Endpoint
+ * ID command) by physical address requests and
+ * destination eid as 0. Endpoint shall accept and
+ * handle this request.
+ */
+static void mctp_core_test_rx_with_null_dst_eid()
+{
+	struct mctp *mctp = NULL;
+	struct mctp_binding_test *binding = NULL;
+	struct test_params test_param;
+	uint8_t test_payload[2 * MCTP_BTU];
+	struct pktbuf pktbuf;
+
+	memset(test_payload, 0, sizeof(test_payload));
+	test_param.seen = false;
+	test_param.message_size = 0;
+	mctp_test_stack_init(&mctp, &binding, TEST_DEST_EID);
+	mctp_set_rx_all(mctp, rx_message, &test_param);
+	memset(&pktbuf, 0, sizeof(pktbuf));
+	pktbuf.hdr.dest = TEST_DEST_NULL_EID;
+	pktbuf.hdr.src = TEST_SRC_EID;
+
+	/* Receive 2 fragments of equal size */
+	receive_two_fragment_message(binding, test_payload, MCTP_BTU, MCTP_BTU,
+				     &pktbuf);
+
+	assert(test_param.seen);
+	assert(test_param.message_size == 2 * MCTP_BTU);
+
+	mctp_binding_test_destroy(binding);
+	mctp_destroy(mctp);
+}
+
+/*
+ * This test case covers Broadcast Request message (i.e.,
+ * `Endpoint Discovery` command). Endpoint shall accept
+ * and handle this request.
+ */
+static void mctp_core_test_rx_with_broadcast_dst_eid()
+{
+	struct mctp *mctp = NULL;
+	struct mctp_binding_test *binding = NULL;
+	struct test_params test_param;
+	uint8_t test_payload[2 * MCTP_BTU];
+	struct pktbuf pktbuf;
+
+	memset(test_payload, 0, sizeof(test_payload));
+	test_param.seen = false;
+	test_param.message_size = 0;
+	mctp_test_stack_init(&mctp, &binding, TEST_DEST_EID);
+	mctp_set_rx_all(mctp, rx_message, &test_param);
+	memset(&pktbuf, 0, sizeof(pktbuf));
+	pktbuf.hdr.dest = TEST_DEST_BROADCAST_EID;
+	pktbuf.hdr.src = TEST_SRC_EID;
+
+	/* Receive 2 fragments of equal size */
+	receive_two_fragment_message(binding, test_payload, MCTP_BTU, MCTP_BTU,
+				     &pktbuf);
+
+	assert(test_param.seen);
+	assert(test_param.message_size == 2 * MCTP_BTU);
+
+	mctp_binding_test_destroy(binding);
+	mctp_destroy(mctp);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -548,6 +618,8 @@ static const struct {
 	TEST_CASE(mctp_core_test_exhaust_context_buffers),
 	TEST_CASE(mctp_core_test_rx_with_tag),
 	TEST_CASE(mctp_core_test_rx_with_tag_multifragment),
+	TEST_CASE(mctp_core_test_rx_with_null_dst_eid),
+	TEST_CASE(mctp_core_test_rx_with_broadcast_dst_eid),
 };
 /* clang-format on */
 

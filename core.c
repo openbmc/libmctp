@@ -560,7 +560,8 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 	/* small optimisation: don't bother reassembly if we're going to
 	 * drop the packet in mctp_rx anyway */
-	if (mctp->route_policy == ROUTE_ENDPOINT && hdr->dest != bus->eid)
+	if (mctp->route_policy == ROUTE_ENDPOINT &&
+	    !mctp_rx_dest_is_local(bus, hdr->dest))
 		goto out;
 
 	flags = hdr->flags_seq_tag & (MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM);
