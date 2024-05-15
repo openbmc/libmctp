@@ -16,6 +16,23 @@
       "message": "Hi Jeremy, thanks for the review. I updated the patch per comments.",
       "revId": "9f8b7a3b5e3c633978ddf18ee4e66aacc1961fff",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86f8261d_11f18b32",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001712
+      },
+      "writtenOn": "2024-05-15T10:32:52Z",
+      "side": 1,
+      "message": "tested to work 👍",
+      "revId": "9f8b7a3b5e3c633978ddf18ee4e66aacc1961fff",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
