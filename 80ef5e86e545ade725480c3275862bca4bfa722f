@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "561e3ad6_20e62011",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002038
+      },
+      "writtenOn": "2024-05-15T04:08:39Z",
+      "side": 1,
+      "message": "Thanks for the review, Andrew! I have added test cases for each special address. And it will be asserted if test case failed.",
+      "parentUuid": "fc4f9ddf_87f932e8",
+      "revId": "80ef5e86e545ade725480c3275862bca4bfa722f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1495277f_bf282673",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-15T01:55:33Z",
       "side": 1,
       "message": "Can you please add test cases demonstrating delivery for each special address?",
+      "revId": "80ef5e86e545ade725480c3275862bca4bfa722f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f746a49_8e189b49",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 1002038
+      },
+      "writtenOn": "2024-05-15T04:08:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1495277f_bf282673",
       "revId": "80ef5e86e545ade725480c3275862bca4bfa722f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
