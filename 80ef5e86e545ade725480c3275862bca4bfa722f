@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc4f9ddf_87f932e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2024-05-15T01:55:33Z",
+      "side": 1,
+      "message": "Hi John, I don\u0027t have any concerns with the implementation, but I do have a request that we add some tests.",
+      "revId": "80ef5e86e545ade725480c3275862bca4bfa722f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1495277f_bf282673",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2024-05-15T01:55:33Z",
+      "side": 1,
+      "message": "Can you please add test cases demonstrating delivery for each special address?",
+      "revId": "80ef5e86e545ade725480c3275862bca4bfa722f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
