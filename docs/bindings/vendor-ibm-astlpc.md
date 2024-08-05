@@ -12,14 +12,14 @@ document.
 
 1. DMTF DSP0236, Management Component Transport Protocol (MCTP) Base
    Specification 1.0,  
-   http://www.dmtf.org/standards/published_documents/DSP0236_1.0.pdf
+   <http://www.dmtf.org/standards/published_documents/DSP0236_1.0.pdf>
 
 2. Intel (R) Low Pin Count (LPC) Interface Specification 1.1,  
-   https://www.intel.com/content/dam/www/program/design/us/en/documents/low-pin-count-interface-specification.pdf
+   <https://www.intel.com/content/dam/www/program/design/us/en/documents/low-pin-count-interface-specification.pdf>
 
 3. IPMI Consortium, Intelligent Platform Management Interface Specification,
    v1.5 Revision 1.1 February 20, 2002,  
-   http://download.intel.com/design/servers/ipmi/IPMIv1_5rev1_1.pdf
+   <http://download.intel.com/design/servers/ipmi/IPMIv1_5rev1_1.pdf>
 
 ## Definitions
 
