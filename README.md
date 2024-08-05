@@ -98,11 +98,11 @@ with the core:
 The libmctp code is intended to be integrated into other codebases by two
 methods:
 
-1.  as a simple library (`libmctp.{a,so}`) which can be compiled separately and
-    linked into the containing project
+1. as a simple library (`libmctp.{a,so}`) which can be compiled separately and
+   linked into the containing project
 
-2.  as a set of sources to be included into the containing project (either
-    imported, or as a git subtree/submodule)
+2. as a set of sources to be included into the containing project (either
+   imported, or as a git subtree/submodule)
 
 For (1), you can use the top-level makefile to produce `libmctp.a`.
 
