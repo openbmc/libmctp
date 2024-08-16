@@ -1,0 +1,7 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Andrew Jeffery <andrew@codeconstruct.com.au>
+Submitted-by: George Liu <liuxiwei@ieisystem.com>
+Submitted-at: Fri, 16 Aug 2024 02:31:51 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/libmctp/+/73570
+Project: openbmc/libmctp
+Branch: refs/heads/master
