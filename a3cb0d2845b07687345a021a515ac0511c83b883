@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8b91534_9cf14e4f",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2024-08-16T00:55:06Z",
+      "side": 1,
+      "message": "This isn\u0027t the fix. Just delete one of the spaces after the `1.` from the text on the left, and realign the wrapped line. Please don\u0027t indent the list as you\u0027ve done here.",
+      "revId": "a3cb0d2845b07687345a021a515ac0511c83b883",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d0d4f6e_98b76ef7",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2024-08-16T00:55:06Z",
+      "side": 1,
+      "message": "As above.",
+      "revId": "a3cb0d2845b07687345a021a515ac0511c83b883",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
