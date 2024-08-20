@@ -1,0 +1,4 @@
+name: libmctp
+build:
+  cmake: zephyr 
+  kconfig: zephyr/Kconfig

@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 #include "crc-16-ccitt.h"
 
@@ -24,6 +25,10 @@ static const size_t write(int fd, void *buf, size_t len)
 #endif
 
 #define pr_fmt(x) "serial: " x
+
+#ifdef CONFIG_MCTP
+#define typeof __typeof__
+#endif
 
 /*
  * @fn: A function that will copy data from the buffer at src into the dst object
@@ -48,6 +53,7 @@ static const size_t write(int fd, void *buf, size_t len)
 		}                                                              \
 		len ? wrote : 0;                                               \
 	})
+
 
 static ssize_t mctp_serial_write(int fildes, const void *buf, size_t nbyte)
 {
