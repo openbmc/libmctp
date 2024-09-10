@@ -2,7 +2,9 @@
 
 #define _GNU_SOURCE
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #define SD_LISTEN_FDS_START 3
 
