@@ -1,0 +1,33 @@
+option(
+    'tests',
+    type: 'feature',
+    value: 'enabled',
+    description: 'Build tests'
+)
+option(
+    'bindings',
+    type: 'array',
+    description: 'Bindings to include',
+    choices: ['serial', 'astlpc'],
+    value: ['serial', 'astlpc'],
+)
+option(
+    'default_alloc',
+    type: 'feature',
+    description: 'Use libc malloc and free for heap memory',
+)
+option(
+    'stdio',
+    type: 'feature',
+    description: 'Support logging to stdio',
+)
+option(
+    'fileio',
+    type: 'feature',
+    description: 'Support interfaces based on file-descriptors',
+)
+option(
+    'syslog',
+    type: 'feature',
+    description: 'Support logging to syslog',
+)
