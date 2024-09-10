@@ -17,7 +17,7 @@
 #include <poll.h>
 #include <unistd.h>
 #else
-static const size_t write(int fd, void *buf, size_t len)
+static const size_t write(int fd, const void *buf, size_t len)
 {
 	return -1;
 }
