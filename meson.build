@@ -64,9 +64,16 @@ if get_option('default_alloc').require(
     add_project_arguments('-DMCTP_DEFAULT_ALLOC', language : 'c')
 endif
 
-if get_option('fileio').require(
-    compiler.check_header('unistd.h') and compiler.check_header('fcntl.h')
-    ).allowed()
+feat_fileio = get_option('fileio').require(
+    compiler.links('''
+        #include <poll.h>
+        #include <unistd.h>
+        void main()
+        {
+            poll(NULL, 0, -1);
+        }
+    '''))
+if feat_fileio.allowed()
     add_project_arguments('-DMCTP_HAVE_FILEIO', language : 'c')
 endif
 
@@ -140,7 +147,9 @@ libmctp_dep = declare_dependency(
     link_with: libmctp,
 )
 
-subdir('utils')
+if feat_fileio.allowed()
+    subdir('utils')
+endif
 
 if get_option('tests').allowed()
     subdir('tests')
