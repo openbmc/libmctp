@@ -870,6 +870,26 @@ static int mctp_binding_astlpc_tx(struct mctp_binding *b,
 	return rc == -EBUSY ? 0 : rc;
 }
 
+/* Update binding pkt_size and reallocate tx_storage */
+static int mctp_astlpc_set_pkt_size(struct mctp_binding_astlpc *astlpc,
+				    size_t pkt_size)
+{
+	size_t body = MCTP_BODY_SIZE(pkt_size);
+	body += astlpc->binding.pkt_header + astlpc->binding.pkt_trailer;
+	size_t pktbuf_size = MCTP_PKTBUF_SIZE(body);
+	/* Reallocate TX storage */
+	if (astlpc->binding.tx_storage) {
+		__mctp_free(astlpc->binding.tx_storage);
+	}
+	astlpc->binding.tx_storage = __mctp_alloc(pktbuf_size);
+	if (!astlpc->binding.tx_storage) {
+		return -ENOMEM;
+	}
+
+	astlpc->binding.pkt_size = pkt_size;
+	return 0;
+}
+
 static uint32_t mctp_astlpc_calculate_mtu(struct mctp_binding_astlpc *astlpc,
 					  struct mctp_astlpc_layout *layout)
 {
@@ -940,8 +960,13 @@ static int mctp_astlpc_negotiate_layout_bmc(struct mctp_binding_astlpc *astlpc)
 		return -EINVAL;
 	}
 
-	if (astlpc->proto->version >= 2)
-		astlpc->binding.pkt_size = MCTP_PACKET_SIZE(mtu);
+	if (astlpc->proto->version >= 2) {
+		rc = mctp_astlpc_set_pkt_size(astlpc, MCTP_PACKET_SIZE(mtu));
+		if (rc) {
+			astlpc_prwarn(astlpc, "Allocation error");
+			return rc;
+		}
+	}
 
 	return 0;
 }
@@ -1056,9 +1081,9 @@ static void mctp_astlpc_rx_start(struct mctp_binding_astlpc *astlpc)
 		mctp_bus_rx(&astlpc->binding, pkt);
 	} else {
 		/* TODO: Drop any associated assembly */
-		mctp_pktbuf_free(pkt);
 		astlpc_prdebug(astlpc, "Dropped corrupt packet");
 	}
+	mctp_pktbuf_free(pkt);
 }
 
 static void mctp_astlpc_tx_complete(struct mctp_binding_astlpc *astlpc)
@@ -1266,8 +1291,6 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(uint8_t mode,
 	astlpc->requested_mtu = mtu;
 	astlpc->binding.name = "astlpc";
 	astlpc->binding.version = 1;
-	astlpc->binding.pkt_size =
-		MCTP_PACKET_SIZE(mtu > MCTP_BTU ? mtu : MCTP_BTU);
 	astlpc->binding.pkt_header = 4;
 	astlpc->binding.pkt_trailer = 4;
 	astlpc->binding.tx = mctp_binding_astlpc_tx;
@@ -1277,6 +1300,14 @@ static struct mctp_binding_astlpc *__mctp_astlpc_init(uint8_t mode,
 		astlpc->binding.start = mctp_binding_astlpc_start_host;
 	else {
 		astlpc_prerr(astlpc, "%s: Invalid mode: %d\n", __func__, mode);
+		__mctp_free(astlpc);
+		return NULL;
+	}
+
+	if (mctp_astlpc_set_pkt_size(
+		    astlpc,
+		    MCTP_PACKET_SIZE(mtu > MCTP_BTU ? mtu : MCTP_BTU)) != 0) {
+		astlpc_prerr(astlpc, "%s: Allocation error", __func__);
 		__mctp_free(astlpc);
 		return NULL;
 	}
@@ -1326,6 +1357,7 @@ void mctp_astlpc_destroy(struct mctp_binding_astlpc *astlpc)
 	/* Clear channel-active and bmc-ready */
 	if (astlpc->mode == MCTP_BINDING_ASTLPC_MODE_BMC)
 		mctp_astlpc_kcs_set_status(astlpc, 0);
+	__mctp_free(astlpc->binding.tx_storage);
 	__mctp_free(astlpc);
 }
 
