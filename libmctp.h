@@ -141,8 +141,19 @@ int mctp_set_rx_all(struct mctp *mctp, mctp_rx_fn fn, void *data);
  * a message is already pending for transmission (msg will be freed).
  * Asynchronous users can test mctp_is_tx_ready() prior to sending.
  */
+int mctp_message_tx_alloced(struct mctp *mctp, mctp_eid_t eid, bool tag_owner,
+			    uint8_t msg_tag, void *msg, size_t msg_len);
+
+/* Transmit a message.
+ * @msg: The message buffer to send. Ownership of this buffer
+ * remains with the caller (a copy is made internally with __mctp_msg_alloc).
+ *
+ * If an asynchronous binding is being used, it will return -EBUSY if
+ * a message is already pending for transmission (msg will be freed).
+ * Asynchronous users can test mctp_is_tx_ready() prior to sending.
+ */
 int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid, bool tag_owner,
-		    uint8_t msg_tag, void *msg, size_t msg_len);
+		    uint8_t msg_tag, const void *msg, size_t msg_len);
 
 bool mctp_is_tx_ready(struct mctp *mctp, mctp_eid_t eid);
 

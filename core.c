@@ -946,7 +946,7 @@ int mctp_message_tx_alloced(struct mctp *mctp, mctp_eid_t eid, bool tag_owner,
 }
 
 int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid, bool tag_owner,
-		    uint8_t msg_tag, void *msg, size_t msg_len)
+		    uint8_t msg_tag, const void *msg, size_t msg_len)
 {
 	void *copy = mctp_msg_dup(msg, msg_len, mctp);
 	if (!copy) {
