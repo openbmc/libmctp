@@ -9,15 +9,33 @@
 #include "config.h"
 #endif
 
+#include "compiler.h"
+
+#ifdef MCTP_DEFAULT_ALLOC
+static void *default_msg_malloc(size_t size, void *ctx __unused)
+{
+	void *ptr = __mctp_alloc(size);
+	return ptr;
+}
+
+static void default_msg_free(void *msg, void *ctx __unused)
+{
+	__mctp_free(msg);
+}
+#endif
+
 struct {
 	void *(*m_alloc)(size_t);
 	void (*m_free)(void *);
-	void *(*m_realloc)(void *, size_t);
+	/* Final argument is ctx */
+	void *(*m_msg_alloc)(size_t, void *);
+	void (*m_msg_free)(void *, void *);
 } alloc_ops = {
 #ifdef MCTP_DEFAULT_ALLOC
 	malloc,
 	free,
-	realloc,
+	default_msg_malloc,
+	default_msg_free,
 #endif
 };
 
@@ -26,8 +44,6 @@ void *__mctp_alloc(size_t size)
 {
 	if (alloc_ops.m_alloc)
 		return alloc_ops.m_alloc(size);
-	if (alloc_ops.m_realloc)
-		return alloc_ops.m_realloc(NULL, size);
 	assert(0);
 	return NULL;
 }
@@ -36,24 +52,32 @@ void __mctp_free(void *ptr)
 {
 	if (alloc_ops.m_free)
 		alloc_ops.m_free(ptr);
-	else if (alloc_ops.m_realloc)
-		alloc_ops.m_realloc(ptr, 0);
 	else
 		assert(0);
 }
 
-void *__mctp_realloc(void *ptr, size_t size)
+void *__mctp_msg_alloc(size_t size, struct mctp *mctp)
 {
-	if (alloc_ops.m_realloc)
-		return alloc_ops.m_realloc(ptr, size);
+	void *ctx = mctp_get_alloc_ctx(mctp);
+	if (alloc_ops.m_msg_alloc)
+		return alloc_ops.m_msg_alloc(size, ctx);
 	assert(0);
 	return NULL;
 }
 
+void __mctp_msg_free(void *ptr, struct mctp *mctp)
+{
+	void *ctx = mctp_get_alloc_ctx(mctp);
+	if (alloc_ops.m_msg_free)
+		alloc_ops.m_msg_free(ptr, ctx);
+}
+
 void mctp_set_alloc_ops(void *(*m_alloc)(size_t), void (*m_free)(void *),
-			void *(m_realloc)(void *, size_t))
+			void *(*m_msg_alloc)(size_t, void *),
+			void (*m_msg_free)(void *, void *))
 {
 	alloc_ops.m_alloc = m_alloc;
 	alloc_ops.m_free = m_free;
-	alloc_ops.m_realloc = m_realloc;
+	alloc_ops.m_msg_alloc = m_msg_alloc;
+	alloc_ops.m_msg_free = m_msg_free;
 }

@@ -97,11 +97,11 @@ static void receive_ptkbuf(struct mctp_binding_test *binding,
 	rx_pkt->start = 0;
 	rx_pkt->end = MCTP_PACKET_SIZE(len);
 	rx_pkt->mctp_hdr_off = 0;
-	rx_pkt->next = NULL;
 	memcpy(rx_pkt->data, &pktbuf->hdr, sizeof(pktbuf->hdr));
 	memcpy(rx_pkt->data + sizeof(pktbuf->hdr), pktbuf->payload, alloc_size);
 
 	mctp_bus_rx((struct mctp_binding *)binding, rx_pkt);
+	__mctp_free(rx_pkt);
 }
 
 static void receive_one_fragment(struct mctp_binding_test *binding,

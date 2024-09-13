@@ -19,6 +19,7 @@ struct mctp_binding_bridge {
 	int rx_count;
 	int tx_count;
 	uint8_t last_pkt_data;
+	uint8_t tx_storage[MCTP_PKTBUF_SIZE(MCTP_BTU)];
 };
 
 struct test_ctx {
@@ -61,6 +62,7 @@ static void mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 
 	binding->rx_count++;
 	mctp_bus_rx(&binding->binding, pkt);
+	mctp_pktbuf_free(pkt);
 }
 
 static struct mctp_binding_bridge *mctp_binding_bridge_init(char *name)
@@ -75,6 +77,7 @@ static struct mctp_binding_bridge *mctp_binding_bridge_init(char *name)
 	binding->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
 	binding->binding.pkt_header = 0;
 	binding->binding.pkt_trailer = 0;
+	binding->binding.tx_storage = binding->tx_storage;
 	return binding;
 }
 

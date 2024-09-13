@@ -25,6 +25,8 @@ static const size_t write(int fd, const void *buf, size_t len)
 
 #define pr_fmt(x) "serial: " x
 
+#define SERIAL_BTU MCTP_BTU
+
 #include "libmctp.h"
 #include "libmctp-alloc.h"
 #include "libmctp-log.h"
@@ -42,6 +44,7 @@ struct mctp_binding_serial {
 	/* receive buffer and state */
 	uint8_t rxbuf[1024];
 	struct mctp_pktbuf *rx_pkt;
+	uint8_t rx_storage[MCTP_PKTBUF_SIZE(SERIAL_BTU)];
 	uint8_t rx_exp_len;
 	uint16_t rx_fcs;
 	uint16_t rx_fcs_calc;
@@ -58,6 +61,8 @@ struct mctp_binding_serial {
 
 	/* temporary transmit buffer */
 	uint8_t txbuf[256];
+	/* used by the MCTP stack */
+	uint8_t tx_storage[MCTP_PKTBUF_SIZE(SERIAL_BTU)];
 };
 
 #define binding_to_serial(b)                                                   \
@@ -198,10 +203,9 @@ static void mctp_serial_finish_packet(struct mctp_binding_serial *serial,
 	serial->rx_pkt = NULL;
 }
 
-static void mctp_serial_start_packet(struct mctp_binding_serial *serial,
-				     uint8_t len)
+static void mctp_serial_start_packet(struct mctp_binding_serial *serial)
 {
-	serial->rx_pkt = mctp_pktbuf_alloc(&serial->binding, len);
+	serial->rx_pkt = mctp_pktbuf_init(&serial->binding, serial->rx_storage);
 }
 
 static void mctp_rx_consume_one(struct mctp_binding_serial *serial, uint8_t c)
@@ -253,7 +257,7 @@ static void mctp_rx_consume_one(struct mctp_binding_serial *serial, uint8_t c)
 			mctp_prdebug("invalid size %d", c);
 			serial->rx_state = STATE_WAIT_SYNC_START;
 		} else {
-			mctp_serial_start_packet(serial, 0);
+			mctp_serial_start_packet(serial);
 			pkt = serial->rx_pkt;
 			serial->rx_exp_len = c;
 			serial->rx_state = STATE_DATA;
@@ -404,9 +408,10 @@ struct mctp_binding_serial *mctp_serial_init(void)
 	serial->rx_pkt = NULL;
 	serial->binding.name = "serial";
 	serial->binding.version = 1;
-	serial->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
+	serial->binding.pkt_size = MCTP_PACKET_SIZE(SERIAL_BTU);
 	serial->binding.pkt_header = 0;
 	serial->binding.pkt_trailer = 0;
+	serial->binding.tx_storage = serial->tx_storage;
 
 	serial->binding.start = mctp_serial_core_start;
 	serial->binding.tx = mctp_binding_serial_tx;
