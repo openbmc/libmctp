@@ -50,6 +50,7 @@ static void rcv_ctrl_msg(struct mctp_binding *b, const void *buf, size_t len)
 	struct mctp_pktbuf *pkt = mctp_pktbuf_alloc(b, len);
 	memcpy(mctp_pktbuf_hdr(pkt), buf, len);
 	mctp_bus_rx(b, pkt);
+	mctp_pktbuf_free(pkt);
 }
 
 static void setup_test_binding(struct mctp_binding *test_binding,
@@ -59,6 +60,7 @@ static void setup_test_binding(struct mctp_binding *test_binding,
 	assert(test_endpoint != NULL);
 	assert(callback_ctx != NULL);
 
+	uint8_t tx_storage[MCTP_PKTBUF_SIZE(MCTP_BTU)];
 	memset(test_binding, 0, sizeof(*test_binding));
 	test_binding->name = "test";
 	test_binding->version = 1;
@@ -68,6 +70,7 @@ static void setup_test_binding(struct mctp_binding *test_binding,
 	test_binding->pkt_trailer = 0;
 	test_binding->control_rx = control_message_transport_callback;
 	test_binding->control_rx_data = callback_ctx;
+	test_binding->tx_storage = tx_storage;
 
 	mctp_register_bus(test_endpoint, test_binding, eid_1);
 	mctp_binding_set_tx_enabled(test_binding, true);
