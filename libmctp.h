@@ -97,13 +97,21 @@ void mctp_msgbuf_free(struct mctp_msgbuf *msg, struct mctp *mctp);
 
 /* MCTP core */
 
+/* Allocate and setup a MCTP instance */
 struct mctp *mctp_init(void);
+/* Cleanup and deallocate a MCTP instance from mctp_init() */
+void mctp_destroy(struct mctp *mctp);
+
+/* Setup a MCTP instance */
+void mctp_setup(struct mctp *mctp);
+/* Release resource of a MCTP instance */
+void mctp_cleanup(struct mctp *mctp);
+
 void mctp_set_max_message_size(struct mctp *mctp, size_t message_size);
 typedef void (*mctp_capture_fn)(struct mctp_pktbuf *pkt, bool outgoing,
 				void *user);
 void mctp_set_capture_handler(struct mctp *mctp, mctp_capture_fn fn,
 			      void *user);
-void mctp_destroy(struct mctp *mctp);
 
 /* Register a binding to the MCTP core, and creates a bus (populating
  * binding->bus).

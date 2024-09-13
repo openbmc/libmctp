@@ -19,6 +19,17 @@
 #include "range.h"
 #include "compiler.h"
 
+/* 64kb should be sufficient for a single message. Applications
+ * requiring higher sizes can override by setting max_message_size.*/
+#ifndef MCTP_MAX_MESSAGE_SIZE
+#define MCTP_MAX_MESSAGE_SIZE 65536
+#endif
+
+/* Must be >= 2 for bridge busses */
+#ifndef MCTP_MAX_BUSSES
+#define MCTP_MAX_BUSSES 2
+#endif
+
 /* Internal data structures */
 
 enum mctp_bus_state {
@@ -65,7 +76,7 @@ struct mctp_msg_ctx {
 
 struct mctp {
 	int n_busses;
-	struct mctp_bus *busses;
+	struct mctp_bus busses[MCTP_MAX_BUSSES];
 
 	/* Message RX callback */
 	mctp_rx_fn message_rx;
@@ -91,12 +102,6 @@ struct mctp {
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
-#endif
-
-/* 64kb should be sufficient for a single message. Applications
- * requiring higher sizes can override by setting max_message_size.*/
-#ifndef MCTP_MAX_MESSAGE_SIZE
-#define MCTP_MAX_MESSAGE_SIZE 65536
 #endif
 
 static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
@@ -307,10 +312,14 @@ struct mctp *mctp_init(void)
 	if (!mctp)
 		return NULL;
 
+	mctp_setup(mctp);
+	return mctp;
+}
+
+void mctp_setup(struct mctp *mctp)
+{
 	memset(mctp, 0, sizeof(*mctp));
 	mctp->max_message_size = MCTP_MAX_MESSAGE_SIZE;
-
-	return mctp;
 }
 
 void mctp_set_max_message_size(struct mctp *mctp, size_t message_size)
@@ -332,7 +341,7 @@ static void mctp_bus_destroy(struct mctp_bus *bus, struct mctp *mctp)
 	}
 }
 
-void mctp_destroy(struct mctp *mctp)
+void mctp_cleanup(struct mctp *mctp)
 {
 	size_t i;
 
@@ -346,8 +355,11 @@ void mctp_destroy(struct mctp *mctp)
 
 	while (mctp->n_busses--)
 		mctp_bus_destroy(&mctp->busses[mctp->n_busses], mctp);
+}
 
-	__mctp_free(mctp->busses);
+void mctp_destroy(struct mctp *mctp)
+{
+	mctp_cleanup(mctp);
 	__mctp_free(mctp);
 }
 
@@ -375,14 +387,11 @@ int mctp_register_bus(struct mctp *mctp, struct mctp_binding *binding,
 	int rc = 0;
 
 	/* todo: multiple busses */
+	static_assert(MCTP_MAX_BUSSES >= 1, "need a bus");
 	assert(mctp->n_busses == 0);
 	mctp->n_busses = 1;
 
 	assert(binding->tx_storage);
-
-	mctp->busses = __mctp_alloc(sizeof(struct mctp_bus));
-	if (!mctp->busses)
-		return -ENOMEM;
 
 	memset(mctp->busses, 0, sizeof(struct mctp_bus));
 	mctp->busses[0].mctp = mctp;
@@ -397,8 +406,6 @@ int mctp_register_bus(struct mctp *mctp, struct mctp_binding *binding,
 		if (rc < 0) {
 			mctp_prerr("Failed to start binding: %d", rc);
 			binding->bus = NULL;
-			__mctp_free(mctp->busses);
-			mctp->busses = NULL;
 			mctp->n_busses = 0;
 		}
 	}
@@ -415,7 +422,6 @@ void mctp_unregister_bus(struct mctp *mctp, struct mctp_binding *binding)
 	mctp->n_busses = 0;
 	binding->mctp = NULL;
 	binding->bus = NULL;
-	__mctp_free(mctp->busses);
 }
 
 int mctp_bridge_busses(struct mctp *mctp, struct mctp_binding *b1,
@@ -427,9 +433,7 @@ int mctp_bridge_busses(struct mctp *mctp, struct mctp_binding *b1,
 	assert(b2->tx_storage);
 
 	assert(mctp->n_busses == 0);
-	mctp->busses = __mctp_alloc(2 * sizeof(struct mctp_bus));
-	if (!mctp->busses)
-		return -ENOMEM;
+	assert(MCTP_MAX_BUSSES >= 2);
 	memset(mctp->busses, 0, 2 * sizeof(struct mctp_bus));
 	mctp->n_busses = 2;
 	mctp->busses[0].binding = b1;
