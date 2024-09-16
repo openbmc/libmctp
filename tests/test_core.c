@@ -1,5 +1,4 @@
 /* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
-
 #define _GNU_SOURCE
 
 #ifdef NDEBUG
@@ -18,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "compiler.h"
 #include "libmctp-alloc.h"
@@ -602,6 +602,76 @@ static void mctp_core_test_rx_with_broadcast_dst_eid()
 	mctp_destroy(mctp);
 }
 
+/*
+ * This test case tests tag allocation. 8 tags
+ * are allowed to be pending.
+ */
+static void mctp_core_test_tx_alloc_tag()
+{
+	struct mctp *mctp = NULL;
+	struct mctp_binding_test *binding = NULL;
+	struct test_params test_param;
+	uint8_t msg_tag;
+	void *msg;
+	int rc;
+	mctp_eid_t dest_eid1 = 30;
+	size_t msg_len = 10;
+
+	mctp_test_stack_init(&mctp, &binding, dest_eid1);
+	mctp_set_rx_all(mctp, rx_message, &test_param);
+
+	uint8_t used = 0;
+	for (int i = 0; i < 8; i++) {
+		test_param.seen = false;
+		test_param.msg_tag = 0xff;
+		test_param.tag_owner = false;
+
+		msg = __mctp_alloc(msg_len);
+		memset(msg, 0x99, msg_len);
+		rc = mctp_message_tx_request(mctp, dest_eid1, msg, msg_len,
+					     &msg_tag);
+		assert(rc == 0);
+		assert(test_param.seen == true);
+		assert(test_param.msg_tag == msg_tag);
+		assert(test_param.tag_owner == true);
+		used |= (1 << msg_tag);
+	}
+	assert(used == 0xff);
+
+	/* Ran out of tags */
+	test_param.seen = false;
+	msg = __mctp_alloc(msg_len);
+	memset(msg, 0x99, msg_len);
+	rc = mctp_message_tx_request(mctp, dest_eid1, msg, msg_len, &msg_tag);
+	assert(rc == -EBUSY);
+	assert(test_param.seen == false);
+
+	/* Send/Receive a response to one of those tags */
+	test_param.seen = false;
+	msg = __mctp_alloc(msg_len);
+	memset(msg, 0x99, msg_len);
+	/* Arbitrary one */
+	uint8_t replied_tag = 3;
+	rc = mctp_message_tx_alloced(mctp, dest_eid1, false, replied_tag, msg,
+				     msg_len);
+	assert(rc == 0);
+	assert(test_param.seen == true);
+	assert(test_param.msg_tag == replied_tag);
+	assert(test_param.tag_owner == false);
+
+	/* Now sending allocates that tag again, since it is the only spare one */
+	test_param.seen = false;
+	msg = __mctp_alloc(msg_len);
+	memset(msg, 0x99, msg_len);
+	rc = mctp_message_tx_request(mctp, dest_eid1, msg, msg_len, &msg_tag);
+	assert(rc == 0);
+	assert(test_param.seen == true);
+	assert(msg_tag == replied_tag);
+
+	mctp_binding_test_destroy(binding);
+	mctp_destroy(mctp);
+}
+
 /* clang-format off */
 #define TEST_CASE(test) { #test, test }
 static const struct {
@@ -620,6 +690,7 @@ static const struct {
 	TEST_CASE(mctp_core_test_rx_with_tag_multifragment),
 	TEST_CASE(mctp_core_test_rx_with_null_dst_eid),
 	TEST_CASE(mctp_core_test_rx_with_broadcast_dst_eid),
+	TEST_CASE(mctp_core_test_tx_alloc_tag),
 };
 /* clang-format on */
 
