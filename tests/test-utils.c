@@ -12,16 +12,16 @@
 
 #include "test-utils.h"
 
+/* mctp_binding_test can be used for loopback in tests. Senders must use
+ * the local EID as the destination */
 struct mctp_binding_test {
 	struct mctp_binding binding;
 	uint8_t tx_storage[MCTP_PKTBUF_SIZE(MCTP_BTU)];
 };
 
-static int mctp_binding_test_tx(struct mctp_binding *b __attribute__((unused)),
-				struct mctp_pktbuf *pkt __attribute__((unused)))
+static int mctp_binding_test_tx(struct mctp_binding *b, struct mctp_pktbuf *pkt)
 {
-	/* we are not expecting TX packets */
-	assert(0);
+	mctp_bus_rx(b, pkt);
 	return 0;
 }
 
@@ -73,4 +73,5 @@ void mctp_test_stack_init(struct mctp **mctp,
 	assert(*binding);
 
 	mctp_binding_test_register_bus(*binding, *mctp, eid);
+	mctp_binding_set_tx_enabled(&(*binding)->binding, true);
 }
