@@ -30,6 +30,16 @@
 #define MCTP_MAX_BUSSES 2
 #endif
 
+/* Concurrent reassembly contexts. */
+#ifndef MCTP_REASSEMBLY_CTXS
+#define MCTP_REASSEMBLY_CTXS 16
+#endif
+
+/* Outbound request tags */
+#ifndef MCTP_REQ_TAGS
+#define MCTP_REQ_TAGS MCTP_REASSEMBLY_CTXS
+#endif
+
 /* Internal data structures */
 
 enum mctp_bus_state {
@@ -74,6 +84,13 @@ struct mctp_msg_ctx {
 	size_t fragment_size;
 };
 
+struct mctp_req_tag {
+	/* 0 is an unused entry */
+	mctp_eid_t local;
+	mctp_eid_t remote;
+	uint8_t tag;
+};
+
 struct mctp {
 	int n_busses;
 	struct mctp_bus busses[MCTP_MAX_BUSSES];
@@ -86,10 +103,13 @@ struct mctp {
 	mctp_capture_fn capture;
 	void *capture_data;
 
-	/* Message reassembly.
-	 * @todo: flexible context count
-	 */
-	struct mctp_msg_ctx msg_ctxs[16];
+	/* Message reassembly. */
+	struct mctp_msg_ctx msg_ctxs[MCTP_REASSEMBLY_CTXS];
+
+	/* Allocated outbound TO tags */
+	struct mctp_req_tag req_tags[MCTP_REQ_TAGS];
+	/* used to avoid always allocating tag 0 */
+	uint8_t tag_round_robin;
 
 	enum {
 		ROUTE_ENDPOINT,
@@ -107,6 +127,8 @@ struct mctp {
 static int mctp_message_tx_on_bus(struct mctp_bus *bus, mctp_eid_t src,
 				  mctp_eid_t dest, bool tag_owner,
 				  uint8_t msg_tag, void *msg, size_t msg_len);
+static void mctp_dealloc_tag(struct mctp_bus *bus, mctp_eid_t local,
+			     mctp_eid_t remote, uint8_t tag);
 
 struct mctp_pktbuf *mctp_pktbuf_alloc(struct mctp_binding *binding, size_t len)
 {
@@ -531,6 +553,11 @@ static void mctp_rx(struct mctp *mctp, struct mctp_bus *bus, mctp_eid_t src,
 
 	if (mctp->route_policy == ROUTE_ENDPOINT &&
 	    mctp_rx_dest_is_local(bus, dest)) {
+		/* Note responses to allocated tags */
+		if (!tag_owner) {
+			mctp_dealloc_tag(bus, dest, src, msg_tag);
+		}
+
 		/* Handle MCTP Control Messages: */
 		if (len >= sizeof(struct mctp_ctrl_msg_hdr)) {
 			struct mctp_ctrl_msg_hdr *msg_hdr = buf;
@@ -958,6 +985,95 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid, bool tag_owner,
 	}
 
 	return mctp_message_tx_alloced(mctp, eid, tag_owner, msg_tag, copy,
+				       msg_len);
+}
+
+static void mctp_dealloc_tag(struct mctp_bus *bus, mctp_eid_t local,
+			     mctp_eid_t remote, uint8_t tag)
+{
+	struct mctp *mctp = bus->binding->mctp;
+	if (local == 0 || remote == 0) {
+		return;
+	}
+
+	for (size_t i = 0; i < ARRAY_SIZE(mctp->req_tags); i++) {
+		struct mctp_req_tag *r = &mctp->req_tags[i];
+		if (r->local == local && r->remote == remote && r->tag == tag) {
+			r->local = 0;
+			r->remote = 0;
+			r->tag = 0;
+			return;
+		}
+	}
+}
+
+static int mctp_alloc_tag(struct mctp *mctp, mctp_eid_t local,
+			  mctp_eid_t remote, uint8_t *ret_tag)
+{
+	assert(local != 0);
+	assert(remote != 0);
+
+	uint8_t used = 0;
+	struct mctp_req_tag *spare = NULL;
+	/* Find which tags and slots are used/spare */
+	for (size_t i = 0; i < ARRAY_SIZE(mctp->req_tags); i++) {
+		struct mctp_req_tag *r = &mctp->req_tags[i];
+		if (r->local == 0) {
+			spare = r;
+		} else {
+			// TODO: check timeouts
+			if (r->local == local && r->remote == remote) {
+				used |= 1 << r->tag;
+			}
+		}
+	}
+
+	if (spare == NULL) {
+		// All req_tag slots are in-use
+		return -EBUSY;
+	}
+
+	for (uint8_t t = 0; t < 8; t++) {
+		uint8_t tag = (t + mctp->tag_round_robin) % 8;
+		if ((used & 1 << tag) == 0) {
+			spare->local = local;
+			spare->remote = remote;
+			spare->tag = tag;
+			*ret_tag = tag;
+			mctp->tag_round_robin = (tag + 1) % 8;
+			return 0;
+		}
+	}
+
+	// All 8 tags are used for this src/dest pair
+	return -EBUSY;
+}
+
+int mctp_message_tx_request(struct mctp *mctp, mctp_eid_t eid, void *msg,
+			    size_t msg_len, uint8_t *ret_alloc_msg_tag)
+{
+	int rc;
+	struct mctp_bus *bus;
+
+	bus = find_bus_for_eid(mctp, eid);
+	if (!bus) {
+		__mctp_msg_free(msg, mctp);
+		return 0;
+	}
+
+	uint8_t alloc_tag;
+	rc = mctp_alloc_tag(mctp, bus->eid, eid, &alloc_tag);
+	if (rc) {
+		mctp_prdebug("Failed allocating tag");
+		__mctp_msg_free(msg, mctp);
+		return rc;
+	}
+
+	if (ret_alloc_msg_tag) {
+		*ret_alloc_msg_tag = alloc_tag;
+	}
+
+	return mctp_message_tx_alloced(mctp, eid, true, alloc_tag, msg,
 				       msg_len);
 }
 
