@@ -163,6 +163,22 @@ int mctp_message_tx_alloced(struct mctp *mctp, mctp_eid_t eid, bool tag_owner,
 int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid, bool tag_owner,
 		    uint8_t msg_tag, const void *msg, size_t msg_len);
 
+/* Transmit a request message.
+ * @msg: The message buffer to send. Must be suitable for
+ * free(), or the custom mctp_set_alloc_ops() m_msg_free.
+ *
+ * A tag with Tag Owner bit set will allocated for the sent message,
+ * and returned to the caller (TO bit is unset in the returned @alloc_msg_tag).
+ * alloc_msg_tag may be NULL to ignore the returned tag.
+ * If no tags are spare -EBUSY will be returned.
+ *
+ * If an asynchronous binding is being used, it will return -EBUSY if
+ * a message is already pending for transmission (msg will be freed).
+ * Asynchronous users can test mctp_is_tx_ready() prior to sending.
+ */
+int mctp_message_tx_request(struct mctp *mctp, mctp_eid_t eid, void *msg,
+			    size_t msg_len, uint8_t *alloc_msg_tag);
+
 bool mctp_is_tx_ready(struct mctp *mctp, mctp_eid_t eid);
 
 /* hardware bindings */
