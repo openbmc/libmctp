@@ -8,8 +8,8 @@ option(
     'bindings',
     type: 'array',
     description: 'Bindings to include',
-    choices: ['serial', 'astlpc'],
-    value: ['serial', 'astlpc'],
+    choices: ['serial', 'astlpc', 'i2c'],
+    value: ['serial', 'astlpc', 'i2c'],
 )
 option(
     'default_alloc',
