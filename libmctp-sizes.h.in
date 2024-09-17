@@ -1,0 +1,5 @@
+#pragma once
+
+#define MCTP_SIZEOF_STRUCT_MCTP @sizeof_struct_mctp@
+/* sizeof(struct mctp_binding_i2c) */
+#define MCTP_SIZEOF_BINDING_I2C @sizeof_binding_i2c@
