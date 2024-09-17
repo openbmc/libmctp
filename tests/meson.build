@@ -13,6 +13,9 @@ endif
 if get_option('bindings').contains('astlpc')
     tests += 'test_astlpc'
 endif
+if get_option('bindings').contains('i2c')
+    tests += 'test_i2c'
+endif
 
 test_include_dirs = [include_directories('.'), libmctp_include_dir]
 foreach t : tests
