@@ -31,3 +31,9 @@ option(
     type: 'feature',
     description: 'Support logging to syslog',
 )
+option(
+    'custom_alloc',
+    type: 'boolean',
+    value: false,
+    description: 'Use fixed application-provided allocators',
+)

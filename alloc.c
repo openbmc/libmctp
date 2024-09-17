@@ -11,6 +11,10 @@
 
 #include "compiler.h"
 
+#if defined(MCTP_DEFAULT_ALLOC) && defined(MCTP_CUSTOM_ALLOC)
+#error Default and Custom alloc are incompatible
+#endif
+
 #ifdef MCTP_DEFAULT_ALLOC
 static void *default_msg_malloc(size_t size, void *ctx __unused)
 {
@@ -24,7 +28,18 @@ static void default_msg_free(void *msg, void *ctx __unused)
 }
 #endif
 
-struct {
+/* Allocators provided as functions to call */
+#ifdef MCTP_CUSTOM_ALLOC
+extern void *mctp_custom_malloc(size_t size);
+extern void mctp_custom_free(void *ptr);
+extern void *mctp_custom_msg_alloc(size_t size, void *ctx);
+extern void mctp_custom_msg_free(void *msg, void *ctx);
+#endif
+
+#ifdef MCTP_CUSTOM_ALLOC
+const
+#endif
+	struct {
 	void *(*m_alloc)(size_t);
 	void (*m_free)(void *);
 	/* Final argument is ctx */
@@ -36,6 +51,12 @@ struct {
 	free,
 	default_msg_malloc,
 	default_msg_free,
+#endif
+#ifdef MCTP_CUSTOM_ALLOC
+	mctp_custom_malloc,
+	mctp_custom_free,
+	mctp_custom_msg_alloc,
+	mctp_custom_msg_free,
 #endif
 };
 
@@ -72,6 +93,7 @@ void __mctp_msg_free(void *ptr, struct mctp *mctp)
 		alloc_ops.m_msg_free(ptr, ctx);
 }
 
+#ifndef MCTP_CUSTOM_ALLOC
 void mctp_set_alloc_ops(void *(*m_alloc)(size_t), void (*m_free)(void *),
 			void *(*m_msg_alloc)(size_t, void *),
 			void (*m_msg_free)(void *, void *))
@@ -81,3 +103,4 @@ void mctp_set_alloc_ops(void *(*m_alloc)(size_t), void (*m_free)(void *),
 	alloc_ops.m_msg_alloc = m_msg_alloc;
 	alloc_ops.m_msg_free = m_msg_free;
 }
+#endif // MCTP_CUSTOM_ALLOC
