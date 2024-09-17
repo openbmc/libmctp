@@ -53,7 +53,7 @@ endif
 
 compiler = meson.get_compiler('c')
 
-if get_option('default_alloc').require(
+if not get_option('custom_alloc') and get_option('default_alloc').require(
     compiler.links('''
         #include <stdlib.h>
         void main()
@@ -62,6 +62,10 @@ if get_option('default_alloc').require(
         }
     ''')).allowed()
     add_project_arguments('-DMCTP_DEFAULT_ALLOC', language : 'c')
+endif
+
+if get_option('custom_alloc')
+    add_project_arguments('-DMCTP_CUSTOM_ALLOC', language : 'c')
 endif
 
 feat_fileio = get_option('fileio').require(
