@@ -38,6 +38,14 @@ astlpc_headers = [
     'libmctp-astlpc.h',
 ]
 
+i2c_sources = [
+    'i2c.c',
+]
+
+i2c_headers = [
+    'libmctp-i2c.h',
+]
+
 libmctp_sources = sources
 libmctp_headers = headers
 
@@ -48,6 +56,10 @@ endif
 if get_option('bindings').contains('astlpc')
     libmctp_sources += astlpc_sources
     libmctp_headers += astlpc_headers
+endif
+if get_option('bindings').contains('i2c')
+    libmctp_sources += i2c_sources
+    libmctp_headers += i2c_headers
 endif
 
 compiler = meson.get_compiler('c')
@@ -156,11 +168,17 @@ libmctp_dep = declare_dependency(
     link_with: libmctp,
 )
 
+# TODO: these should depend on the -internal.h headers so they rebuild
+# on changes, unclear how to do that.
 sizeof_mctp = compiler.sizeof('struct mctp',
     include_directories: libmctp_include_dir,
     prefix: '#include "core-internal.h"')
+sizeof_binding_i2c = compiler.sizeof('struct mctp_binding_i2c',
+    include_directories: libmctp_include_dir,
+    prefix: '#include "i2c-internal.h"')
 sizes_h = configure_file(configuration: {
         'sizeof_struct_mctp': sizeof_mctp,
+        'sizeof_binding_i2c': sizeof_binding_i2c,
     },
     input: 'libmctp-sizes.h.in',
     output: 'libmctp-sizes.h',
