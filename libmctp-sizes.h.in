@@ -1,0 +1,3 @@
+#pragma once
+
+#define MCTP_SIZEOF_STRUCT_MCTP @sizeof_struct_mctp@

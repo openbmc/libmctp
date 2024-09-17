@@ -88,7 +88,7 @@ struct mctp *mctp_init(void);
 void mctp_destroy(struct mctp *mctp);
 
 /* Setup a MCTP instance */
-void mctp_setup(struct mctp *mctp);
+int mctp_setup(struct mctp *mctp, size_t struct_mctp_size);
 /* Release resource of a MCTP instance */
 void mctp_cleanup(struct mctp *mctp);
 

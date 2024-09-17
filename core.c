@@ -18,107 +18,7 @@
 #include "libmctp-cmds.h"
 #include "range.h"
 #include "compiler.h"
-
-/* 64kb should be sufficient for a single message. Applications
- * requiring higher sizes can override by setting max_message_size.*/
-#ifndef MCTP_MAX_MESSAGE_SIZE
-#define MCTP_MAX_MESSAGE_SIZE 65536
-#endif
-
-/* Must be >= 2 for bridge busses */
-#ifndef MCTP_MAX_BUSSES
-#define MCTP_MAX_BUSSES 2
-#endif
-
-/* Concurrent reassembly contexts. */
-#ifndef MCTP_REASSEMBLY_CTXS
-#define MCTP_REASSEMBLY_CTXS 16
-#endif
-
-/* Outbound request tags */
-#ifndef MCTP_REQ_TAGS
-#define MCTP_REQ_TAGS MCTP_REASSEMBLY_CTXS
-#endif
-
-/* Internal data structures */
-
-enum mctp_bus_state {
-	mctp_bus_state_constructed = 0,
-	mctp_bus_state_tx_enabled,
-	mctp_bus_state_tx_disabled,
-};
-
-struct mctp_bus {
-	mctp_eid_t eid;
-	struct mctp_binding *binding;
-	enum mctp_bus_state state;
-	struct mctp *mctp;
-
-	/* Current message to transmit */
-	void *tx_msg;
-	/* Position in tx_msg */
-	size_t tx_msgpos;
-	/* Length of tx_msg */
-	size_t tx_msglen;
-	/* Length of current packet payload */
-	size_t tx_pktlen;
-	uint8_t tx_seq;
-	uint8_t tx_src;
-	uint8_t tx_dest;
-	bool tx_to;
-	uint8_t tx_tag;
-
-	/* todo: routing */
-};
-
-struct mctp_msg_ctx {
-	/* NULL buf indicates an unused mctp_msg_ctx */
-	void *buf;
-
-	uint8_t src;
-	uint8_t dest;
-	uint8_t tag;
-	uint8_t last_seq;
-	size_t buf_size;
-	size_t buf_alloc_size;
-	size_t fragment_size;
-};
-
-struct mctp_req_tag {
-	/* 0 is an unused entry */
-	mctp_eid_t local;
-	mctp_eid_t remote;
-	uint8_t tag;
-};
-
-struct mctp {
-	int n_busses;
-	struct mctp_bus busses[MCTP_MAX_BUSSES];
-
-	/* Message RX callback */
-	mctp_rx_fn message_rx;
-	void *message_rx_data;
-
-	/* Packet capture callback */
-	mctp_capture_fn capture;
-	void *capture_data;
-
-	/* Message reassembly. */
-	struct mctp_msg_ctx msg_ctxs[MCTP_REASSEMBLY_CTXS];
-
-	/* Allocated outbound TO tags */
-	struct mctp_req_tag req_tags[MCTP_REQ_TAGS];
-	/* used to avoid always allocating tag 0 */
-	uint8_t tag_round_robin;
-
-	enum {
-		ROUTE_ENDPOINT,
-		ROUTE_BRIDGE,
-	} route_policy;
-	size_t max_message_size;
-
-	void *alloc_ctx;
-};
+#include "core-internal.h"
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -334,14 +234,19 @@ struct mctp *mctp_init(void)
 	if (!mctp)
 		return NULL;
 
-	mctp_setup(mctp);
+	mctp_setup(mctp, sizeof(*mctp));
 	return mctp;
 }
 
-void mctp_setup(struct mctp *mctp)
+int mctp_setup(struct mctp *mctp, size_t struct_mctp_size)
 {
+	if (struct_mctp_size < sizeof(struct mctp)) {
+		mctp_prdebug("Mismatching struct mctp");
+		return -EINVAL;
+	}
 	memset(mctp, 0, sizeof(*mctp));
 	mctp->max_message_size = MCTP_MAX_MESSAGE_SIZE;
+	return 0;
 }
 
 void mctp_set_max_message_size(struct mctp *mctp, size_t message_size)

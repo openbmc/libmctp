@@ -156,6 +156,17 @@ libmctp_dep = declare_dependency(
     link_with: libmctp,
 )
 
+sizeof_mctp = compiler.sizeof('struct mctp',
+    include_directories: libmctp_include_dir,
+    prefix: '#include "core-internal.h"')
+sizes_h = configure_file(configuration: {
+        'sizeof_struct_mctp': sizeof_mctp,
+    },
+    input: 'libmctp-sizes.h.in',
+    output: 'libmctp-sizes.h',
+    )
+install_headers(sizes_h)
+
 if feat_fileio.allowed()
     subdir('utils')
 endif
