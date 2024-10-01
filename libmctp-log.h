@@ -5,8 +5,23 @@
 
 /* libmctp-internal logging */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef MCTP_NOLOG
+
+__attribute__((format(printf, 2, 3))) static inline void
+mctp_prlog(int level __unused, const char *fmt __unused, ...)
+{
+}
+
+#else
+
 void mctp_prlog(int level, const char *fmt, ...)
 	__attribute__((format(printf, 2, 3)));
+
+#endif
 
 #ifndef pr_fmt
 #define pr_fmt(x) x
