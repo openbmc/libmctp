@@ -37,3 +37,9 @@ option(
     value: false,
     description: 'Use fixed application-provided allocators',
 )
+option(
+    'nolog',
+    type: 'boolean',
+    value: false,
+    description: 'Don\'t include any logging functionality',
+)

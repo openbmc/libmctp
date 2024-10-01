@@ -14,7 +14,6 @@ project(
 sources = [
          'core.c',
          'alloc.c',
-         'log.c',
 ]
 
 headers = [
@@ -66,6 +65,12 @@ endif
 
 if get_option('custom_alloc')
     add_project_arguments('-DMCTP_CUSTOM_ALLOC', language : 'c')
+endif
+
+if get_option('nolog')
+    add_project_arguments('-DMCTP_NOLOG', language : 'c')
+else
+    libmctp_sources += ['log.c']
 endif
 
 feat_fileio = get_option('fileio').require(
