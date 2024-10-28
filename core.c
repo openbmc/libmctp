@@ -549,7 +549,7 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 	assert(bus);
 
 	/* Drop packet if it was smaller than mctp hdr size */
-	if (mctp_pktbuf_size(pkt) <= sizeof(struct mctp_hdr))
+	if (mctp_pktbuf_size(pkt) < sizeof(struct mctp_hdr))
 		goto out;
 
 	if (mctp->capture)
