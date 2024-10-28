@@ -155,7 +155,7 @@ void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, size_t size)
 	return buf;
 }
 
-int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, size_t len)
+int mctp_pktbuf_push(struct mctp_pktbuf *pkt, const void *data, size_t len)
 {
 	void *p;
 
