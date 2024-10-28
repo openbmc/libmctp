@@ -65,7 +65,7 @@ void *mctp_pktbuf_data(struct mctp_pktbuf *pkt);
 size_t mctp_pktbuf_size(struct mctp_pktbuf *pkt);
 void *mctp_pktbuf_alloc_start(struct mctp_pktbuf *pkt, size_t size);
 void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, size_t size);
-int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, size_t len);
+int mctp_pktbuf_push(struct mctp_pktbuf *pkt, const void *data, size_t len);
 void *mctp_pktbuf_pop(struct mctp_pktbuf *pkt, size_t len);
 
 /* MCTP core */
