@@ -24,6 +24,13 @@
 #define MCTP_REQ_TAGS MCTP_REASSEMBLY_CTXS
 #endif
 
+#ifndef MCTP_DEFAULT_CLOCK_GETTIME
+#define MCTP_DEFAULT_CLOCK_GETTIME 1
+#endif
+
+/* Tag expiry timeout, in milliseconds */
+static const uint64_t MCTP_TAG_TIMEOUT = 6000;
+
 /* Internal data structures */
 
 enum mctp_bus_state {
@@ -73,6 +80,8 @@ struct mctp_req_tag {
 	mctp_eid_t local;
 	mctp_eid_t remote;
 	uint8_t tag;
+	/* time of tag expiry */
+	uint64_t expiry;
 };
 
 struct mctp {
@@ -102,4 +111,7 @@ struct mctp {
 	size_t max_message_size;
 
 	void *alloc_ctx;
+
+	uint64_t (*platform_now)(void *);
+	void *platform_now_ctx;
 };

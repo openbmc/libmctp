@@ -224,6 +224,15 @@ void mctp_set_log_custom(void (*fn)(int, const char *, va_list));
 #define MCTP_LOG_INFO	 6
 #define MCTP_LOG_DEBUG	 7
 
+/* Environment-specific time functionality */
+/* The `now` callback returns a timestamp in milliseconds.
+ * Timestamps should be monotonically increasing, and can have an arbitrary
+ * origin. (As long as returned timestamps aren't too close to UINT64_MAX, not
+ * a problem forany reasonable implementation). */
+void mctp_set_now_op(struct mctp *mctp, uint64_t (*now)(void *), void *ctx);
+/* Returns a timestamp in milliseconds */
+uint64_t mctp_now(struct mctp *mctp);
+
 #ifdef __cplusplus
 }
 #endif
