@@ -238,6 +238,10 @@ void mctp_set_log_custom(void (*fn)(int, const char *, va_list));
 #define MCTP_LOG_INFO	 6
 #define MCTP_LOG_DEBUG	 7
 
+/* environment-specific time functionality */
+void mctp_set_now_op(struct mctp *mctp, uint64_t (*now)(void *), void *ctx);
+uint64_t mctp_now(struct mctp *mctp);
+
 #ifdef __cplusplus
 }
 #endif
