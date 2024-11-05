@@ -20,6 +20,10 @@
 #include "compiler.h"
 #include "core-internal.h"
 
+#if MCTP_DEFAULT_CLOCK_GETTIME
+#include <time.h>
+#endif
+
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif
@@ -238,10 +242,27 @@ struct mctp *mctp_init(void)
 	return mctp;
 }
 
+#if MCTP_DEFAULT_CLOCK_GETTIME
+static uint64_t mctp_default_now(void *ctx __attribute__((unused)))
+{
+	struct timespec tp;
+	int rc = clock_gettime(CLOCK_MONOTONIC, &tp);
+	if (rc) {
+		/* Should not be possible */
+		return 0;
+	}
+	return (uint64_t)tp.tv_sec * 1000 + tp.tv_nsec / 1000000;
+}
+#endif
+
 void mctp_setup(struct mctp *mctp)
 {
 	memset(mctp, 0, sizeof(*mctp));
 	mctp->max_message_size = MCTP_MAX_MESSAGE_SIZE;
+
+#if MCTP_DEFAULT_CLOCK_GETTIME
+	mctp->platform_now = mctp_default_now;
+#endif
 }
 
 void mctp_set_max_message_size(struct mctp *mctp, size_t message_size)
@@ -888,11 +909,24 @@ int mctp_message_tx(struct mctp *mctp, mctp_eid_t eid, bool tag_owner,
 				       msg_len);
 }
 
+void mctp_set_now_op(struct mctp *mctp, uint64_t (*now)(void *), void *ctx)
+{
+	assert(now);
+	mctp->platform_now = now;
+	mctp->platform_now_ctx = ctx;
+}
+
+uint64_t mctp_now(struct mctp *mctp)
+{
+	assert(mctp->platform_now);
+	return mctp->platform_now(mctp->platform_now_ctx);
+}
+
 static void mctp_dealloc_tag(struct mctp_bus *bus, mctp_eid_t local,
 			     mctp_eid_t remote, uint8_t tag)
 {
 	struct mctp *mctp = bus->binding->mctp;
-	if (local == 0 || remote == 0) {
+	if (local == 0) {
 		return;
 	}
 
@@ -902,6 +936,7 @@ static void mctp_dealloc_tag(struct mctp_bus *bus, mctp_eid_t local,
 			r->local = 0;
 			r->remote = 0;
 			r->tag = 0;
+			r->expiry = 0;
 			return;
 		}
 	}
@@ -911,17 +946,16 @@ static int mctp_alloc_tag(struct mctp *mctp, mctp_eid_t local,
 			  mctp_eid_t remote, uint8_t *ret_tag)
 {
 	assert(local != 0);
-	assert(remote != 0);
+	uint64_t now = mctp_now(mctp);
 
 	uint8_t used = 0;
 	struct mctp_req_tag *spare = NULL;
 	/* Find which tags and slots are used/spare */
 	for (size_t i = 0; i < ARRAY_SIZE(mctp->req_tags); i++) {
 		struct mctp_req_tag *r = &mctp->req_tags[i];
-		if (r->local == 0) {
+		if (r->local == 0 || r->expiry < now) {
 			spare = r;
 		} else {
-			// TODO: check timeouts
 			if (r->local == local && r->remote == remote) {
 				used |= 1 << r->tag;
 			}
@@ -939,6 +973,7 @@ static int mctp_alloc_tag(struct mctp *mctp, mctp_eid_t local,
 			spare->local = local;
 			spare->remote = remote;
 			spare->tag = tag;
+			spare->expiry = now + MCTP_TAG_TIMEOUT;
 			*ret_tag = tag;
 			mctp->tag_round_robin = (tag + 1) % 8;
 			return 0;
