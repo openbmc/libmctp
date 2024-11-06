@@ -17,7 +17,6 @@ struct mctp_ctrl_msg_hdr {
 	uint8_t ic_msg_type;
 	uint8_t rq_dgram_inst;
 	uint8_t command_code;
-	uint8_t completion_code;
 };
 
 #define MCTP_CTRL_HDR_MSG_TYPE	       0
