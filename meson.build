@@ -14,6 +14,7 @@ project(
 sources = [
      'core.c',
      'alloc.c',
+     'control.c',
 ]
 
 headers = [
@@ -45,6 +46,9 @@ i2c_sources = [
 i2c_headers = [
     'libmctp-i2c.h',
 ]
+control_sources = [
+    'control.c',
+]
 
 libmctp_sources = sources
 libmctp_headers = headers
@@ -60,6 +64,9 @@ endif
 if get_option('bindings').contains('i2c')
     libmctp_sources += i2c_sources
     libmctp_headers += i2c_headers
+endif
+if get_option('control')
+    libmctp_sources += control_sources
 endif
 
 compiler = meson.get_compiler('c')

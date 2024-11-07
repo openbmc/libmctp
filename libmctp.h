@@ -110,6 +110,8 @@ int mctp_register_bus(struct mctp *mctp, struct mctp_binding *binding,
 
 void mctp_unregister_bus(struct mctp *mctp, struct mctp_binding *binding);
 
+int mctp_bus_set_eid(struct mctp_binding *binding, mctp_eid_t eid);
+
 /* Create a simple bidirectional bridge between busses.
  *
  * In this mode, the MCTP stack is initialised as a bridge. There is no EID
@@ -232,6 +234,14 @@ void mctp_set_log_custom(void (*fn)(int, const char *, va_list));
 void mctp_set_now_op(struct mctp *mctp, uint64_t (*now)(void *), void *ctx);
 /* Returns a timestamp in milliseconds */
 uint64_t mctp_now(struct mctp *mctp);
+
+int mctp_control_handler_enable(struct mctp *mctp);
+void mctp_control_handler_disable(struct mctp *mctp);
+
+/* Add/remove message types to be reported by Get MCTP Version Support.
+ * Control type is added automatically for the control handler */
+int mctp_control_add_type(struct mctp *mctp, uint8_t msg_type);
+void mctp_control_remove_type(struct mctp *mctp, uint8_t msg_type);
 
 #ifdef __cplusplus
 }

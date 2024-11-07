@@ -19,6 +19,7 @@
 #include "range.h"
 #include "compiler.h"
 #include "core-internal.h"
+#include "control.h"
 
 #if MCTP_DEFAULT_CLOCK_GETTIME
 #include <time.h>
@@ -266,6 +267,9 @@ int mctp_setup(struct mctp *mctp, size_t struct_mctp_size)
 #if MCTP_DEFAULT_CLOCK_GETTIME
 	mctp->platform_now = mctp_default_now;
 #endif
+#if MCTP_CONTROL_HANDLER
+	mctp_control_add_type(mctp, MCTP_CTRL_HDR_MSG_TYPE);
+#endif
 	return 0;
 }
 
@@ -360,6 +364,16 @@ int mctp_register_bus(struct mctp *mctp, struct mctp_binding *binding,
 	return rc;
 }
 
+int mctp_bus_set_eid(struct mctp_binding *binding, mctp_eid_t eid)
+{
+	if (eid < 8 || eid == 0xff) {
+		return -EINVAL;
+	}
+
+	binding->bus->eid = eid;
+	return 0;
+}
+
 void mctp_unregister_bus(struct mctp *mctp, struct mctp_binding *binding)
 {
 	/*
@@ -444,6 +458,12 @@ static bool mctp_ctrl_handle_msg(struct mctp_bus *bus, mctp_eid_t src,
 						 buffer, length);
 			return true;
 		}
+	} else {
+#if MCTP_CONTROL_HANDLER
+		/* libmctp will handle control requests */
+		return mctp_control_handler(bus, src, tag_owner, msg_tag,
+					    buffer, length);
+#endif
 	}
 
 	/*

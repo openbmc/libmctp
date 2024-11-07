@@ -43,3 +43,9 @@ option(
     value: false,
     description: 'Don\'t include any logging functionality',
 )
+option(
+    'control',
+    type: 'boolean',
+    value: true,
+    description: 'Include MCTP control protocol handler',
+)
