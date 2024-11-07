@@ -66,6 +66,75 @@ struct mctp_ctrl_msg_hdr {
 #define MCTP_CTRL_CC_ERROR_UNSUPPORTED_CMD 0x05
 /* 0x80 - 0xFF are command specific */
 
+struct mctp_ctrl_cmd_empty_resp {
+	struct mctp_ctrl_msg_hdr hdr;
+	uint8_t completion_code;
+} __attribute__((packed));
+
+/* Set Endpoint ID request, Operation. Bits [1:0] */
+#define MCTP_CTRL_SET_EID_OP_MASK	    0x03
+#define MCTP_CTRL_SET_EID_OP_SET	    0x00
+#define MCTP_CTRL_SET_EID_OP_FORCE	    0x01
+#define MCTP_CTRL_SET_EID_OP_RESET	    0x02
+#define MCTP_CTRL_SET_EID_OP_SET_DISCOVERED 0x03
+
+struct mctp_ctrl_cmd_set_endpoint_id_req {
+	struct mctp_ctrl_msg_hdr hdr;
+	uint8_t operation;
+	uint8_t eid;
+} __attribute__((packed));
+
+/* Set Endpoint ID response, assignment status. Bits [1:0] */
+#define MCTP_CTRL_SET_EID_STATUS_ACCEPTED 0x00
+#define MCTP_CTRL_SET_EID_STATUS_REJECTED 0x01
+
+struct mctp_ctrl_cmd_set_endpoint_id_resp {
+	struct mctp_ctrl_msg_hdr hdr;
+	uint8_t completion_code;
+	uint8_t status;
+	uint8_t eid;
+	uint8_t pool_size;
+} __attribute__((packed));
+
+/* Get Endpoint ID, Endpoint Type. Bits [5:4] */
+#define MCTP_CTRL_ENDPOINT_TYPE_SIMPLE		0x00
+#define MCTP_CTRL_ENDPOINT_TYPE_BUSOWNER_BRIDGE 0x10
+
+/* Get Endpoint ID, Endpoint ID Type. Bits [1:0] */
+#define MCTP_CTRL_ENDPOINT_ID_TYPE_DYNAMIC_ONLY	    0x00
+#define MCTP_CTRL_ENDPOINT_ID_TYPE_STATIC	    0x01
+#define MCTP_CTRL_ENDPOINT_ID_TYPE_STATIC_SAME	    0x02
+#define MCTP_CTRL_ENDPOINT_ID_TYPE_STATIC_DIFFERENT 0x03
+
+struct mctp_ctrl_cmd_get_endpoint_id_resp {
+	struct mctp_ctrl_msg_hdr hdr;
+	uint8_t completion_code;
+	uint8_t endpoint_id;
+	uint8_t endpoint_type;
+	uint8_t medium_specific;
+} __attribute__((packed));
+
+#define MCTP_CTRL_VERSIONS_NOT_SUPPORTED 0x80
+
+struct mctp_ctrl_cmd_get_version_req {
+	struct mctp_ctrl_msg_hdr hdr;
+	uint8_t msg_type;
+} __attribute__((packed));
+
+struct mctp_ctrl_cmd_get_version_resp {
+	struct mctp_ctrl_msg_hdr hdr;
+	uint8_t completion_code;
+	uint8_t version_count;
+	uint32_t versions[];
+} __attribute__((packed));
+
+struct mctp_ctrl_cmd_get_types_resp {
+	struct mctp_ctrl_msg_hdr hdr;
+	uint8_t completion_code;
+	uint8_t type_count;
+	uint8_t types[];
+} __attribute__((packed));
+
 #ifdef __cplusplus
 }
 #endif
