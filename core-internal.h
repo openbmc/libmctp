@@ -28,6 +28,10 @@
 #define MCTP_DEFAULT_CLOCK_GETTIME 1
 #endif
 
+#ifndef MCTP_CONTROL_HANDLER
+#define MCTP_CONTROL_HANDLER 1
+#endif
+
 /* Tag expiry timeout, in milliseconds */
 static const uint64_t MCTP_TAG_TIMEOUT = 6000;
 
@@ -84,6 +88,14 @@ struct mctp_req_tag {
 	uint64_t expiry;
 };
 
+#define MCTP_CONTROL_MAX_TYPES 10
+
+struct mctp_control {
+	/* Types to report from Get MCTP Version Support */
+	uint8_t msg_types[MCTP_CONTROL_MAX_TYPES];
+	size_t num_msg_types;
+};
+
 struct mctp {
 	int n_busses;
 	struct mctp_bus busses[MCTP_MAX_BUSSES];
@@ -109,6 +121,10 @@ struct mctp {
 		ROUTE_BRIDGE,
 	} route_policy;
 	size_t max_message_size;
+
+#if MCTP_CONTROL_HANDLER
+	struct mctp_control control;
+#endif
 
 	void *alloc_ctx;
 

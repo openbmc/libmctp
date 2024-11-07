@@ -103,7 +103,7 @@ struct mctp *mctp_init(void);
 void mctp_destroy(struct mctp *mctp);
 
 /* Setup a MCTP instance */
-void mctp_setup(struct mctp *mctp);
+int mctp_setup(struct mctp *mctp, size_t struct_mctp_size);
 /* Release resource of a MCTP instance */
 void mctp_cleanup(struct mctp *mctp);
 
@@ -124,6 +124,8 @@ int mctp_register_bus(struct mctp *mctp, struct mctp_binding *binding,
 		      mctp_eid_t eid);
 
 void mctp_unregister_bus(struct mctp *mctp, struct mctp_binding *binding);
+
+int mctp_bus_set_eid(struct mctp_binding *binding, mctp_eid_t eid);
 
 /* Create a simple bidirectional bridge between busses.
  *
@@ -241,6 +243,14 @@ void mctp_set_log_custom(void (*fn)(int, const char *, va_list));
 /* environment-specific time functionality */
 void mctp_set_now_op(struct mctp *mctp, uint64_t (*now)(void *), void *ctx);
 uint64_t mctp_now(struct mctp *mctp);
+
+int mctp_control_handler_enable(struct mctp *mctp);
+void mctp_control_handler_disable(struct mctp *mctp);
+
+/* Add/remove message types to be reported by Get MCTP Version Support.
+ * Control type is added automatically for the control handler */
+int mctp_control_add_type(struct mctp *mctp, uint8_t msg_type);
+void mctp_control_remove_type(struct mctp *mctp, uint8_t msg_type);
 
 #ifdef __cplusplus
 }
