@@ -568,6 +568,11 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 	hdr = mctp_pktbuf_hdr(pkt);
 
+	if (hdr->src == MCTP_EID_BROADCAST) {
+		/* drop packets with broadcast EID src */
+		goto out;
+	}
+
 	/* small optimisation: don't bother reassembly if we're going to
 	 * drop the packet in mctp_rx anyway */
 	if (mctp->route_policy == ROUTE_ENDPOINT &&
