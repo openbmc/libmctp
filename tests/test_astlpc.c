@@ -1515,20 +1515,13 @@ static const struct {
 };
 /* clang-format on */
 
-#ifndef BUILD_ASSERT
-#define BUILD_ASSERT(x)                                                        \
-	do {                                                                   \
-		(void)sizeof(char[0 - (!(x))]);                                \
-	} while (0)
-#endif
-
 int main(void)
 {
 	size_t i;
 
 	mctp_set_log_stdio(MCTP_LOG_DEBUG);
 
-	BUILD_ASSERT(ARRAY_SIZE(astlpc_tests) < SIZE_MAX);
+	static_assert(ARRAY_SIZE(astlpc_tests) < SIZE_MAX, "size");
 	for (i = 0; i < ARRAY_SIZE(astlpc_tests); i++) {
 		mctp_prlog(MCTP_LOG_DEBUG, "begin: %s", astlpc_tests[i].name);
 		astlpc_tests[i].test();
