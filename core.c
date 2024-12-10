@@ -432,8 +432,11 @@ done:
 
 static inline bool mctp_ctrl_cmd_is_transport(struct mctp_ctrl_msg_hdr *hdr)
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
 	return ((hdr->command_code >= MCTP_CTRL_CMD_FIRST_TRANSPORT) &&
 		(hdr->command_code <= MCTP_CTRL_CMD_LAST_TRANSPORT));
+#pragma GCC diagnostic pop
 }
 
 static bool mctp_ctrl_handle_msg(struct mctp_bus *bus, mctp_eid_t src,
