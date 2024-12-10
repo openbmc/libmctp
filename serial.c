@@ -317,7 +317,7 @@ static void mctp_rx_consume(struct mctp_binding_serial *serial, const void *buf,
 	size_t i;
 
 	for (i = 0; i < len; i++)
-		mctp_rx_consume_one(serial, *(uint8_t *)(buf + i));
+		mctp_rx_consume_one(serial, ((const uint8_t *)buf)[i]);
 }
 
 #ifdef MCTP_HAVE_FILEIO
@@ -330,7 +330,8 @@ int mctp_serial_read(struct mctp_binding_serial *serial)
 		return -1;
 
 	if (len < 0) {
-		mctp_prerr("can't read from serial device: %m");
+		mctp_prerr("can't read from serial device: %s",
+			   strerror(errno));
 		return -1;
 	}
 
@@ -353,7 +354,7 @@ int mctp_serial_open_path(struct mctp_binding_serial *serial,
 {
 	serial->fd = open(device, O_RDWR);
 	if (serial->fd < 0)
-		mctp_prerr("can't open device %s: %m", device);
+		mctp_prerr("can't open device %s: %s", device, strerror(errno));
 
 	return 0;
 }
