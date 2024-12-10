@@ -64,7 +64,7 @@ struct ctx {
 	struct binding *binding;
 	bool verbose;
 	int local_eid;
-	void *buf;
+	uint8_t *buf;
 	size_t buf_size;
 
 	int sock;
