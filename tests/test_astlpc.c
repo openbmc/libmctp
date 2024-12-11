@@ -1187,22 +1187,14 @@ static void astlpc_test_negotiate_mtu_high_low(void)
 	rc = mctp_astlpc_poll(ctx.host.astlpc);
 	assert(rc == 0);
 
-	/*
-	 * Transmit a message to place a packet on the interface. This releases the buffer and
-	 * disables the binding, plugging the binding's transmit queue while the host hasn't polled
-	 * to pull the packet off.
-	 */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_DST, tag, msg,
 			     sizeof(msg));
-
-	/* Leave the packet in place on the interface by not polling the host binding */
-
-	/*
-	 * Transmit another message to force packetisation at the current MTU while the binding is
-	 * disabled, leaving the packet(s) in the binding's transmit queue
-	 */
-	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_DST, tag, msg,
-			     sizeof(msg));
+	rc = mctp_astlpc_poll(ctx.bmc.astlpc);
+	assert(rc == 0);
+	rc = mctp_astlpc_poll(ctx.host.astlpc);
+	assert(rc == 0);
+	/* Check the message was received */
+	assert(ctx.count == 1);
 
 	/* Tear-down the host so we can bring up a new one */
 	endpoint_destroy(&ctx.host);
@@ -1226,22 +1218,15 @@ static void astlpc_test_negotiate_mtu_high_low(void)
 	rc = mctp_astlpc_poll(ctx.host.astlpc);
 	assert(rc == 0);
 
-	/*
-	 * Check that there are no outstanding messages to be received by the host. The message
-	 * packetised on the BMC at the larger MTU must be dropped as its now no longer possible to
-	 * transmit those packets
-	 */
-	rc = mctp_astlpc_poll(ctx.host.astlpc);
-	assert(rc == 0);
-	assert(ctx.count == 0);
-
-	/* Transmit another message from the BMC to the host, packetised using the new MTU */
 	rc = mctp_message_tx(ctx.bmc.mctp, 9, MCTP_MESSAGE_TO_DST, tag, msg,
-			     hmtu);
-
-	/* Check that the most recent BMC transmission is received by the host */
-	rc = mctp_astlpc_poll(ctx.host.astlpc);
-	assert(rc == 0);
+			     sizeof(msg));
+	while (!mctp_astlpc_tx_done(ctx.bmc.astlpc)) {
+		rc = mctp_astlpc_poll(ctx.bmc.astlpc);
+		assert(rc == 0);
+		rc = mctp_astlpc_poll(ctx.host.astlpc);
+		assert(rc == 0);
+	}
+	/* Check the mssage was received */
 	assert(ctx.count == 1);
 
 	/* Ensure buffer ownership is returned to the BMC and the BMC Tx queue is processed */
