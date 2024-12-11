@@ -3,7 +3,9 @@
 #ifndef _UTILS_MCTP_CAPTURE_H
 #define _UTILS_MCTP_CAPTURE_H
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #include "compiler.h"
 #include "libmctp.h"

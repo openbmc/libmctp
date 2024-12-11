@@ -30,8 +30,6 @@ int capture_init(void)
 
 int capture_prepare(struct capture *cap)
 {
-	int rc;
-
 	if (!(cap->pcap = pcap_open_dead(CAPTURE_LINKTYPE_LINUX_SLL2,
 					 UINT16_MAX))) {
 		fprintf(stderr, "pcap_open_dead: failed\n");
@@ -135,7 +133,7 @@ void capture_socket(pcap_dumper_t *dumper, const void *buf, size_t len,
 
 	/* Ignore the eid at start of buf */
 	memcpy(pktbuf + sizeof(struct sll2_header) + sizeof(struct mctp_hdr),
-	       buf + 1, len - 1);
+	       (const uint8_t *)buf + 1, len - 1);
 
 	hdr.caplen = size;
 	hdr.len = size;

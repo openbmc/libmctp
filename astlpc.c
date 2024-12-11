@@ -1401,7 +1401,8 @@ static int mctp_astlpc_init_fileio_lpc(struct mctp_binding_astlpc *astlpc)
 		astlpc_prwarn(astlpc, "LPC mmap failed");
 		rc = -1;
 	} else {
-		astlpc->lpc_map = lpc_map_base + map.size - LPC_WIN_SIZE;
+		astlpc->lpc_map =
+			(uint8_t *)lpc_map_base + map.size - LPC_WIN_SIZE;
 	}
 
 	close(fd);
