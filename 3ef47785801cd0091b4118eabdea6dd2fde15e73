@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb266cd0_dc73070b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001129
+      },
+      "writtenOn": "2024-12-12T03:38:37Z",
+      "side": 1,
+      "message": "These earlier warning-fix commits are necessary prior to adding the Meson build (https://gerrit.openbmc.org/c/openbmc/libmctp/+/76461). \n\nOnce meson is added, OpenBMC CI will set warning_level\u003d3 which brings in `-Wpedantic`, which is more strict than the previous autoconf build.",
+      "revId": "3ef47785801cd0091b4118eabdea6dd2fde15e73",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
