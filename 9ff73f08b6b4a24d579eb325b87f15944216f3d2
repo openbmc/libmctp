@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fa87487_fe85ac2c",
+        "filename": "core.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T06:47:56Z",
+      "side": 1,
+      "message": "Just a note for my/others\u0027 future reference: we have never support creating a third bus; we have a limit of 2 already.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 25
+      },
+      "revId": "9ff73f08b6b4a24d579eb325b87f15944216f3d2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
