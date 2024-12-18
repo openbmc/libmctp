@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a59cfbe8_7544524d",
+        "filename": "core.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1037,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T07:00:06Z",
+      "side": 1,
+      "message": "Does this need to be distinct from the loop variable?\n\n(eg., we\u0027ll only do one loop if `mctp-\u003etag_round_robin \u003d\u003d 7`)",
+      "range": {
+        "startLine": 1037,
+        "startChar": 2,
+        "endLine": 1037,
+        "endChar": 5
+      },
+      "revId": "eb2ca3e24a09d1084ca7d43c3feedd6617aee521",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
