@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bbecd88_61cde24d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T07:02:54Z",
+      "side": 1,
+      "message": "Would it be worth getting rid of `mctp_set_alloc_ops` entirely then?",
+      "revId": "711f13985a4600e3b692afb8a6889126849a2e2d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
