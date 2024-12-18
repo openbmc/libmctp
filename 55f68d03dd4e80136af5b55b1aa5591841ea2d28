@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e504a32a_d79595b9",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1194,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T06:00:23Z",
+      "side": 1,
+      "message": "I\u0027m not clear on the intention behind checking for specific buffer behaviour here (@arj?), but isn\u0027t this comment would be out-of-date now that we\u0027re polling to the point of message delivery?",
+      "range": {
+        "startLine": 1190,
+        "startChar": 1,
+        "endLine": 1194,
+        "endChar": 4
+      },
+      "revId": "55f68d03dd4e80136af5b55b1aa5591841ea2d28",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df7c7e26_97906138",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1201,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T06:00:23Z",
+      "side": 1,
+      "message": "super minor: `message`.",
+      "revId": "55f68d03dd4e80136af5b55b1aa5591841ea2d28",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
