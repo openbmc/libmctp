@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13696a98_7127c888",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T06:42:24Z",
+      "side": 1,
+      "message": "nice.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 63
+      },
+      "revId": "29bb0c9831f5be0f26542806771530077d79b247",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1211f15b_f6c24d94",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T06:42:24Z",
+      "side": 1,
+      "message": "Is this unused? or for API-user usage?",
+      "revId": "29bb0c9831f5be0f26542806771530077d79b247",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1402503_679d0e31",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T06:42:24Z",
+      "side": 1,
+      "message": "Seems odd that the message remains with the caller, except in error cases, where it is free()ed.\n\nDid you have a usage pattern in mind where this transfer of ownership is preferred, or is this more for the internal implementation in `mctp_message_tx`?\n\n... or is this comment now stale? Looks like the implementation doesn\u0027t free the (`const`!) `msg`.",
+      "range": {
+        "startLine": 152,
+        "startChar": 50,
+        "endLine": 152,
+        "endChar": 67
+      },
+      "revId": "29bb0c9831f5be0f26542806771530077d79b247",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee95ca26_1cb878d9",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T06:42:24Z",
+      "side": 1,
+      "message": "This appears to be unused?",
+      "revId": "29bb0c9831f5be0f26542806771530077d79b247",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fab56375_c9f8bfc9",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T06:42:24Z",
+      "side": 1,
+      "message": "`will be`",
+      "revId": "29bb0c9831f5be0f26542806771530077d79b247",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
