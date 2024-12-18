@@ -16,6 +16,24 @@
       "message": "Would it be worth getting rid of `mctp_set_alloc_ops` entirely then?",
       "revId": "711f13985a4600e3b692afb8a6889126849a2e2d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6bd2daf_f1fc1e15",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001129
+      },
+      "writtenOn": "2024-12-18T07:22:56Z",
+      "side": 1,
+      "message": "I guess that might make sense. The only user I see on github is https://github.com/open-power/skiboot/blob/bc7b85db1e7ef55c8fd0ec3d90c093572b02a153/hw/ast-bmc/ast-mctp.c#L328 , which could use `custom_alloc`",
+      "parentUuid": "2bbecd88_61cde24d",
+      "revId": "711f13985a4600e3b692afb8a6889126849a2e2d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
