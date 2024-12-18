@@ -48,6 +48,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b7c7156_6a4706dd",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1194,
+      "author": {
+        "id": 1001129
+      },
+      "writtenOn": "2024-12-18T08:29:05Z",
+      "side": 1,
+      "message": "I\u0027ve removed the comment",
+      "parentUuid": "4b02e114_a495b5c2",
+      "range": {
+        "startLine": 1190,
+        "startChar": 1,
+        "endLine": 1194,
+        "endChar": 4
+      },
+      "revId": "55f68d03dd4e80136af5b55b1aa5591841ea2d28",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df7c7e26_97906138",
@@ -61,6 +85,24 @@
       "writtenOn": "2024-12-18T06:00:23Z",
       "side": 1,
       "message": "super minor: `message`.",
+      "revId": "55f68d03dd4e80136af5b55b1aa5591841ea2d28",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c658a51c_60f0cec6",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1201,
+      "author": {
+        "id": 1001129
+      },
+      "writtenOn": "2024-12-18T08:29:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df7c7e26_97906138",
       "revId": "55f68d03dd4e80136af5b55b1aa5591841ea2d28",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
