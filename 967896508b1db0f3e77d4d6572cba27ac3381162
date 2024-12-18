@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "212b8f65_23d3536b",
+        "filename": "libmctp.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T07:10:56Z",
+      "side": 1,
+      "message": "Might be good to document what `now` should return (ms?)",
+      "revId": "967896508b1db0f3e77d4d6572cba27ac3381162",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
