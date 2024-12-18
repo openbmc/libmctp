@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4b02e114_a495b5c2",
+        "filename": "tests/test_astlpc.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1194,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2024-12-18T06:57:42Z",
+      "side": 1,
+      "message": "The test was exercising that the implementation correctly drops packets sized beyond the currently negotiated MTU, because the current MTU might have been negotiated after message packetisation had occurred. The sequence of events was organised such to force a packetised message to remain in the transmit queue.\n\nNow that we\u0027re packetising the remainder of the message on-demand the implementation shouldn\u0027t itself drop anything, though I imagine in practice the remote side will likely drop received packets either due to a packet lost in the process reinitialising the interface, or lack of associated assembly context due to a reboot or firmware hand-over.\n\nI think the comment should be removed now here on the right if we\u0027re polling to the point of message delivery, as you suggested.",
+      "parentUuid": "e504a32a_d79595b9",
+      "range": {
+        "startLine": 1190,
+        "startChar": 1,
+        "endLine": 1194,
+        "endChar": 4
+      },
+      "revId": "55f68d03dd4e80136af5b55b1aa5591841ea2d28",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "df7c7e26_97906138",
         "filename": "tests/test_astlpc.c",
         "patchSetId": 3
