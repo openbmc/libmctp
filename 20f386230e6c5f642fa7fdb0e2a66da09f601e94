@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c86935e_93e57853",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-18T05:37:22Z",
+      "side": 1,
+      "message": "the `typeofs` implementations would give us basic typechecking here; any way we can allow statement expressions?\n\nIf not, would seem like a reasonable reason for relaxing `-Wpedantic`...",
+      "revId": "20f386230e6c5f642fa7fdb0e2a66da09f601e94",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
