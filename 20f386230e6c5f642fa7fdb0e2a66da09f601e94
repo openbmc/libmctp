@@ -70,6 +70,24 @@
       "parentUuid": "274a7e70_1450c42b",
       "revId": "20f386230e6c5f642fa7fdb0e2a66da09f601e94",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbbc50f9_c1a5168b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001129
+      },
+      "writtenOn": "2024-12-19T03:16:32Z",
+      "side": 1,
+      "message": "They\u0027re used as `uint32_t` as well, so I\u0027ll leave it as `MIN`/`MAX` macros.",
+      "parentUuid": "9922afa6_e87a99ca",
+      "revId": "20f386230e6c5f642fa7fdb0e2a66da09f601e94",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
