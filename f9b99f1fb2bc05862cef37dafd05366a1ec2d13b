@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76aaec4d_9f5d7380",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2024-12-19T01:09:40Z",
+      "side": 1,
+      "message": "Just noting that this now has the `mctp_setup()` change, moved from a later patch in the series.",
+      "revId": "f9b99f1fb2bc05862cef37dafd05366a1ec2d13b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
