@@ -29,3 +29,5 @@ foreach t : tests
         ),
     )
 endforeach
+
+subdir('fuzz')
