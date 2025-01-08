@@ -6,7 +6,7 @@
 #include "libmctp-i2c.h"
 
 /* Limited by bytecount field */
-static_assert(I2C_BTU <= 254);
+static_assert(I2C_BTU <= 254, "I2C BTU is limited to 254");
 
 #ifndef MCTP_I2C_NEIGH_COUNT
 #define MCTP_I2C_NEIGH_COUNT 4
