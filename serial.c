@@ -44,7 +44,7 @@ struct mctp_binding_serial {
 	/* receive buffer and state */
 	uint8_t rxbuf[1024];
 	struct mctp_pktbuf *rx_pkt;
-	uint8_t rx_storage[MCTP_PKTBUF_SIZE(SERIAL_BTU)];
+	uint8_t rx_storage[MCTP_PKTBUF_SIZE(SERIAL_BTU)] PKTBUF_STORAGE_ALIGN;
 	uint8_t rx_exp_len;
 	uint16_t rx_fcs;
 	uint16_t rx_fcs_calc;
@@ -62,7 +62,7 @@ struct mctp_binding_serial {
 	/* temporary transmit buffer */
 	uint8_t txbuf[256];
 	/* used by the MCTP stack */
-	uint8_t tx_storage[MCTP_PKTBUF_SIZE(SERIAL_BTU)];
+	uint8_t tx_storage[MCTP_PKTBUF_SIZE(SERIAL_BTU)] PKTBUF_STORAGE_ALIGN;
 };
 
 #define binding_to_serial(b)                                                   \

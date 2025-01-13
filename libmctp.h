@@ -11,6 +11,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <stdalign.h>
 
 typedef uint8_t mctp_eid_t;
 
@@ -58,6 +59,7 @@ struct mctp_pktbuf {
 
 #define MCTP_PKTBUF_SIZE(payload)                                              \
 	(MCTP_PACKET_SIZE(payload) + sizeof(struct mctp_pktbuf))
+#define PKTBUF_STORAGE_ALIGN __attribute((aligned(alignof(struct mctp_pktbuf))))
 
 struct mctp;
 struct mctp_bus;
@@ -65,7 +67,9 @@ struct mctp_binding;
 
 /* Initialise a mctp_pktbuf in static storage. Should not be freed.
  * Storage must be sized to fit the binding,
- * MCTP_PKTBUF_SIZE(binding->pkt_size + binding->pkt_header + binding->pkt_trailer) */
+ * MCTP_PKTBUF_SIZE(binding->pkt_size + binding->pkt_header + binding->pkt_trailer).
+ * storage must be aligned to alignof(struct mctp_pktbuf), 
+ * use PKTBUF_STORAGE_ALIGN macro */
 struct mctp_pktbuf *mctp_pktbuf_init(struct mctp_binding *binding,
 				     void *storage);
 /* Allocate and initialise a mctp_pktbuf. Should be freed with
@@ -175,7 +179,7 @@ bool mctp_is_tx_ready(struct mctp *mctp, mctp_eid_t eid);
 /**
  * @tx: Binding function to transmit one packet on the interface
  * @tx_storage: A buffer for transmitting packets. Must be sized
- * as MCTP_PKTBUF_SIZE(mtu).
+ * as MCTP_PKTBUF_SIZE(mtu) and 8 byte aligned.
  *      Return:
  *      * 0 - Success, pktbuf can be released
  *	* -EMSGSIZE - Packet exceeds binding MTU, pktbuf must be dropped
