@@ -19,7 +19,7 @@ struct mctp_binding_bridge {
 	int rx_count;
 	int tx_count;
 	uint8_t last_pkt_data;
-	uint8_t tx_storage[MCTP_PKTBUF_SIZE(MCTP_BTU)];
+	uint8_t tx_storage[MCTP_PKTBUF_SIZE(MCTP_BTU)] PKTBUF_STORAGE_ALIGN;
 };
 
 struct test_ctx {

@@ -60,7 +60,7 @@ static void setup_test_binding(struct mctp_binding *test_binding,
 	assert(test_endpoint != NULL);
 	assert(callback_ctx != NULL);
 
-	uint8_t tx_storage[MCTP_PKTBUF_SIZE(MCTP_BTU)];
+	uint8_t tx_storage[MCTP_PKTBUF_SIZE(MCTP_BTU)] PKTBUF_STORAGE_ALIGN;
 	memset(test_binding, 0, sizeof(*test_binding));
 	test_binding->name = "test";
 	test_binding->version = 1;

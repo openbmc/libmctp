@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdalign.h>
 
 #undef pr_fmt
 #define pr_fmt(fmt) "core: " fmt
@@ -65,6 +66,8 @@ void mctp_pktbuf_free(struct mctp_pktbuf *pkt)
 struct mctp_pktbuf *mctp_pktbuf_init(struct mctp_binding *binding,
 				     void *storage)
 {
+	assert((size_t)storage % alignof(struct mctp_pktbuf) == 0);
+
 	size_t size =
 		binding->pkt_size + binding->pkt_header + binding->pkt_trailer;
 	struct mctp_pktbuf *buf = (struct mctp_pktbuf *)storage;

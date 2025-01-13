@@ -35,10 +35,8 @@ struct mctp_binding_i2c {
 
 	uint8_t own_addr;
 
-	uint8_t tx_storage[sizeof(struct mctp_i2c_hdr) +
-			   MCTP_PKTBUF_SIZE(I2C_BTU)] __attribute((aligned(8)));
-	uint8_t rx_storage[sizeof(struct mctp_i2c_hdr) +
-			   MCTP_PKTBUF_SIZE(I2C_BTU)] __attribute((aligned(8)));
+	uint8_t tx_storage[MCTP_PKTBUF_SIZE(I2C_BTU)] PKTBUF_STORAGE_ALIGN;
+	uint8_t rx_storage[MCTP_PKTBUF_SIZE(I2C_BTU)] PKTBUF_STORAGE_ALIGN;
 
 	mctp_i2c_tx_fn tx_fn;
 	void *tx_ctx;
