@@ -16,7 +16,7 @@
  * the local EID as the destination */
 struct mctp_binding_test {
 	struct mctp_binding binding;
-	uint8_t tx_storage[MCTP_PKTBUF_SIZE(MCTP_BTU)];
+	uint8_t tx_storage[MCTP_PKTBUF_SIZE(MCTP_BTU)] PKTBUF_STORAGE_ALIGN;
 };
 
 static int mctp_binding_test_tx(struct mctp_binding *b, struct mctp_pktbuf *pkt)
