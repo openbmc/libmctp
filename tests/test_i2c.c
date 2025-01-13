@@ -259,5 +259,10 @@ int main(void)
 
 	test_neigh_expiry(tx_test, rx_test);
 
+	free(tx_test->i2c);
+	free(rx_test->i2c);
+	mctp_destroy(tx_test->mctp);
+	mctp_destroy(rx_test->mctp);
+
 	return 0;
 }
