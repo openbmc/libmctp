@@ -9,7 +9,6 @@
 #endif
 
 #include <assert.h>
-#include <err.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stdbool.h>
