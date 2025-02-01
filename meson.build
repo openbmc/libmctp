@@ -1,5 +1,6 @@
 project(
-    'libmctp', 'c',
+    'libmctp',
+    'c',
     meson_version: '>= 1.1',
     version: '0.11',
     default_options: [
@@ -11,44 +12,22 @@ project(
     ],
 )
 
-sources = [
-     'core.c',
-     'alloc.c',
-     'control.c',
-]
+sources = ['core.c', 'alloc.c', 'control.c']
 
-headers = [
-    'libmctp.h',
-]
+headers = ['libmctp.h']
 
-serial_sources = [
-    'serial.c',
-    'crc-16-ccitt.c',
-]
+serial_sources = ['serial.c', 'crc-16-ccitt.c']
 
-serial_headers = [
-    'libmctp-serial.h'
-]
+serial_headers = ['libmctp-serial.h']
 
-astlpc_sources = [
-    'astlpc.c',
-    'crc32.c',
-]
+astlpc_sources = ['astlpc.c', 'crc32.c']
 
-astlpc_headers = [
-    'libmctp-astlpc.h',
-]
+astlpc_headers = ['libmctp-astlpc.h']
 
-i2c_sources = [
-    'i2c.c',
-]
+i2c_sources = ['i2c.c']
 
-i2c_headers = [
-    'libmctp-i2c.h',
-]
-control_sources = [
-    'control.c',
-]
+i2c_headers = ['libmctp-i2c.h']
+control_sources = ['control.c']
 
 libmctp_sources = sources
 libmctp_headers = headers
@@ -72,41 +51,48 @@ endif
 compiler = meson.get_compiler('c')
 
 if not get_option('custom_alloc') and get_option('default_alloc').require(
-    compiler.links('''
+    compiler.links(
+        '''
         #include <stdlib.h>
         void main()
         {
             free(malloc(4096));
         }
-    ''')).allowed()
-    add_project_arguments('-DMCTP_DEFAULT_ALLOC', language : 'c')
+    ''',
+    ),
+).allowed()
+    add_project_arguments('-DMCTP_DEFAULT_ALLOC', language: 'c')
 endif
 
 if get_option('custom_alloc')
-    add_project_arguments('-DMCTP_CUSTOM_ALLOC', language : 'c')
+    add_project_arguments('-DMCTP_CUSTOM_ALLOC', language: 'c')
 endif
 
 if get_option('nolog')
-    add_project_arguments('-DMCTP_NOLOG', language : 'c')
+    add_project_arguments('-DMCTP_NOLOG', language: 'c')
 else
     libmctp_sources += ['log.c']
 endif
 
 feat_fileio = get_option('fileio').require(
-    compiler.links('''
+    compiler.links(
+        '''
         #include <poll.h>
         #include <unistd.h>
         void main()
         {
             poll(NULL, 0, -1);
         }
-    '''))
+    ''',
+    ),
+)
 if feat_fileio.allowed()
-    add_project_arguments('-DMCTP_HAVE_FILEIO', language : 'c')
+    add_project_arguments('-DMCTP_HAVE_FILEIO', language: 'c')
 endif
 
 if get_option('syslog').require(
-    compiler.links('''
+    compiler.links(
+        '''
         #include <stdarg.h>
         #include <syslog.h>
         void check_vsyslog(int level, const char *fmt, ...)
@@ -120,12 +106,15 @@ if get_option('syslog').require(
         {
             check_vsyslog(0, "\n");
         }
-        ''')).allowed()
-    add_project_arguments('-DMCTP_HAVE_SYSLOG', language : 'c')
+        ''',
+    ),
+).allowed()
+    add_project_arguments('-DMCTP_HAVE_SYSLOG', language: 'c')
 endif
 
 if get_option('stdio').require(
-    compiler.links('''
+    compiler.links(
+        '''
         #include <stdarg.h>
         #include <stdio.h>
         void check_vsyslog(const char *fmt, ...)
@@ -139,8 +128,10 @@ if get_option('stdio').require(
         {
             check_vsyslog("\n");
         }
-        ''')).allowed()
-    add_project_arguments('-DMCTP_HAVE_STDIO', language : 'c')
+        ''',
+    ),
+).allowed()
+    add_project_arguments('-DMCTP_HAVE_STDIO', language: 'c')
 endif
 
 # pcap is necessary for mctp-demux-daemon to be functional
@@ -150,7 +141,8 @@ systemd_dep = dependency('systemd', required: false)
 libsystemd_dep = dependency('libsystemd', required: false)
 
 libmctp_include_dir = include_directories('.', is_system: true)
-libmctp = library('mctp',
+libmctp = library(
+    'mctp',
     libmctp_sources,
     include_directories: libmctp_include_dir,
     version: meson.project_version(),
@@ -164,7 +156,8 @@ if systemd_dep.found()
     install_data('systemd/system/mctp-demux.socket', install_dir: unitdir)
 endif
 
-import('pkgconfig').generate(libmctp,
+import('pkgconfig').generate(
+    libmctp,
     name: 'libmctp',
     description: 'MCTP protocol implementation',
     version: meson.project_version(),
@@ -177,19 +170,24 @@ libmctp_dep = declare_dependency(
 
 # TODO: these should depend on the -internal.h headers so they rebuild
 # on changes, unclear how to do that.
-sizeof_mctp = compiler.sizeof('struct mctp',
+sizeof_mctp = compiler.sizeof(
+    'struct mctp',
     include_directories: libmctp_include_dir,
-    prefix: '#include "core-internal.h"')
-sizeof_binding_i2c = compiler.sizeof('struct mctp_binding_i2c',
+    prefix: '#include "core-internal.h"',
+)
+sizeof_binding_i2c = compiler.sizeof(
+    'struct mctp_binding_i2c',
     include_directories: libmctp_include_dir,
-    prefix: '#include "i2c-internal.h"')
-sizes_h = configure_file(configuration: {
+    prefix: '#include "i2c-internal.h"',
+)
+sizes_h = configure_file(
+    configuration: {
         'sizeof_struct_mctp': sizeof_mctp,
         'sizeof_binding_i2c': sizeof_binding_i2c,
     },
     input: 'libmctp-sizes.h.in',
     output: 'libmctp-sizes.h',
-    )
+)
 install_headers(sizes_h)
 
 if feat_fileio.allowed()

@@ -9,7 +9,8 @@ if pcap_dep.found()
     demux_sources += 'mctp-capture.c'
 endif
 
-demux = executable('mctp-demux-daemon',
+demux = executable(
+    'mctp-demux-daemon',
     demux_sources,
     include_directories: libmctp_include_dir,
     dependencies: demux_dep,
@@ -17,14 +18,16 @@ demux = executable('mctp-demux-daemon',
     install: true,
 )
 
-pipe = executable('mctp-pipe',
+pipe = executable(
+    'mctp-pipe',
     'mctp-pipe.c',
     include_directories: libmctp_include_dir,
     dependencies: [libmctp_dep],
     install: false,
 )
 
-mctp_in = executable('mctp-in',
+mctp_in = executable(
+    'mctp-in',
     'mctp-in.c',
     include_directories: libmctp_include_dir,
     dependencies: [libmctp_dep],

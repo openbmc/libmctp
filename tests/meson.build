@@ -1,11 +1,5 @@
 
-tests = [
-    'test_eid',
-    'test_seq',
-    'test_bridge',
-    'test_cmds',
-    'test_core',
-    ]
+tests = ['test_eid', 'test_seq', 'test_bridge', 'test_cmds', 'test_core']
 
 if get_option('bindings').contains('serial')
     tests += 'test_serial'
