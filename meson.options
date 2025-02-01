@@ -1,9 +1,4 @@
-option(
-    'tests',
-    type: 'feature',
-    value: 'enabled',
-    description: 'Build tests'
-)
+option('tests', type: 'feature', value: 'enabled', description: 'Build tests')
 option(
     'bindings',
     type: 'array',
@@ -16,21 +11,13 @@ option(
     type: 'feature',
     description: 'Use libc malloc and free for heap memory',
 )
-option(
-    'stdio',
-    type: 'feature',
-    description: 'Support logging to stdio',
-)
+option('stdio', type: 'feature', description: 'Support logging to stdio')
 option(
     'fileio',
     type: 'feature',
     description: 'Support interfaces based on file-descriptors',
 )
-option(
-    'syslog',
-    type: 'feature',
-    description: 'Support logging to syslog',
-)
+option('syslog', type: 'feature', description: 'Support logging to syslog')
 option(
     'custom_alloc',
     type: 'boolean',
