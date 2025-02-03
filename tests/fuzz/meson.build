@@ -6,5 +6,5 @@ if get_option('bindings').contains('i2c')
         cpp_args: ['-Wno-gnu-statement-expression-from-macro-expansion'],
         include_directories: test_include_dirs,
         dependencies: [libmctp_dep],
-        )
+    )
 endif
