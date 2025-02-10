@@ -1,0 +1,3 @@
+name: libmctp
+build:
+  cmake: zephyr
