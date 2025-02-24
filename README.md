@@ -4,6 +4,21 @@ This library is intended to be a portable implementation of the Management
 Component Transport Protocol (MCTP), as defined by DMTF standard "DSP0236", plus
 transport binding specifications.
 
+## Target usage
+
+`libmctp` is a library that implements a straightforward MCTP stack. It will be
+useful in a two main scenarios:
+
+- where you are implementing MCTP in an embedded device; or
+- where you have Linux system:
+  - with no kernel MCTP support,
+  - need a single application implementing all of the MCTP stack; and
+  - you are providing your own hardware drivers for MCTP transports.
+
+Notably, if you are implementing an MCTP application on Linux, you _almost
+certainly_ want to use the in-kernel MCTP support, which gives you a standard
+sockets-based interface to transmit and receive MCTP messages.
+
 ## Contact
 
 - Email: See [OWNERS](OWNERS). Please also Cc <openbmc@lists.ozlabs.org>
