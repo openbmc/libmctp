@@ -16,6 +16,24 @@
       "message": "What do you think of adding this at the end?\n\n```\n`libmctp` does _not_ provide abstractions for Linux\u0027s MCTP sockets. Examples of how to use MCTP\nsockets can be found in the [introduction to MCTP on Linux][mctp-on-linux-introduction].\n\n[mctp-on-linux-introduction]: https://codeconstruct.com.au/docs/mctp-on-linux-introduction/\n```",
       "revId": "accd8c8cf4fa7bf8a02c9126453b27e80bdc57b9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "663b00fa_6962d7b1",
+        "filename": "README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2025-02-25T04:46:14Z",
+      "side": 1,
+      "message": "Or maybe just adding:\n\n```\nYou do not need to use `libmctp` to make use of that sockets-based interface.\n```\n\nI didn\u0027t want to be pushing the cc docs too much, nor put too much description of the non-libmctp approach, hence keeping it fairly short and not including the link here.\n\nHowever, if you think that adds to the description, I can certainly be persuaded!",
+      "parentUuid": "60cbdfde_8839f3bf",
+      "revId": "accd8c8cf4fa7bf8a02c9126453b27e80bdc57b9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
