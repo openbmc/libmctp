@@ -34,6 +34,24 @@
       "parentUuid": "60cbdfde_8839f3bf",
       "revId": "accd8c8cf4fa7bf8a02c9126453b27e80bdc57b9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2037e3d_48cffbc0",
+        "filename": "README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2025-02-25T05:08:19Z",
+      "side": 1,
+      "message": "Yeah, I\u0027m fine with your suggestion. Just from experience some seem to have the impression they need to use a library to abstract over kernel interfaces (true in other circumstances; libgpiod, liburing etc), so I think it\u0027s worth emphasising it\u0027s not necessary here. The link to the doc wasn\u0027t so much promotional as directly demonstrating that. Maybe https://docs.kernel.org/networking/mctp.html is better, but if you don\u0027t think we need it then I\u0027m happy to not have it.",
+      "parentUuid": "663b00fa_6962d7b1",
+      "revId": "accd8c8cf4fa7bf8a02c9126453b27e80bdc57b9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
