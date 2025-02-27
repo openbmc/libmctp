@@ -1,0 +1,9 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Jeremy Kerr <jk@ozlabs.org>
+Code-Review+1: Andrew Jeffery <andrew@codeconstruct.com.au>
+Submitted-by: Jeremy Kerr <jk@ozlabs.org>
+Submitted-at: Thu, 27 Feb 2025 06:42:25 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/libmctp/+/78416
+Comments-Total: 5
+Project: openbmc/libmctp
+Branch: refs/heads/master
