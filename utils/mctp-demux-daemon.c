@@ -461,6 +461,7 @@ static int run_daemon(struct ctx *ctx)
 	bool clients_changed = false;
 	sigset_t mask;
 	int rc, i;
+	int n_clients;
 
 	ctx->pollfds = malloc(FD_NR * sizeof(struct pollfd));
 
@@ -534,12 +535,23 @@ static int run_daemon(struct ctx *ctx)
 			}
 		}
 
+		n_clients = ctx->n_clients;
 		if (ctx->pollfds[FD_BINDING].revents) {
 			rc = 0;
 			if (ctx->binding->process)
 				rc = ctx->binding->process(ctx->binding);
 			if (rc)
 				break;
+		}
+		if (n_clients != ctx->n_clients) {
+			/*
+			 * Clients (i.e. sockets) were removed in the binding->process() function
+			 * call above. More specifically in function rx_message(), invoked through
+			 * the binding->process() call.
+			 * We must go back to the top of the loop to realign the pollfds sockets array
+			 */
+			clients_changed = true;
+			continue;
 		}
 
 		for (i = 0; i < ctx->n_clients; i++) {
