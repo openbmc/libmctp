@@ -16,6 +16,24 @@
       "message": "Hi Ken, thanks for the patch. CI hasn\u0027t triggered in this case because you\u0027re not recognised as having signed a CLA for contributions to OpenBMC. There\u0027s more info on the process here:\n\nhttps://github.com/openbmc/docs/blob/master/CONTRIBUTING.md#starting-out\n\nAre you happy to do so? Generally we encourage a corporate CLA if that suits your circumstances. If not an individual CLA is also fine.",
       "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e504a74_074514cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002410
+      },
+      "writtenOn": "2025-03-17T13:03:12Z",
+      "side": 1,
+      "message": "Hi Andrew, thanks for reviewing the patch and enlightening me about the contribution process.\nSure, I\u0027m happy to sign a CLA. I will ask my employer (Napatech) if they are okay with executing a corporate one. I will get back to you.",
+      "parentUuid": "8a2a0cbd_658ba618",
+      "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
