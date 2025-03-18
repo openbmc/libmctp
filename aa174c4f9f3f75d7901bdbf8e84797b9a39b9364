@@ -34,6 +34,24 @@
       "parentUuid": "8a2a0cbd_658ba618",
       "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22db0f67_b68a9ce0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002410
+      },
+      "writtenOn": "2025-03-18T12:01:56Z",
+      "side": 1,
+      "message": "Hi @andrew@codeconstruct.com.au, my employer asks about the apparent dual licenses scheme used by OpenBMC. It says \"Apache-2.0\" or \"GPLv2+\" license.\nWhich one is it, or do both apply in the sense that you are free to adhere to the one you prefer? If you are the right person to answer this question? Thanks.",
+      "parentUuid": "2e504a74_074514cc",
+      "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
