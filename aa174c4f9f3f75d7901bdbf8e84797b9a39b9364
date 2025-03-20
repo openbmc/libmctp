@@ -88,6 +88,24 @@
       "parentUuid": "2788cb52_20e159c6",
       "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd52daa7_5cc4baca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002410
+      },
+      "writtenOn": "2025-03-20T15:48:07Z",
+      "side": 1,
+      "message": "But actually, one question that did arise regarding the Corporate CLA, is whether submitting this CLA is a one-time event, or it has to be done for any consecutive contributions we might have.\nMy understanding is that it\u0027s a one-time thing, and all the individuals we list in \"Schedule A\" will be able to contribute on a consecutive basis, without having to submit a new CLA each time. Is this correctly understood? You know?\nSorry to bug you with all these question.",
+      "parentUuid": "95a85153_6c0a2522",
+      "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
