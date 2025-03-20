@@ -70,6 +70,24 @@
       "parentUuid": "22db0f67_b68a9ce0",
       "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95a85153_6c0a2522",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002410
+      },
+      "writtenOn": "2025-03-20T15:24:37Z",
+      "side": 1,
+      "message": "Cheers for the clarification. Much appreciated.\nJust FYI, the process of getting a Corporate CLA signed is stalled a bit because one guy is out traveling this week and next week. But I\u0027ll keep you posted hopefully soon after he\u0027s back.",
+      "parentUuid": "2788cb52_20e159c6",
+      "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
