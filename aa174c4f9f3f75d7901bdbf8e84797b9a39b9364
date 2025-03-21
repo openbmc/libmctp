@@ -106,6 +106,24 @@
       "parentUuid": "95a85153_6c0a2522",
       "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2dae37d_f1d91a46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2025-03-21T01:26:28Z",
+      "side": 1,
+      "message": "\u003e But actually, one question that did arise regarding the Corporate CLA, is whether submitting this CLA is a one-time event, or it has to be done for any consecutive contributions we might have.\n\nIt must be adjusted whenever you change the listed CLA managers or contributors. Otherwise, it is effectively a one-time event.\n\n\u003e My understanding is that it\u0027s a one-time thing, and all the individuals we list in \"Schedule A\" will be able to contribute on a consecutive basis, without having to submit a new CLA each time. Is this correctly understood?\n\nYes, that\u0027s correct.\n\n\u003e Sorry to bug you with all these question.\n\nNo problems, best if they\u0027re clarified 😊",
+      "parentUuid": "bd52daa7_5cc4baca",
+      "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
