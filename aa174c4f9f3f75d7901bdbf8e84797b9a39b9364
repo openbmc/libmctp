@@ -124,6 +124,24 @@
       "parentUuid": "bd52daa7_5cc4baca",
       "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "165de05c_edffaa35",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002410
+      },
+      "writtenOn": "2025-03-21T13:02:57Z",
+      "side": 1,
+      "message": "Excellent, thanks a lot!\nOne final question (I hope) regarding \"Schedule B\" then. We are a bit uncertain in which circumstances one would fill in this one. Could you perhaps please clarify?\nSpecifically for our actual case, should we fill in a description of the contribution (i.e. bugfix) we intend to make to libmctp? Or should we state something more general about what we foresee to contribute with going forward? Or simply leave it blank? 😊\nThanks.",
+      "parentUuid": "d2dae37d_f1d91a46",
+      "revId": "aa174c4f9f3f75d7901bdbf8e84797b9a39b9364",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
