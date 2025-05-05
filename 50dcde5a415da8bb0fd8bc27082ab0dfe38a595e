@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c858830_61f2a8a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2025-05-05T03:35:47Z",
+      "side": 1,
+      "message": "All good for the change, but should the authorship stay with oohal?",
+      "revId": "50dcde5a415da8bb0fd8bc27082ab0dfe38a595e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
