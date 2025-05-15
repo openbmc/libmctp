@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f599d96_340e6dfb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002492
+      },
+      "writtenOn": "2025-05-15T16:42:57Z",
+      "side": 1,
+      "message": "Not sure if I need to do something in response to the \"User not approved\" status. My company (Napatech) has already submitted a corporate CLA with my name listed in \"Schedule A\" 😊",
+      "revId": "349a7c6a7d921bef1bdb2dfb44bdae2db3317a15",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
