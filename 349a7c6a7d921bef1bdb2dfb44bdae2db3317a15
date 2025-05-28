@@ -34,6 +34,41 @@
       "parentUuid": "0f599d96_340e6dfb",
       "revId": "349a7c6a7d921bef1bdb2dfb44bdae2db3317a15",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9587a2ae_6cbf5565",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002492
+      },
+      "writtenOn": "2025-05-28T04:56:20Z",
+      "side": 1,
+      "message": "Just acknowledging that the user approval came through.",
+      "revId": "349a7c6a7d921bef1bdb2dfb44bdae2db3317a15",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a1ed303_b594c427",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002492
+      },
+      "writtenOn": "2025-05-28T04:56:20Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f5f9dd68_0f4dc5c2",
+      "revId": "349a7c6a7d921bef1bdb2dfb44bdae2db3317a15",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
