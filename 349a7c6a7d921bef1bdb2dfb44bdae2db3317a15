@@ -69,6 +69,23 @@
       "parentUuid": "f5f9dd68_0f4dc5c2",
       "revId": "349a7c6a7d921bef1bdb2dfb44bdae2db3317a15",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c4cbde7_2db8774f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002492
+      },
+      "writtenOn": "2025-06-02T06:55:54Z",
+      "side": 1,
+      "message": "Hi @jk@ozlabs.org, I hope you have a chance to look at this patch. Thanks in advance 😊",
+      "revId": "349a7c6a7d921bef1bdb2dfb44bdae2db3317a15",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
