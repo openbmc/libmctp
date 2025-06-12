@@ -93,7 +93,7 @@ versions of the protocol unless marked otherwise.
 
 ## MCTP over LPC Transport
 
-### Concepts
+### MCTP over LPC: Concepts
 
 The basic components used for the transfer are:
 
@@ -117,7 +117,7 @@ On this indication, the remote side will:
    interrupt
 3. Read the MCTP packet from the LPC FW window
 
-### Scope
+### MCTP over LPC: Scope
 
 The document limits itself to describing the operation of the binding protocol.
 The following issues of protocol ABI are considered out of scope:
@@ -377,7 +377,7 @@ below.
 The sequences below contain steps where the BMC updates the channel status and
 where commands are sent between the BMC and the host. The act of updating status
 or sending a command invokes the behaviour outlined in
-[KCS Control](#kcs-control).
+[KCS Control](#kcs-status-and-control-sequences).
 
 The packet transmission sequences assume that `BMC Active` and `Channel Active`
 are set.

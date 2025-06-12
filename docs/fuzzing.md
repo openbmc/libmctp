@@ -13,14 +13,14 @@ needs to be built from source.
 
 Run with
 
-```
+```shell
 nice honggfuzz -T -i corpusdir --linux_perf_branch -- ./bhf/tests/fuzz/i2c-fuzz
 ```
 
 The `--linux_perf_branch` switch is optional, it requires permissions for perf
 counters:
 
-```
+```shell
 echo 0 | sudo tee /proc/sys/kernel/perf_event_paranoid
 ```
 
@@ -33,7 +33,7 @@ The corpus directory can be reused between runs with different fuzzers.
 
 Running a single instance (just for testing):
 
-```
+```shell
 afl-fuzz -i fuzzrun/hf11/ -o fuzzrun/out12single ./bfuzz/tests/fuzz/i2c-fuzz
 ```
 
@@ -42,7 +42,7 @@ AFL++ requires a separate TUI instantiation for each CPU thread. The helper
 
 Running with 20 threads:
 
-```
+```shell
 nice aflr run  -t bfuzz/tests/fuzz/i2c-fuzz -i workdir/out5/m_i2c-fuzz/queue -o workdir/out6 -c bcmplog/tests/fuzz/i2c-fuzz -s bfuzzasan/tests/fuzz/i2c-fuzz -n 20  --session-name fuzz
 ```
 
@@ -66,7 +66,7 @@ It will:
 
 Typical usage, with corpus in `fuzzrun/corpus`:
 
-```
+```shell
 ./tests/fuzz/fuzz-coverage.py fuzzrun/corpus bnoopt/tests/fuzz/i2c-fuzz . bnoopt/ coverage-output
 ```
 
@@ -75,6 +75,6 @@ Typical usage, with corpus in `fuzzrun/corpus`:
 When the fuzz run encounters a crash, the testcase can be run against the built
 target manually, and stepped through with GDB etc.
 
-```
+```shell
 ./bnoopt/tests/fuzz/i2c-fuzz < crashing.bin
 ```
