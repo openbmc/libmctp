@@ -151,7 +151,7 @@ libmctp = library(
 install_headers(libmctp_headers)
 
 if systemd_dep.found()
-    unitdir = systemd_dep.get_variable(pkgconfig: 'systemdsystemunitdir')
+    unitdir = systemd_dep.get_variable(pkgconfig: 'systemd_system_unit_dir')
     install_data('systemd/system/mctp-demux.service', install_dir: unitdir)
     install_data('systemd/system/mctp-demux.socket', install_dir: unitdir)
 endif
