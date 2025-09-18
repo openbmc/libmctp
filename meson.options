@@ -1,4 +1,3 @@
-option('tests', type: 'feature', value: 'enabled', description: 'Build tests')
 option(
     'bindings',
     type: 'array',
@@ -7,17 +6,11 @@ option(
     value: ['serial', 'astlpc', 'i2c'],
 )
 option(
-    'default_alloc',
-    type: 'feature',
-    description: 'Use libc malloc and free for heap memory',
+    'control',
+    type: 'boolean',
+    value: true,
+    description: 'Include MCTP control protocol handler',
 )
-option('stdio', type: 'feature', description: 'Support logging to stdio')
-option(
-    'fileio',
-    type: 'feature',
-    description: 'Support interfaces based on file-descriptors',
-)
-option('syslog', type: 'feature', description: 'Support logging to syslog')
 option(
     'custom_alloc',
     type: 'boolean',
@@ -25,14 +18,56 @@ option(
     description: 'Use fixed application-provided allocators',
 )
 option(
+    'default_alloc',
+    type: 'feature',
+    description: 'Use libc malloc and free for heap memory',
+)
+option(
+    'default_clock_gettime',
+    type: 'boolean',
+    value: true,
+    description: 'Use clock_gettime() for time',
+)
+option(
+    'fileio',
+    type: 'feature',
+    description: 'Support interfaces based on file-descriptors',
+)
+option(
     'nolog',
     type: 'boolean',
     value: false,
     description: 'Don\'t include any logging functionality',
 )
+option('stdio', type: 'feature', description: 'Support logging to stdio')
+option('syslog', type: 'feature', description: 'Support logging to syslog')
+option('tests', type: 'feature', value: 'enabled', description: 'Build tests')
+
+
 option(
-    'control',
-    type: 'boolean',
-    value: true,
-    description: 'Include MCTP control protocol handler',
+    'max_message_size',
+    type: 'integer',
+    value: 65536,
+    description: 'Maximum message size',
+)
+option(
+    'reassembly_contexts',
+    type: 'integer',
+    value: 16,
+    description: 'Number of concurrent reassembly contexts',
+)
+option(
+    'request_tags',
+    type: 'integer',
+    value: 16,
+    description: 'Number of outbound request tags',
+)
+
+
+option('i2c_mtu', type: 'integer', value: 64, description: 'I2C packet MTU')
+option(
+    'i2c_neigh_count',
+    type: 'integer',
+    value: 4,
+    description: 'I2C neighbour table size',
 )
