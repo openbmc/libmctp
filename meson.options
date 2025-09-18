@@ -36,3 +36,40 @@ option(
     value: true,
     description: 'Include MCTP control protocol handler',
 )
+option(
+    'max_message_size',
+    type: 'integer',
+    value: 65536,
+    description: 'Maximum message size',
+)
+option(
+    'reassembly_contexts',
+    type: 'integer',
+    value: 16,
+    description: 'Number of concurrent reassembly contexts',
+)
+option(
+    'request_tags',
+    type: 'integer',
+    value: 16,
+    description: 'Number of outbound requst tags',
+)
+option(
+    'default_clock_gettime',
+    type: 'boolean',
+    value: true,
+    description: 'Use clock_gettime() for time',
+)
+option(
+    'control_handler',
+    type: 'boolean',
+    value: true,
+    description: 'Include MCTP Control Protocol handler',
+)
+option('i2c_mtu', type: 'integer', value: 64, description: 'I2C packet MTU')
+option(
+    'i2c_neigh_count',
+    type: 'integer',
+    value: 4,
+    description: 'I2C neighbour table size',
+)

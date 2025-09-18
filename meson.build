@@ -74,6 +74,20 @@ else
     libmctp_sources += ['log.c']
 endif
 
+option_args = [
+    '-DMCTP_MAX_MESSAGE_SIZE=@0@'.format(get_option('max_message_size')),
+    '-DMCTP_REASSEMBLY_CTXS=@0@'.format(get_option('reassembly_contexts')),
+    '-DMCTP_REQ_TAGS=@0@'.format(get_option('request_tags')),
+    '-DMCTP_DEFAULT_CLOCK_GETTIME=@0@'.format(
+        get_option('default_clock_gettime').to_int(),
+    ),
+    '-DMCTP_CONTROL_HANDLER=@0@'.format(get_option('control_handler').to_int()),
+    '-DI2C_BTU=@0@'.format(get_option('i2c_mtu')),
+    '-DMCTP_I2C_NEIGH_COUNT=@0@'.format(get_option('i2c_neigh_count')),
+]
+
+add_project_arguments(option_args, language: 'c')
+
 feat_fileio = get_option('fileio').require(
     compiler.links(
         '''
@@ -173,11 +187,13 @@ libmctp_dep = declare_dependency(
 sizeof_mctp = compiler.sizeof(
     'struct mctp',
     include_directories: libmctp_include_dir,
+    args: option_args,
     prefix: '#include "core-internal.h"',
 )
 sizeof_binding_i2c = compiler.sizeof(
     'struct mctp_binding_i2c',
     include_directories: libmctp_include_dir,
+    args: option_args,
     prefix: '#include "i2c-internal.h"',
 )
 sizes_h = configure_file(
