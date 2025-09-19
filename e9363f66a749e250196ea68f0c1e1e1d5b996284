@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b27e0ef4_89cb6b79",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2025-09-19T03:44:47Z",
+      "side": 1,
+      "message": "is `BTU` vs `mtu` intentional?",
+      "revId": "e9363f66a749e250196ea68f0c1e1e1d5b996284",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c457f0d_06ccf4e2",
+        "filename": "meson.options",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2025-09-19T03:44:47Z",
+      "side": 1,
+      "message": "mm, idly thinking we should sort the options. not required.",
+      "revId": "e9363f66a749e250196ea68f0c1e1e1d5b996284",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
