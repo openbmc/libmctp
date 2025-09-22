@@ -16,6 +16,24 @@
       "message": "Ack: we\u0027ll need to have the custom definitions available as meson setup time, so the only sensible approach here is with options\n\n(unless the sizes header can consume compile-time values, but that sounds like a bit of a maintenance nightmare)",
       "revId": "b04447c2d8c7d4659350a808ade9b1345794e3fc",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac3f44e4_8816c8fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001129
+      },
+      "writtenOn": "2025-09-22T07:54:10Z",
+      "side": 1,
+      "message": "Yeah, meson compiler tests (like sizeof) explicitly don\u0027t use any provided arguments so that wouldn\u0027t work.\n\n\u003e These compiler checks do not use compiler arguments added with add_*_arguments(), via -Dlang_args on the command-line, or through CFLAGS/LDFLAGS, etc in the environment. Hence, you can trust that the tests will be fully self-contained, and won\u0027t fail because of custom flags added by other parts of the build file or by users.",
+      "parentUuid": "d889ca29_50ca5b45",
+      "revId": "b04447c2d8c7d4659350a808ade9b1345794e3fc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
