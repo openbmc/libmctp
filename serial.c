@@ -386,6 +386,11 @@ int mctp_serial_rx(struct mctp_binding_serial *serial, const void *buf,
 	return 0;
 }
 
+bool mctp_serial_tx_ready(struct mctp_binding_serial *serial)
+{
+	return mctp_is_bus_tx_ready(serial->binding.bus);
+}
+
 static int mctp_serial_core_start(struct mctp_binding *binding)
 {
 	mctp_binding_set_tx_enabled(binding, true);

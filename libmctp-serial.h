@@ -35,6 +35,8 @@ void mctp_serial_set_tx_fn(struct mctp_binding_serial *serial,
 int mctp_serial_rx(struct mctp_binding_serial *serial, const void *buf,
 		   size_t len);
 
+bool mctp_serial_tx_ready(struct mctp_binding_serial *serial);
+
 #ifdef __cplusplus
 }
 #endif

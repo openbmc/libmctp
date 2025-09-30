@@ -1185,6 +1185,11 @@ bool mctp_astlpc_tx_done(struct mctp_binding_astlpc *astlpc)
 	return astlpc->layout.tx.state == buffer_state_acquired;
 }
 
+bool mctp_astlpc_tx_ready(struct mctp_binding_astlpc *astlpc)
+{
+	return mctp_is_bus_tx_ready(astlpc->binding.bus);
+}
+
 int mctp_astlpc_poll(struct mctp_binding_astlpc *astlpc)
 {
 	uint8_t status, data;

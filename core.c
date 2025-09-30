@@ -1055,6 +1055,11 @@ bool mctp_is_tx_ready(struct mctp *mctp, mctp_eid_t eid)
 	return bus->tx_msg == NULL;
 }
 
+bool mctp_is_bus_tx_ready(struct mctp_bus *bus)
+{
+	return bus->tx_msg == NULL;
+}
+
 void *mctp_get_alloc_ctx(struct mctp *mctp)
 {
 	return mctp->alloc_ctx;

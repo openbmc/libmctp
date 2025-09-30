@@ -173,6 +173,7 @@ int mctp_message_tx_request(struct mctp *mctp, mctp_eid_t eid, void *msg,
 			    size_t msg_len, uint8_t *alloc_msg_tag);
 
 bool mctp_is_tx_ready(struct mctp *mctp, mctp_eid_t eid);
+bool mctp_is_bus_tx_ready(struct mctp_bus *bus);
 
 /* hardware bindings */
 

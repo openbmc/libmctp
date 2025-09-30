@@ -52,6 +52,7 @@ struct binding {
 	void (*destroy)(struct mctp *mctp, struct binding *binding);
 	int (*init_pollfd)(struct binding *binding, struct pollfd *pollfd);
 	int (*process)(struct binding *binding);
+	bool (*tx_ready)(struct binding *binding);
 	void *data;
 };
 
@@ -208,6 +209,11 @@ static int binding_serial_process(struct binding *binding)
 	return mctp_serial_read(binding->data);
 }
 
+static bool binding_serial_tx_ready(struct binding *binding)
+{
+	return mctp_serial_tx_ready(binding->data);
+}
+
 static int binding_astlpc_init(struct mctp *mctp, struct binding *binding,
 			       mctp_eid_t eid, int n_params,
 			       char *const *params __attribute__((unused)))
@@ -254,6 +260,11 @@ static int binding_astlpc_process(struct binding *binding)
 	return mctp_astlpc_poll(binding->data);
 }
 
+static bool binding_astlpc_tx_ready(struct binding *binding)
+{
+	return mctp_astlpc_tx_ready(binding->data);
+}
+
 struct binding bindings[] = { {
 				      .name = "null",
 				      .init = binding_null_init,
@@ -264,6 +275,7 @@ struct binding bindings[] = { {
 				      .destroy = NULL,
 				      .init_pollfd = binding_serial_init_pollfd,
 				      .process = binding_serial_process,
+				      .tx_ready = binding_serial_tx_ready,
 			      },
 			      {
 				      .name = "astlpc",
@@ -271,6 +283,7 @@ struct binding bindings[] = { {
 				      .destroy = binding_astlpc_destroy,
 				      .init_pollfd = binding_astlpc_init_pollfd,
 				      .process = binding_astlpc_process,
+				      .tx_ready = binding_astlpc_tx_ready,
 			      } };
 
 struct binding *binding_lookup(const char *name)
@@ -499,9 +512,19 @@ static int run_daemon(struct ctx *ctx)
 			for (i = 0; i < ctx->n_clients; i++) {
 				ctx->pollfds[FD_NR + i].fd =
 					ctx->clients[i].sock;
-				ctx->pollfds[FD_NR + i].events = POLLIN;
+				if (ctx->binding->tx_ready(ctx->binding))
+					ctx->pollfds[FD_NR + i].events = POLLIN;
+				else
+					ctx->pollfds[FD_NR + i].events = 0;
 			}
 			clients_changed = false;
+		} else {
+			for (i = 0; i < ctx->n_clients; i++) {
+				if (ctx->binding->tx_ready(ctx->binding))
+					ctx->pollfds[FD_NR + i].events = POLLIN;
+				else
+					ctx->pollfds[FD_NR + i].events = 0;
+			}
 		}
 
 		if (ctx->binding->init_pollfd)
