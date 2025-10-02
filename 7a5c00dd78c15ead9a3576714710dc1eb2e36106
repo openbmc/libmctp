@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "6880b47e_f1d5951c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2025-10-02T18:56:05Z",
+      "side": 1,
+      "message": "looking back, `fix bug when` is unnecessarily verbose \n\nstart this subject line with the area affected\n\n```suggested\nmctp-demux: eid option requires an argument \n```",
+      "revId": "7a5c00dd78c15ead9a3576714710dc1eb2e36106",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "777566c7_e84c907e",
