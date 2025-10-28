@@ -16,6 +16,23 @@
       "message": "Just for my own reference: we don\u0027t need the headers included in the serial transport, as that does not use the storage buffer for the header data.",
       "revId": "9626db9acc5a3eb5056ec8df95b035fed9f924db",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49ce9952_88f786fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2025-10-28T08:17:27Z",
+      "side": 1,
+      "message": "Might be good to start documenting what we\u0027re including in the storage data here. Not necessarily with this change, but so we have a record of the binding\u0027s requirements.",
+      "revId": "9626db9acc5a3eb5056ec8df95b035fed9f924db",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
