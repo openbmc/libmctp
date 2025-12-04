@@ -23,7 +23,7 @@ static uint8_t mctp_ctrl_set_endpoint_id(struct mctp_bus *bus, uint8_t src_eid,
 					 uint8_t msg_tag, const void *data,
 					 size_t len)
 {
-	if (len != sizeof(struct mctp_ctrl_cmd_set_endpoint_id_req)) {
+	if (len < sizeof(struct mctp_ctrl_cmd_set_endpoint_id_req)) {
 		return MCTP_CTRL_CC_ERROR_INVALID_LENGTH;
 	}
 	const struct mctp_ctrl_cmd_set_endpoint_id_req *req = data;
@@ -63,7 +63,7 @@ static uint8_t mctp_ctrl_get_endpoint_id(struct mctp_bus *bus, uint8_t src_eid,
 					 uint8_t msg_tag, const void *data,
 					 size_t len)
 {
-	if (len != sizeof(struct mctp_ctrl_msg_hdr)) {
+	if (len < sizeof(struct mctp_ctrl_msg_hdr)) {
 		/* Expect empty request */
 		return MCTP_CTRL_CC_ERROR_INVALID_LENGTH;
 	}
@@ -120,7 +120,7 @@ static uint8_t mctp_ctrl_get_version(struct mctp_bus *bus, uint8_t src_eid,
 				     uint8_t msg_tag, const void *data,
 				     size_t len)
 {
-	if (len != sizeof(struct mctp_ctrl_cmd_get_version_req)) {
+	if (len < sizeof(struct mctp_ctrl_cmd_get_version_req)) {
 		return MCTP_CTRL_CC_ERROR_INVALID_LENGTH;
 	}
 	const struct mctp_ctrl_cmd_get_version_req *req = data;
@@ -163,7 +163,7 @@ static uint8_t mctp_ctrl_get_types(struct mctp_bus *bus, uint8_t src_eid,
 				   uint8_t msg_tag, const void *data,
 				   size_t len)
 {
-	if (len != sizeof(struct mctp_ctrl_msg_hdr)) {
+	if (len < sizeof(struct mctp_ctrl_msg_hdr)) {
 		return MCTP_CTRL_CC_ERROR_INVALID_LENGTH;
 	}
 	(void)data;
