@@ -51,6 +51,23 @@
       "parentUuid": "177fb5d4_d8fcc30c",
       "revId": "6eec7efbeb0c747594be2aea463acd498b51b0d1",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddb58cd3_3c8832fd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002777
+      },
+      "writtenOn": "2025-12-04T04:28:42Z",
+      "side": 1,
+      "message": "I got it.\nWith your comment, I\u0027ve just realized that PCIE VDM header has the \u0027Pad Len\u0027 to identify the padding bytes exactly for that purpose.\nI\u0027ll change the framing from the transport layer.",
+      "revId": "6eec7efbeb0c747594be2aea463acd498b51b0d1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
