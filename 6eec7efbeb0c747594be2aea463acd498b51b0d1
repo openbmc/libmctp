@@ -16,6 +16,23 @@
       "message": "We will need more of a description of the issue here.\n\nFrom the change, it appears that your transport is providing larger messages than the originally-sent data. This sounds like it would also be an issue when the length actually matters?\n\nShould this be fixed in the transport instead?",
       "revId": "6eec7efbeb0c747594be2aea463acd498b51b0d1",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "177fb5d4_d8fcc30c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002777
+      },
+      "writtenOn": "2025-12-04T02:16:11Z",
+      "side": 1,
+      "message": "In DSP0238 \u0027MCTP PCIe VDM Transport Binding Specification\u0027, PCIe VDM can tranfer the VDM data in dwords. \n\nWhen MCTP Bus Onwer send a \u0027dword not aligned sized\u0027 packet (for example, 5 bytes of Set_Endpoint_ID_Request), PCIe VDM(transport) layer will send this as 8 bytes payload with padding. And PCIe Endpoint side\u0027s PCIe VDM transport layer has no idea of this MCTP payload\u0027s real size.\n\nOnly way to send real len to libMCTP is to decode the payload at the transport layer to figure out the content of MCTP packet payload. (e.g. Message type, Command code). Also, transfer layer should check SOM/EOM flag condition to figure out the last message. I feel this will be not the role of transport layer to decode MCTP packet itself.",
+      "revId": "6eec7efbeb0c747594be2aea463acd498b51b0d1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
