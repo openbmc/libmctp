@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39c4571f_06da31bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000086
+      },
+      "writtenOn": "2026-01-01T05:45:30Z",
+      "side": 1,
+      "message": "Base configuration file review is here https://gerrit.openbmc.org/c/openbmc/docs/+/86315",
+      "revId": "002db27a2fe14ae4b9d21b01bb7bf543f9be1b90",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
