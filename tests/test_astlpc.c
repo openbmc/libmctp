@@ -736,8 +736,8 @@ static const struct mctp_binding_astlpc astlpc_layout_ctx = {
 static void astlpc_test_buffers_rx_offset_overflow(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { UINT32_MAX, BUFFER_MIN },
-		.tx = { control_size, BUFFER_MIN },
+		.rx = { UINT32_MAX, BUFFER_MIN, buffer_state_idle },
+		.tx = { control_size, BUFFER_MIN, buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -746,8 +746,8 @@ static void astlpc_test_buffers_rx_offset_overflow(void)
 static void astlpc_test_buffers_tx_offset_overflow(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, BUFFER_MIN },
-		.tx = { UINT32_MAX, BUFFER_MIN },
+		.rx = { control_size, BUFFER_MIN, buffer_state_idle },
+		.tx = { UINT32_MAX, BUFFER_MIN, buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -756,8 +756,9 @@ static void astlpc_test_buffers_tx_offset_overflow(void)
 static void astlpc_test_buffers_rx_size_overflow(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size + BUFFER_MIN, UINT32_MAX },
-		.tx = { control_size, BUFFER_MIN },
+		.rx = { control_size + BUFFER_MIN, UINT32_MAX,
+			buffer_state_idle },
+		.tx = { control_size, BUFFER_MIN, buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -766,8 +767,9 @@ static void astlpc_test_buffers_rx_size_overflow(void)
 static void astlpc_test_buffers_tx_size_overflow(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, BUFFER_MIN },
-		.tx = { control_size + BUFFER_MIN, UINT32_MAX },
+		.rx = { control_size, BUFFER_MIN, buffer_state_idle },
+		.tx = { control_size + BUFFER_MIN, UINT32_MAX,
+			buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -776,8 +778,9 @@ static void astlpc_test_buffers_tx_size_overflow(void)
 static void astlpc_test_buffers_rx_window_violation(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN },
-		.tx = { control_size, BUFFER_MIN },
+		.rx = { LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN,
+			buffer_state_idle },
+		.tx = { control_size, BUFFER_MIN, buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -786,8 +789,9 @@ static void astlpc_test_buffers_rx_window_violation(void)
 static void astlpc_test_buffers_tx_window_violation(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, BUFFER_MIN },
-		.tx = { LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN },
+		.rx = { control_size, BUFFER_MIN, buffer_state_idle },
+		.tx = { LPC_WIN_SIZE - BUFFER_MIN + 1, BUFFER_MIN,
+			buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -796,8 +800,9 @@ static void astlpc_test_buffers_tx_window_violation(void)
 static void astlpc_test_buffers_rx_size_fails_btu(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, BUFFER_MIN - 1 },
-		.tx = { control_size + BUFFER_MIN, BUFFER_MIN },
+		.rx = { control_size, BUFFER_MIN - 1, buffer_state_idle },
+		.tx = { control_size + BUFFER_MIN, BUFFER_MIN,
+			buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -806,8 +811,9 @@ static void astlpc_test_buffers_rx_size_fails_btu(void)
 static void astlpc_test_buffers_tx_size_fails_btu(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, BUFFER_MIN },
-		.tx = { control_size + BUFFER_MIN, BUFFER_MIN - 1 },
+		.rx = { control_size, BUFFER_MIN, buffer_state_idle },
+		.tx = { control_size + BUFFER_MIN, BUFFER_MIN - 1,
+			buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -816,8 +822,9 @@ static void astlpc_test_buffers_tx_size_fails_btu(void)
 static void astlpc_test_buffers_overlap_rx_low(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, 2 * BUFFER_MIN },
-		.tx = { control_size + BUFFER_MIN, 2 * BUFFER_MIN },
+		.rx = { control_size, 2 * BUFFER_MIN, buffer_state_idle },
+		.tx = { control_size + BUFFER_MIN, 2 * BUFFER_MIN,
+			buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -826,8 +833,9 @@ static void astlpc_test_buffers_overlap_rx_low(void)
 static void astlpc_test_buffers_overlap_tx_low(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size + BUFFER_MIN, 2 * BUFFER_MIN },
-		.tx = { control_size, 2 * BUFFER_MIN },
+		.rx = { control_size + BUFFER_MIN, 2 * BUFFER_MIN,
+			buffer_state_idle },
+		.tx = { control_size, 2 * BUFFER_MIN, buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -836,8 +844,8 @@ static void astlpc_test_buffers_overlap_tx_low(void)
 static void astlpc_test_buffers_overlap_exact(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { control_size, 2 * BUFFER_MIN },
-		.tx = { control_size, 2 * BUFFER_MIN },
+		.rx = { control_size, 2 * BUFFER_MIN, buffer_state_idle },
+		.tx = { control_size, 2 * BUFFER_MIN, buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
@@ -846,8 +854,9 @@ static void astlpc_test_buffers_overlap_exact(void)
 static void astlpc_test_buffers_overlap_control(void)
 {
 	struct mctp_astlpc_layout l = {
-		.rx = { 0, BUFFER_MIN },
-		.tx = { control_size + BUFFER_MIN, BUFFER_MIN },
+		.rx = { 0, BUFFER_MIN, buffer_state_idle },
+		.tx = { control_size + BUFFER_MIN, BUFFER_MIN,
+			buffer_state_idle },
 	};
 
 	assert(!mctp_astlpc_layout_validate(&astlpc_layout_ctx, &l));
