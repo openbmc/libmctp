@@ -14,7 +14,7 @@
 #include "test-utils.h"
 
 #ifndef ARRAY_SIZE
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #endif
 
 struct test_ctx {
@@ -40,7 +40,7 @@ static void test_rx(uint8_t eid __unused, bool tag_owner __unused,
 	ctx->rx_len += len;
 }
 
-#define SEQ(x) (x << MCTP_HDR_SEQ_SHIFT)
+#define SEQ(x) ((x) << MCTP_HDR_SEQ_SHIFT)
 
 struct test {
 	int n_packets;

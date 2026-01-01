@@ -170,7 +170,7 @@ struct mctp_binding_astlpc {
 /* clang-format on */
 
 #ifndef ARRAY_SIZE
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #endif
 
 static uint32_t astlpc_packet_size_v1(uint32_t body)
