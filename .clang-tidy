@@ -1,5 +1,7 @@
 Checks: '-*,
+    bugprone-sizeof-expression,
     bugprone-unchecked-optional-access,
+    clang-analyzer-core.NullDereference,
     modernize-use-nullptr
     '
 
