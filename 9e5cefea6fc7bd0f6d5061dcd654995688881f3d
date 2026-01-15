@@ -16,6 +16,24 @@
       "message": "Neither of these make sense for C?",
       "revId": "9e5cefea6fc7bd0f6d5061dcd654995688881f3d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fb1025f_4734e0b1",
+        "filename": ".clang-tidy",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000086
+      },
+      "writtenOn": "2026-01-15T05:02:19Z",
+      "side": 1,
+      "message": "Correct. General recommendation to use common clang-tidy file for both C and Cpp . https://gerrit.openbmc.org/c/openbmc/docs/+/86315 . Added new commit to enable C style checks.",
+      "parentUuid": "1d02bdbd_bef2416c",
+      "revId": "9e5cefea6fc7bd0f6d5061dcd654995688881f3d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
