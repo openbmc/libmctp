@@ -89,7 +89,7 @@ struct mctp_serial_trailer {
  * @dst: An opaque object to pass as state to fn
  * @src: A pointer to the buffer of data to copy to dst
  * @len: The length of the data pointed to by src
- * @return: 0 on succes, negative error code on failure
+ * @return: 0 on success, negative error code on failure
  *
  * Pre-condition: fn returns a write count or a negative error code
  * Post-condition: All bytes written or an error has occurred

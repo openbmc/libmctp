@@ -18,7 +18,7 @@ void mctp_binding_test_register_bus(struct mctp_binding_test *binding,
 void mctp_binding_test_rx_raw(struct mctp_binding_test *test, void *buf,
 			      size_t len);
 
-/* gerneral utility functions */
+/* general utility functions */
 
 /* create a MCTP stack, and add a test binding, using the specified EID */
 void mctp_test_stack_init(struct mctp **mctp,

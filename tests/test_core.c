@@ -470,7 +470,7 @@ static void mctp_core_test_rx_with_tag()
 	pktbuf.hdr.dest = TEST_DEST_EID;
 	pktbuf.hdr.src = TEST_SRC_EID;
 
-	/* Set tag and tag owner fields for a recieve packet */
+	/* Set tag and tag owner fields for a receive packet */
 	flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM |
 			(1 << MCTP_HDR_TO_SHIFT) | tag;
 	receive_one_fragment(binding, test_payload, MCTP_BTU, flags_seq_tag,

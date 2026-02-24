@@ -272,7 +272,7 @@ have asymmetric MTUs.
 For all protocol versions, the following properties must be upheld for the Rx
 and Tx buffers to be considered valid:
 
-- Intersect neither eachother nor the control region
+- Intersect neither each other nor the control region
 - Not extend beyond the window allocated to MCTP in the LPC FW address space
 - Must accommodate at least BTU-sized payloads
 

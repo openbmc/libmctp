@@ -790,7 +790,7 @@ static void mctp_send_tx_queue(struct mctp_bus *bus)
 
 		rc = mctp_packet_tx(bus, pkt);
 		switch (rc) {
-		/* If transmission succeded */
+		/* If transmission succeeded */
 		case 0:
 			/* Drop the packet */
 			mctp_tx_complete(bus);
