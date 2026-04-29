@@ -16,6 +16,23 @@
       "message": "Makes sense, thanks!",
       "revId": "7ea7615b5ce6a73432b7e51f804260c4f971dbdb",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be79e278_d32cee94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2026-04-29T00:59:40Z",
+      "side": 1,
+      "message": "Although, do you also need the size definitions to be built? How are you consuming this?",
+      "revId": "7ea7615b5ce6a73432b7e51f804260c4f971dbdb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
