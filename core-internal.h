@@ -32,6 +32,10 @@
 #define MCTP_CONTROL_HANDLER 1
 #endif
 
+#ifndef MCTP_CONTROL_HANDLER_ENABLED
+#define MCTP_CONTROL_HANDLER_ENABLED 1
+#endif
+
 /* Tag expiry timeout, in milliseconds */
 static const uint64_t MCTP_TAG_TIMEOUT = 6000;
 

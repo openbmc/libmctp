@@ -462,7 +462,7 @@ static bool mctp_ctrl_handle_msg(struct mctp_bus *bus, mctp_eid_t src,
 			return true;
 		}
 	} else {
-#if MCTP_CONTROL_HANDLER
+#if MCTP_CONTROL_HANDLER && MCTP_CONTROL_HANDLER_ENABLED == 1
 		/* libmctp will handle control requests */
 		return mctp_control_handler(bus, src, tag_owner, msg_tag,
 					    buffer, length);
