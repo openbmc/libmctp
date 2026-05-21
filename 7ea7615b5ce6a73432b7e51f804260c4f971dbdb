@@ -68,6 +68,24 @@
       "parentUuid": "be79e278_d32cee94",
       "revId": "7ea7615b5ce6a73432b7e51f804260c4f971dbdb",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a810f84b_175c6363",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002940
+      },
+      "writtenOn": "2026-05-21T08:07:34Z",
+      "side": 1,
+      "message": "Hi Jeremy and Matt,\n\nThanks for the review. Currently, I am consuming it by manually allocating the binding struct using calloc in my application code, like this:\n\nmctp_dev-\u003ei2c \u003d calloc(1, sizeof(struct mctp_binding_i2c));\nmctp_i2c_setup(mctp_dev-\u003ei2c, ...);\n\nBecause of this approach, I indeed need the size definition of struct mctp_binding_i2c to be exposed.\n\nHowever, I totally agree with Matt\u0027s point. It would be much cleaner to encapsulate the allocation within the library by introducing mctp_i2c_init() and mctp_i2c_destroy() (similar to mctp_serial_init()). This way, the caller doesn\u0027t need to know the struct size.\n\nI will update the patchset to include mctp_i2c_init() and mctp_i2c_destroy() in i2c.c to improve the API. Does that sound good?",
+      "parentUuid": "a76d9cc3_c1b8727a",
+      "revId": "7ea7615b5ce6a73432b7e51f804260c4f971dbdb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
