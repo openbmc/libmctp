@@ -86,6 +86,24 @@
       "parentUuid": "a76d9cc3_c1b8727a",
       "revId": "7ea7615b5ce6a73432b7e51f804260c4f971dbdb",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e244e3a_90b90841",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001129
+      },
+      "writtenOn": "2026-05-21T09:12:26Z",
+      "side": 1,
+      "message": "Yes, mctp_i2c_init() and mctp_i2c_destroy() would make sense.",
+      "parentUuid": "a810f84b_175c6363",
+      "revId": "7ea7615b5ce6a73432b7e51f804260c4f971dbdb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
