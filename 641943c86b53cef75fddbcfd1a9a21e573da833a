@@ -16,6 +16,23 @@
       "message": "Thanks. One small comment.\n\nIt looks like Gerrit hasn\u0027t allowed your user - not sure if you need to get an account added to the OpenBMC user list?",
       "revId": "641943c86b53cef75fddbcfd1a9a21e573da833a",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffe25cc8_1dc6c6cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002940
+      },
+      "writtenOn": "2026-05-21T10:49:48Z",
+      "side": 1,
+      "message": "Hi Matt, thanks for letting me know. I\u0027m currently figuring out the Gerrit permission issue / applying for the OpenBMC user list. I will update you once my account is properly set up.",
+      "revId": "641943c86b53cef75fddbcfd1a9a21e573da833a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
