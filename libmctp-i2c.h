@@ -1,3 +1,12 @@
+/* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
+
+#ifndef _LIBMCTP_I2C_H
+#define _LIBMCTP_I2C_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #include "libmctp.h"
@@ -29,3 +38,9 @@ void mctp_i2c_tx_poll(struct mctp_binding_i2c *i2c);
 #endif
 
 #define MCTP_I2C_PACKET_SIZE (MCTP_PACKET_SIZE(I2C_BTU) + 4)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _LIBMCTP_I2C_H */
