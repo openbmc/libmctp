@@ -33,6 +33,23 @@
       "message": "Hi Matt, thanks for letting me know. I\u0027m currently figuring out the Gerrit permission issue / applying for the OpenBMC user list. I will update you once my account is properly set up.",
       "revId": "641943c86b53cef75fddbcfd1a9a21e573da833a",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ff5c481_24bd334e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2026-05-22T02:59:09Z",
+      "side": 1,
+      "message": "Looks good, thanks!",
+      "revId": "641943c86b53cef75fddbcfd1a9a21e573da833a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }

@@ -22,6 +22,30 @@
       },
       "revId": "94803706538deb69c5915fcbc278981668d807eb",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e42e8ca_26430c76",
+        "filename": "libmctp-i2c.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2026-05-22T02:59:09Z",
+      "side": 1,
+      "message": "I was wondering whether `#pragma once` works for all of our intended targets (including various early host firmware), but we already use it elsewhere, so I guess we\u0027re all good!",
+      "parentUuid": "d09ca63c_4a1daa92",
+      "range": {
+        "startLine": 3,
+        "startChar": 10,
+        "endLine": 4,
+        "endChar": 10
+      },
+      "revId": "94803706538deb69c5915fcbc278981668d807eb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
