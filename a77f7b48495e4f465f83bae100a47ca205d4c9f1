@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f03c305a_452eb7fa",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2026-06-04T00:28:44Z",
+      "side": 1,
+      "message": "So the issue is you still want the `mctp_control_add_type()` invocation, but not the `mctp_control_handler()` invocation below?",
+      "revId": "a77f7b48495e4f465f83bae100a47ca205d4c9f1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
