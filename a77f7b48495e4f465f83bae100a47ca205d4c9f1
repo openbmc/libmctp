@@ -16,6 +16,24 @@
       "message": "So the issue is you still want the `mctp_control_add_type()` invocation, but not the `mctp_control_handler()` invocation below?",
       "revId": "a77f7b48495e4f465f83bae100a47ca205d4c9f1",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdbdbd34_033f4efb",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1002877
+      },
+      "writtenOn": "2026-06-04T16:39:15Z",
+      "side": 1,
+      "message": "Yes. In my case I want to control when to call `mctp_control_handler`. So my application does the handling and falls back to `mctp_control_handler` as default.\n\nThis allows two things: delay the response to a different context (think of handling the messages on an I3C interrupt, I don\u0027t want the reply to be sent from such a context, so I enqueue them to be sent later) and handle cases not handled by `mctp_control_handler` first (for instance, `mctp_ctrl_get_version` only handles \"base\" and \"control\" types, independent of types added).",
+      "parentUuid": "f03c305a_452eb7fa",
+      "revId": "a77f7b48495e4f465f83bae100a47ca205d4c9f1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
