@@ -34,6 +34,24 @@
       "parentUuid": "f03c305a_452eb7fa",
       "revId": "a77f7b48495e4f465f83bae100a47ca205d4c9f1",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d3f4fdd_6c505f2f",
+        "filename": "core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2026-06-05T00:05:06Z",
+      "side": 1,
+      "message": "Okay. I\u0027d rather we avoid more conditional compilation. I think `MCTP_CONTROL_HANDLER` is helpful in the sense that you can patch out the entire bit of functionality, reducing binary size, but that\u0027s not what we\u0027re after here. I think we may be able to do:\n\n```\n@@ -461,7 +461,7 @@ static bool mctp_ctrl_handle_msg(struct mctp_bus *bus, mctp_eid_t src,\n                                                 buffer, length);\n                        return true;\n                }\n-       } else {\n+       } else if (MCTP_CONTROL_HANDLER_ENABLED) {\n #if MCTP_CONTROL_HANDLER\n                /* libmctp will handle control requests */\n                return mctp_control_handler(bus, src, tag_owner, msg_tag,\n```",
+      "parentUuid": "cdbdbd34_033f4efb",
+      "revId": "a77f7b48495e4f465f83bae100a47ca205d4c9f1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
