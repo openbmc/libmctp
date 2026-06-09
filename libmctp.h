@@ -239,9 +239,6 @@ void mctp_set_now_op(struct mctp *mctp, uint64_t (*now)(void *), void *ctx);
 /* Returns a timestamp in milliseconds */
 uint64_t mctp_now(struct mctp *mctp);
 
-int mctp_control_handler_enable(struct mctp *mctp);
-void mctp_control_handler_disable(struct mctp *mctp);
-
 /* Add/remove message types to be reported by Get MCTP Version Support.
  * Control type is added automatically for the control handler */
 int mctp_control_add_type(struct mctp *mctp, uint8_t msg_type);
