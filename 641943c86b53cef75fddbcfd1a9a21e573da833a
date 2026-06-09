@@ -50,6 +50,24 @@
       "message": "Looks good, thanks!",
       "revId": "641943c86b53cef75fddbcfd1a9a21e573da833a",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "941ce2fd_ffa3a4bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002940
+      },
+      "writtenOn": "2026-06-09T02:21:45Z",
+      "side": 1,
+      "message": "Hi Matt,\n\nI wanted to let you know that my Gerrit account is now properly set up and I\u0027ve successfully joined the OpenBMC user list.\n\nThanks again for your guidance!\n\nBest regards,\nBryan",
+      "parentUuid": "ffe25cc8_1dc6c6cc",
+      "revId": "641943c86b53cef75fddbcfd1a9a21e573da833a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
