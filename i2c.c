@@ -276,3 +276,21 @@ void mctp_i2c_tx_poll(struct mctp_binding_i2c *i2c)
 {
 	mctp_binding_set_tx_enabled(&i2c->binding, true);
 }
+
+struct mctp_binding_i2c *mctp_i2c_init(void)
+{
+	struct mctp_binding_i2c *i2c;
+
+	i2c = __mctp_alloc(sizeof(*i2c));
+	if (!i2c)
+		return NULL;
+
+	return i2c;
+}
+
+void mctp_i2c_destroy(struct mctp_binding_i2c *i2c)
+{
+	if (i2c) {
+		__mctp_free(i2c);
+	}
+}
