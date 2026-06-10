@@ -276,3 +276,29 @@ void mctp_i2c_tx_poll(struct mctp_binding_i2c *i2c)
 {
 	mctp_binding_set_tx_enabled(&i2c->binding, true);
 }
+
+struct mctp_binding_i2c *mctp_i2c_init(uint8_t own_addr, mctp_i2c_tx_fn tx_fn, void *tx_ctx)
+{
+	struct mctp_binding_i2c *i2c;
+
+	i2c = __mctp_alloc(sizeof(*i2c));
+
+	if (i2c == NULL)
+		return NULL;
+
+	memset(i2c, 0, sizeof(*i2c));
+
+	if (mctp_i2c_setup(i2c, own_addr, tx_fn, tx_ctx) < 0) {
+		__mctp_free(i2c);
+		return NULL;
+	}
+
+	return i2c;
+}
+
+void mctp_i2c_destroy(struct mctp_binding_i2c *i2c)
+{
+	if (i2c) {
+		__mctp_free(i2c);
+	}
+}
