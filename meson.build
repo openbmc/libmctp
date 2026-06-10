@@ -199,7 +199,6 @@ sizeof_binding_i2c = compiler.sizeof(
 sizes_h = configure_file(
     configuration: {
         'sizeof_struct_mctp': sizeof_mctp,
-        'sizeof_binding_i2c': sizeof_binding_i2c,
     },
     input: 'libmctp-sizes.h.in',
     output: 'libmctp-sizes.h',
