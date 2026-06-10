@@ -231,11 +231,11 @@ int main(void)
 
 	tx_test->mctp = mctp_init();
 	assert(tx_test->mctp);
-	tx_test->i2c = malloc(MCTP_SIZEOF_BINDING_I2C);
+	tx_test->i2c = mctp_i2c_init();
 	assert(tx_test->i2c);
 	rx_test->mctp = mctp_init();
 	assert(rx_test->mctp);
-	rx_test->i2c = malloc(MCTP_SIZEOF_BINDING_I2C);
+	rx_test->i2c = mctp_i2c_init();
 	assert(rx_test->i2c);
 
 	/* TX side */
@@ -259,10 +259,10 @@ int main(void)
 
 	test_neigh_expiry(tx_test, rx_test);
 
-	free(tx_test->i2c);
-	free(rx_test->i2c);
-	mctp_destroy(tx_test->mctp);
+	mctp_i2c_destroy(rx_test->i2c);
 	mctp_destroy(rx_test->mctp);
+	mctp_i2c_destroy(tx_test->i2c);
+	mctp_destroy(tx_test->mctp);
 
 	return 0;
 }
