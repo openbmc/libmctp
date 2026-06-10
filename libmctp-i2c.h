@@ -11,6 +11,9 @@ extern "C" {
 
 struct mctp_binding_i2c;
 
+struct mctp_binding_i2c *mctp_i2c_init(void);
+void mctp_i2c_destroy(struct mctp_binding_i2c *i2c);
+
 typedef int (*mctp_i2c_tx_fn)(const void *buf, size_t len, void *ctx);
 
 /* Configures the i2c binding. */
