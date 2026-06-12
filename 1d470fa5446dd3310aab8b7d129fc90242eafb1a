@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b82788ee_8c811558",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1001129
+      },
+      "writtenOn": "2026-06-12T03:45:07Z",
+      "side": 0,
+      "message": "The sizeof is still needed on platforms without malloc. Those use MCTP_SIZEOF_BINDING_I2C to size a static storage buffer.",
+      "revId": "1d470fa5446dd3310aab8b7d129fc90242eafb1a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
