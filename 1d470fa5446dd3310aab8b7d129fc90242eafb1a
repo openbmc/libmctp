@@ -16,6 +16,24 @@
       "message": "The sizeof is still needed on platforms without malloc. Those use MCTP_SIZEOF_BINDING_I2C to size a static storage buffer.",
       "revId": "1d470fa5446dd3310aab8b7d129fc90242eafb1a",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6996b3d0_dc794d47",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1002940
+      },
+      "writtenOn": "2026-06-17T02:25:14Z",
+      "side": 0,
+      "message": "Hi Matt,\n\nThanks for pointing this out! I completely overlooked the static allocation use cases for platforms without malloc.\n\nI will keep MCTP_SIZEOF_BINDING_I2C intact (and revert any removal of it in meson.build) to ensure static storage sizing still works. I have updated the commit message and the patch to only update the test/fuzz code to use the new APIs.",
+      "parentUuid": "b82788ee_8c811558",
+      "revId": "1d470fa5446dd3310aab8b7d129fc90242eafb1a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
