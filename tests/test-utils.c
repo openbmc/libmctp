@@ -53,6 +53,7 @@ void mctp_binding_test_rx_raw(struct mctp_binding_test *test, void *buf,
 	pkt = mctp_pktbuf_alloc(&test->binding, len);
 	assert(pkt);
 	memcpy(mctp_pktbuf_hdr(pkt), buf, len);
+	mctp_pktbuf_hdr(pkt)->ver = test->binding.version;
 	mctp_bus_rx(&test->binding, pkt);
 	mctp_pktbuf_free(pkt);
 }

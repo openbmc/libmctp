@@ -571,6 +571,17 @@ void mctp_bus_rx(struct mctp_binding *binding, struct mctp_pktbuf *pkt)
 
 	hdr = mctp_pktbuf_hdr(pkt);
 
+	/*
+	 * DSP0236 v1.3.0 8.7: the header version is the low nibble; bits[7:4]
+	 * are reserved and ignored. Mask both sides, mirroring the tx path in
+	 * mctp_next_tx_pkt() which writes (version & 0xf).
+	 */
+	if ((hdr->ver & 0xf) != (binding->version & 0xf)) {
+		mctp_prdebug("Dropped packet with unsupported header version %u",
+			     hdr->ver);
+		goto out;
+	}
+
 	if (hdr->src == MCTP_EID_BROADCAST) {
 		/* drop packets with broadcast EID src */
 		goto out;

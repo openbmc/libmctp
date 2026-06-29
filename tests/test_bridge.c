@@ -51,6 +51,7 @@ static void mctp_binding_bridge_rx(struct mctp_binding_bridge *binding,
 	assert(pkt);
 
 	hdr = mctp_pktbuf_hdr(pkt);
+	hdr->ver = binding->binding.version;
 	hdr->flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM;
 
 	/* arbitrary src/dest, as we're bridging */

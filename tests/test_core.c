@@ -100,6 +100,30 @@ static void receive_ptkbuf(struct mctp_binding_test *binding,
 	rx_pkt->end = MCTP_PACKET_SIZE(len);
 	rx_pkt->mctp_hdr_off = 0;
 	memcpy(rx_pkt->data, &pktbuf->hdr, sizeof(pktbuf->hdr));
+	((struct mctp_hdr *)rx_pkt->data)->ver =
+		((struct mctp_binding *)binding)->version;
+	memcpy(rx_pkt->data + sizeof(pktbuf->hdr), pktbuf->payload, alloc_size);
+
+	mctp_bus_rx((struct mctp_binding *)binding, rx_pkt);
+	__mctp_free(rx_pkt);
+}
+
+static void receive_ptkbuf_with_hdr_version(struct mctp_binding_test *binding,
+					    const struct pktbuf *pktbuf,
+					    size_t len, uint8_t hdr_version)
+{
+	size_t alloc_size = MIN((size_t)MCTP_BTU, len);
+	struct mctp_pktbuf *rx_pkt;
+
+	rx_pkt = __mctp_alloc(sizeof(*rx_pkt) + MCTP_PACKET_SIZE(alloc_size));
+	assert(rx_pkt);
+
+	rx_pkt->size = MCTP_PACKET_SIZE(len);
+	rx_pkt->start = 0;
+	rx_pkt->end = MCTP_PACKET_SIZE(len);
+	rx_pkt->mctp_hdr_off = 0;
+	memcpy(rx_pkt->data, &pktbuf->hdr, sizeof(pktbuf->hdr));
+	((struct mctp_hdr *)rx_pkt->data)->ver = hdr_version;
 	memcpy(rx_pkt->data + sizeof(pktbuf->hdr), pktbuf->payload, alloc_size);
 
 	mctp_bus_rx((struct mctp_binding *)binding, rx_pkt);
@@ -487,6 +511,80 @@ static void mctp_core_test_rx_with_tag()
 	mctp_destroy(mctp);
 }
 
+static void mctp_core_test_drop_invalid_hdr_version()
+{
+	struct mctp *mctp = NULL;
+	struct mctp_binding_test *binding = NULL;
+	struct test_params test_param;
+	static uint8_t test_payload[MCTP_BTU];
+	struct pktbuf pktbuf;
+	uint8_t flags_seq_tag;
+
+	memset(test_payload, 0, sizeof(test_payload));
+	test_param.seen = false;
+	test_param.message_size = 0;
+
+	mctp_test_stack_init(&mctp, &binding, TEST_DEST_EID);
+	mctp_set_rx_all(mctp, rx_message, &test_param);
+	memset(&pktbuf, 0, sizeof(pktbuf));
+	pktbuf.hdr.dest = TEST_DEST_EID;
+	pktbuf.hdr.src = TEST_SRC_EID;
+
+	flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM |
+			MCTP_HDR_FLAG_TO | get_tag();
+	pktbuf.hdr.flags_seq_tag = flags_seq_tag;
+	pktbuf.payload = test_payload;
+	receive_ptkbuf_with_hdr_version(binding, &pktbuf, MCTP_BTU,
+					((struct mctp_binding *)binding)->version +
+						1);
+
+	assert(!test_param.seen);
+
+	mctp_binding_test_destroy(binding);
+	mctp_destroy(mctp);
+}
+
+/*
+ * A packet whose header version matches in the low nibble but has the
+ * reserved bits[7:4] set must still be accepted (DSP0236 8.7: reserved
+ * bits are ignored on receive).
+ */
+static void mctp_core_test_rx_ignores_reserved_hdr_version_bits()
+{
+	struct mctp *mctp = NULL;
+	struct mctp_binding_test *binding = NULL;
+	struct test_params test_param;
+	static uint8_t test_payload[MCTP_BTU];
+	struct pktbuf pktbuf;
+	uint8_t flags_seq_tag;
+	uint8_t hdr_version;
+
+	memset(test_payload, 0, sizeof(test_payload));
+	test_param.seen = false;
+	test_param.message_size = 0;
+
+	mctp_test_stack_init(&mctp, &binding, TEST_DEST_EID);
+	mctp_set_rx_all(mctp, rx_message, &test_param);
+	memset(&pktbuf, 0, sizeof(pktbuf));
+	pktbuf.hdr.dest = TEST_DEST_EID;
+	pktbuf.hdr.src = TEST_SRC_EID;
+
+	flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM |
+			MCTP_HDR_FLAG_TO | get_tag();
+	pktbuf.hdr.flags_seq_tag = flags_seq_tag;
+	pktbuf.payload = test_payload;
+
+	/* Supported version in the low nibble, reserved bits[7:4] set. */
+	hdr_version = (((struct mctp_binding *)binding)->version & 0xf) | 0x10;
+	receive_ptkbuf_with_hdr_version(binding, &pktbuf, MCTP_BTU, hdr_version);
+
+	assert(test_param.seen);
+	assert(test_param.message_size == MCTP_BTU);
+
+	mctp_binding_test_destroy(binding);
+	mctp_destroy(mctp);
+}
+
 static void mctp_core_test_rx_with_tag_multifragment()
 {
 	struct mctp *mctp = NULL;
@@ -689,6 +787,8 @@ static const struct {
 	TEST_CASE(mctp_core_test_drop_large_fragments),
 	TEST_CASE(mctp_core_test_exhaust_context_buffers),
 	TEST_CASE(mctp_core_test_rx_with_tag),
+	TEST_CASE(mctp_core_test_drop_invalid_hdr_version),
+	TEST_CASE(mctp_core_test_rx_ignores_reserved_hdr_version_bits),
 	TEST_CASE(mctp_core_test_rx_with_tag_multifragment),
 	TEST_CASE(mctp_core_test_rx_with_null_dst_eid),
 	TEST_CASE(mctp_core_test_rx_with_broadcast_dst_eid),
