@@ -230,8 +230,7 @@ int LLVMFuzzerTestOneInput(uint8_t *input, size_t len)
 	struct fuzz_ctx *ctx = &_ctx;
 
 	/* Instantiate the MCTP stack */
-	ctx->i2c = malloc(MCTP_SIZEOF_BINDING_I2C);
-	mctp_i2c_setup(ctx->i2c, OWN_I2C_ADDR, fuzz_i2c_tx, ctx);
+	ctx->i2c = mctp_i2c_init(OWN_I2C_ADDR, fuzz_i2c_tx, ctx);
 	ctx->mctp = mctp_init();
 	mctp_register_bus(ctx->mctp, mctp_binding_i2c_core(ctx->i2c), OWN_EID);
 	mctp_set_rx_all(ctx->mctp, fuzz_i2c_rxmsg, ctx);
@@ -246,7 +245,7 @@ int LLVMFuzzerTestOneInput(uint8_t *input, size_t len)
 	}
 
 	mctp_destroy(ctx->mctp);
-	free(ctx->i2c);
+	mctp_i2c_destroy(ctx->i2c);
 	free(ctx->ctrl);
 	free(ctx->input);
 
