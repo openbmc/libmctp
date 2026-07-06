@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca106f08_28960742",
+        "filename": "i2c.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2026-07-06T00:51:27Z",
+      "side": 1,
+      "message": "Nit: `free()` is specified as taking no action if the pointer argument is a null pointer, so there\u0027s no need to guard this call.",
+      "revId": "1768a9ff38934e6ebe77fdd957214d94aa931b6f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
