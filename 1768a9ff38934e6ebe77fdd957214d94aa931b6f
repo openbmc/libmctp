@@ -16,6 +16,24 @@
       "message": "Nit: `free()` is specified as taking no action if the pointer argument is a null pointer, so there\u0027s no need to guard this call.",
       "revId": "1768a9ff38934e6ebe77fdd957214d94aa931b6f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb1f4065_287785d7",
+        "filename": "i2c.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1002940
+      },
+      "writtenOn": "2026-07-09T05:45:07Z",
+      "side": 1,
+      "message": "Thanks — good catch. free(NULL) is defined to be a no-op in ISO C, so the check is unnecessary. I\u0027ve removed the guard and updated the patchset.",
+      "parentUuid": "ca106f08_28960742",
+      "revId": "1768a9ff38934e6ebe77fdd957214d94aa931b6f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
