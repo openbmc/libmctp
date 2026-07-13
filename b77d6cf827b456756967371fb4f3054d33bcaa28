@@ -16,6 +16,24 @@
       "message": "Can you please rebase this on top of the latest revision of the parent patch so the series is coherent?",
       "revId": "b77d6cf827b456756967371fb4f3054d33bcaa28",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7a2b686_efac3dbd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002940
+      },
+      "writtenOn": "2026-07-13T05:29:53Z",
+      "side": 1,
+      "message": "Thanks for the reminder. I have rebased this patch on top of the latest revision of the parent patch and updated the series accordingly.",
+      "parentUuid": "4f259125_0c83a248",
+      "revId": "b77d6cf827b456756967371fb4f3054d33bcaa28",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
