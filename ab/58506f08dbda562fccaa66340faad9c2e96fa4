@@ -1,0 +1,9 @@
+Code-Review+1: Matt Johnston <matt@codeconstruct.com.au>
+Code-Review+2: Andrew Jeffery <andrew@codeconstruct.com.au>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Submitted-by: Andrew Jeffery <andrew@codeconstruct.com.au>
+Submitted-at: Thu, 06 Aug 2026 00:22:34 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/libmctp/+/91150
+Comments-Total: 4
+Project: openbmc/libmctp
+Branch: refs/heads/master
