@@ -143,8 +143,8 @@ struct mctp_binding_astlpc {
 #define astlpc_prlog(ctx, lvl, fmt, ...)                                       \
 	do {                                                                   \
 		bool __bmc = ((ctx)->mode == MCTP_BINDING_ASTLPC_MODE_BMC);    \
-		mctp_prlog(lvl, pr_fmt("%s: " fmt), __bmc ? "bmc" : "host",    \
-			   ##__VA_ARGS__);                                     \
+		mctp_prlog(lvl, pr_fmt("%s: " fmt),                            \
+			   __bmc ? "bmc" : "host", ##__VA_ARGS__);             \
 	} while (0)
 
 #define astlpc_prerr(ctx, fmt, ...)                                            \
